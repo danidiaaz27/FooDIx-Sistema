@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FoodIx - Sistema de venta de comida por delivery</title>
+    <meta name="description" content="FoodIx - Descuentos increíbles en comida con delivery rápido. Ahorra y disfruta de la mejor comida de Chiclayo.">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Barra de Navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">
+            <i class="fas fa-utensils"></i> FoodIx
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuNav">
+            <ul class="navbar-nav ms-auto">
+                <!-- Opciones solo para usuarios NO autenticados -->
+                <li class="nav-item" th:if="${session.usuario == null}">
+                    <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
+                        <i class="fas fa-question-circle"></i> Tutorial
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${session.usuario == null}">
+                    <a class="nav-link" href="/login" th:href="@{/login}">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${session.usuario == null}">
+                    <a class="nav-link" href="/verificacion" th:href="@{/verificacion}">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${session.usuario == null}">
+                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">
+                        <i class="fas fa-envelope"></i> Contacto
+                    </a>
+                </li>
+
+                <!-- Opciones para usuarios autenticados -->
+                <li class="nav-item dropdown" th:if="${session.usuario != null}">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i> 
+                        <span th:text="${session.usuario.Nombre}">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <!-- Menú según rol -->
+                        <li th:if="${session.usuario.CodigoRol == 1}">
+                            <a class="dropdown-item" href="/menuAdministrador" th:href="@{/menuAdministrador}">
+                                <i class="fas fa-tachometer-alt"></i> Panel Administrador
+                            </a>
+                        </li>
+                        <li th:if="${session.usuario.CodigoRol == 2}">
+                            <a class="dropdown-item" href="/menu" th:href="@{/menu}">
+                                <i class="fas fa-utensils"></i> Mi Menú
+                            </a>
+                        </li>
+                        <li th:if="${session.usuario.CodigoRol == 3}">
+                            <a class="dropdown-item" href="/menuRestaurante" th:href="@{/menuRestaurante}">
+                                <i class="fas fa-store"></i> Panel Restaurante
+                            </a>
+                        </li>
+                        <li th:if="${session.usuario.CodigoRol == 4}">
+                            <a class="dropdown-item" href="/menuDelivery" th:href="@{/menuDelivery}">
+                                <i class="fas fa-motorcycle"></i> Panel Delivery
+                            </a>
+                        </li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#perfilModal">
+                            <i class="fas fa-user-cog"></i> Configurar Perfil
+                        </a></li>
+                        <li><a class="dropdown-item" href="/auth/logout" th:href="@{/auth/logout}">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Mensajes Flash como Modales -->
+<div th:replace="fragments/flash-messages :: flashMessages"></div>
+
+<!-- Contenido Principal -->
+<main id="mainContent">
+
+    <!-- Sección de Inicio / Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-left">
+                <img src="/img/app-ios.png" th:src="@{/img/app-ios.png}" alt="App FoodIx en celular" class="floating-phone">
+            </div>
+            <div class="hero-right">
+                <h1>FoodIx</h1>
+                <img src="/img/logo.png" th:src="@{/img/logo.png}" alt="Logo FoodIx" class="hero-logo">
+                <p>Es como un Ciber de comida, solo que no haces cola y es más rápido</p>
+                
+                <!-- Botones de acción -->
+                <div class="hero-buttons mt-4" th:if="${session.usuario == null}">
+                    <a href="/verificacion" th:href="@{/verificacion}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                    <a href="/login" th:href="@{/login}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </div>
+                
+                <div class="hero-buttons mt-4" th:if="${session.usuario != null}">
+                    <a href="/menu" th:href="@{/menu}" class="btn btn-success btn-lg">
+                        <i class="fas fa-utensils"></i> Ver Promociones
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Cómo Funciona -->
+    <section class="proceso py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Cómo hacemos esto posible</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="proceso-card text-center p-4">
+                        <div class="proceso-icon mb-3">
+                            <i class="fas fa-map-marked-alt fa-3x text-primary"></i>
+                        </div>
+                        <h3>1. Localizar</h3>
+                        <p>Localizamos restaurantes en puntos claves para ofrecerte descuentos impresionantes</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="proceso-card text-center p-4">
+                        <div class="proceso-icon mb-3">
+                            <i class="fas fa-search fa-3x text-success"></i>
+                        </div>
+                        <h3>2. Escoges</h3>
+                        <p>Como buen peruano tener harto filo no es problema, así que tenemos variedad de locales para ti</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="proceso-card text-center p-4">
+                        <div class="proceso-icon mb-3">
+                            <i class="fas fa-shopping-cart fa-3x text-warning"></i>
+                        </div>
+                        <h3>3. Compra</h3>
+                        <p>Elige el producto que tú desees y cómpralo a través de nuestro sitio web</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="proceso-card text-center p-4">
+                        <div class="proceso-icon mb-3">
+                            <i class="fas fa-utensils fa-3x text-danger"></i>
+                        </div>
+                        <h3>4. Recoge</h3>
+                        <p>Recoge tu pedido en el rango establecido y disfruta!. Apúrate y no seas tan piña...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Testimonios -->
+    <section class="testimonios py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Testimonios de nuestros usuarios</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm">
+                        <img src="/img/testimonio1.jpg" th:src="@{/img/testimonio1.jpg}" 
+                             class="card-img-top" alt="Diana Díaz Herrera">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Diana Díaz Herrera</h5>
+                            <p class="card-text">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </p>
+                            <p class="card-text">Ahorro S/150 al mes en comida</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm">
+                        <img src="/img/testimonio2.jpg" th:src="@{/img/testimonio2.jpg}" 
+                             class="card-img-top" alt="Jesús Chanamé Cobeñas">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Jesús Chanamé Cobeñas</h5>
+                            <p class="card-text">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </p>
+                            <p class="card-text">Conoció 10 locales nuevos gracias a la app</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm">
+                        <img src="/img/testimonio3.jpg" th:src="@{/img/testimonio3.jpg}" 
+                             class="card-img-top" alt="Paty Fernández Flores">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Paty Fernández Flores</h5>
+                            <p class="card-text">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </p>
+                            <p class="card-text">Rescató más de 10 platos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm">
+                        <img src="/img/testimonio4.jpg" th:src="@{/img/testimonio4.jpg}" 
+                             class="card-img-top" alt="José Mendoza Suárez">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">José Mendoza Suárez</h5>
+                            <p class="card-text">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            </p>
+                            <p class="card-text">Salvó la fiesta, pero nadie lo salvó de la policía. Las risas no faltaron</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Comunidad -->
+    <section class="Comunidad py-5">
+        <div class="container text-center">
+            <h1 class="mb-4">Nuestra Comunidad "FoodIx Lovers"</h1>
+            <p class="lead">
+                Nuestra comunidad reúne a todos los que disfrutan la buena comida, las ofertas irresistibles y el orgullo de apoyar a Chiclayo.
+                Aquí compartimos experiencias reales, fotos de nuestras mejores compras y celebramos juntos cada plato rescatado.
+                Con el hashtag <strong>#FoodIx</strong>, transformamos cada yapa en un momento para ahorrar, disfrutar y cuidar el planeta.
+            </p>
+            <div class="mt-4">
+                <a href="#" class="btn btn-primary btn-lg me-2">
+                    <i class="fab fa-facebook"></i> Únete en Facebook
+                </a>
+                <a href="#" class="btn btn-info btn-lg">
+                    <i class="fab fa-instagram"></i> Síguenos en Instagram
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Retos y Logros -->
+    <section class="Retos py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-3">Nuestros Retos y Logros</h2>
+            <p class="text-center mb-5">Ayúdanos a seguir estos logros.</p>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="logro-card text-center p-4 h-100">
+                        <div class="icono mb-3" style="font-size: 3rem;">🏅</div>
+                        <h3>Lograr menos desperdicio cada mes</h3>
+                        <p>Súmate al reto mensual y ayuda a reducir la comida que se desperdicia.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="logro-card text-center p-4 h-100">
+                        <div class="icono mb-3" style="font-size: 3rem;">💸</div>
+                        <h3>Billeteras más gorditas</h3>
+                        <p>Ahorra todos los meses aprovechando promos y yapas sorpresa.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="logro-card text-center p-4 h-100">
+                        <div class="icono mb-3" style="font-size: 3rem;">🌱</div>
+                        <h3>Contribuir con el cuidado del medio ambiente</h3>
+                        <p>Cada comida rescatada ayuda a reducir el CO₂ y a cuidar el planeta.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Call to Action para Negocios -->
+    <section class="cta-negocios py-5 bg-dark text-white">
+        <div class="container text-center">
+            <h2 class="mb-4">¿Tienes un negocio?</h2>
+            <p class="lead mb-4">Únete a FoodIx y aumenta tus ventas con nuestras promociones</p>
+            <div class="row justify-content-center">
+                <div class="col-md-5 mb-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <i class="fas fa-store fa-3x mb-3"></i>
+                            <h4>Soy Restaurante</h4>
+                            <p>Registra tu negocio y empieza a vender con descuentos exclusivos</p>
+                            <a href="/verificacion?tipo=restaurante" th:href="@{/verificacion(tipo='restaurante')}" 
+                               class="btn btn-light btn-lg mt-2">
+                                Registrar Restaurante
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 mb-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <i class="fas fa-motorcycle fa-3x mb-3"></i>
+                            <h4>Quiero ser Repartidor</h4>
+                            <p>Gana dinero extra repartiendo comida en tus tiempos libres</p>
+                            <a href="/verificacion?tipo=repartidor" th:href="@{/verificacion(tipo='repartidor')}" 
+                               class="btn btn-light btn-lg mt-2">
+                                Registrarme como Repartidor
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center">
+        <p>&copy; 2024 FoodIx. Todos los derechos reservados.</p>
+        <p>
+            <a href="/terminos" class="text-white me-3">Términos y Condiciones</a>
+            <a href="/privacidad" class="text-white me-3">Política de Privacidad</a>
+            <a href="/contacto" th:href="@{/contacto}" class="text-white">Contacto</a>
+        </p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script th:src="@{/js/main.js}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('FoodIx - Sistema cargado correctamente');
+    
+    // Auto-cierre de alertas después de 5 segundos
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            if (alert && alert.parentNode) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        }, 5000);
+    });
+});
+</script>
+
+</body>
+</html>

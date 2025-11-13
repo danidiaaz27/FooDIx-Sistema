@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contacto - FoodIx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Barra de Navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">
+            <i class="fas fa-utensils"></i> FoodIx
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuNav">
+            <ul class="navbar-nav ms-auto">
+                <!-- Opciones para usuarios NO autenticados -->
+                <li class="nav-item" th:if="${currentUser == null}">
+                    <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
+                        <i class="fas fa-question-circle"></i> Tutorial
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${currentUser == null}">
+                    <a class="nav-link" href="/login" th:href="@{/login}">Iniciar Sesión</a>
+                </li>
+                <li class="nav-item" th:if="${currentUser == null}">
+                    <a class="nav-link active" href="/contacto" th:href="@{/contacto}">Contacto</a>
+                </li>
+
+                <!-- Opciones para usuarios autenticados -->
+                <li class="nav-item" th:if="${currentUser != null}">
+                    <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">Tutorial</a>
+                </li>
+                <li class="nav-item" th:if="${currentUser != null}">
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> <span th:text="${currentUser.name}">Usuario</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/menu" th:href="@{/menu}"><i class="fas fa-utensils"></i> Mi Menú</a></li>
+                            <li><a class="dropdown-item" href="/perfil" th:href="@{/perfil}"><i class="fas fa-user-cog"></i> Mi Perfil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/auth/logout" th:href="@{/auth/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item" th:if="${currentUser != null}">
+                    <a class="nav-link active" href="/contacto" th:href="@{/contacto}">Contacto</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido Principal -->
+<main style="padding-top: 90px;">
+    <!-- Mensajes de notificación -->
+    <div th:if="${message}" class="container">
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <span th:text="${message}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+    <div th:if="${error}" class="container">
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <section class="Contacto py-5">
+        <div class="container-fluid px-3 px-md-4">
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-10 col-xl-8">
+                    <h2 class="mb-4 text-center fw-bold">¡Conecta con Nosotros!</h2>
+                    <p class="contact-subtitle text-center mb-5">
+                        Estamos aquí para ayudarte y responder todas tus dudas
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-striped text-center align-middle contact-table">
+                            <thead class="table-dark">
+                            <tr>
+                                <th scope="col" class="py-3">Medio</th>
+                                <th scope="col" class="py-3">Detalle</th>
+                                <th scope="col" class="py-3 d-none d-md-table-cell">Horario</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="py-3">
+                                    <i class="fas fa-phone-alt me-2 d-none d-sm-inline"></i>
+                                    <span class="fw-semibold">Teléfono</span>
+                                </td>
+                                <td class="py-3">
+                                    <a href="tel:+51999888777" class="text-decoration-none">+51 999 888 777</a>
+                                </td>
+                                <td class="py-3 d-none d-md-table-cell">
+                                    <span class="d-block">Lunes a Domingo</span>
+                                    <small class="text-muted">8:00 AM - 10:00 PM</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3">
+                                    <i class="fas fa-envelope me-2 d-none d-sm-inline"></i>
+                                    <span class="fw-semibold">Correo</span>
+                                </td>
+                                <td class="py-3">
+                                    <a href="mailto:contacto@foodix.com" class="text-decoration-none">contacto@foodix.com</a>
+                                </td>
+                                <td class="py-3 d-none d-md-table-cell">
+                                    <span class="text-muted">Respuesta en 24 horas</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3">
+                                    <i class="fab fa-whatsapp me-2 d-none d-sm-inline"></i>
+                                    <span class="fw-semibold">WhatsApp</span>
+                                </td>
+                                <td class="py-3">
+                                    <a href="https://wa.me/51990875987" target="_blank" class="text-decoration-none">+51 990 875 987</a>
+                                </td>
+                                <td class="py-3 d-none d-md-table-cell">
+                                    <span class="text-muted">Atención inmediata</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3">
+                                    <i class="fab fa-facebook me-2 d-none d-sm-inline"></i>
+                                    <span class="fw-semibold">Facebook</span>
+                                </td>
+                                <td class="py-3">
+                                    <a href="https://facebook.com/foodix" target="_blank" class="text-decoration-none">@FoodIxPeru</a>
+                                </td>
+                                <td class="py-3 d-none d-md-table-cell">
+                                    <span class="text-muted">Síguenos para promos</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3">
+                                    <i class="fab fa-instagram me-2 d-none d-sm-inline"></i>
+                                    <span class="fw-semibold">Instagram</span>
+                                </td>
+                                <td class="py-3">
+                                    <a href="https://instagram.com/foodix" target="_blank" class="text-decoration-none">@foodix_oficial</a>
+                                </td>
+                                <td class="py-3 d-none d-md-table-cell">
+                                    <span class="text-muted">Stories diarios</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Formulario de contacto -->
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <h3 class="text-center mb-4 fw-bold">Envíanos un mensaje</h3>
+                            <form action="/contacto/enviar" th:action="@{/contacto/enviar}" method="post" class="contact-form">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contactName" class="form-label">Nombre *</label>
+                                        <input type="text" class="form-control" id="contactName" name="name" required 
+                                               th:value="${currentUser != null ? currentUser.name + ' ' + currentUser.lastName : ''}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contactEmail" class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="contactEmail" name="email" required
+                                               th:value="${currentUser != null ? currentUser.email : ''}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contactPhone" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="contactPhone" name="phone" 
+                                               placeholder="+51 999 888 777"
+                                               th:value="${currentUser != null ? currentUser.phone : ''}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contactSubject" class="form-label">Asunto *</label>
+                                        <select class="form-select" id="contactSubject" name="subject" required>
+                                            <option value="">Seleccionar</option>
+                                            <option value="consulta">Consulta general</option>
+                                            <option value="problema">Reportar un problema</option>
+                                            <option value="sugerencia">Sugerencia</option>
+                                            <option value="restaurante">Quiero ser restaurante aliado</option>
+                                            <option value="delivery">Quiero ser delivery</option>
+                                            <option value="otro">Otro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="contactMessage" class="form-label">Mensaje *</label>
+                                    <textarea class="form-control" id="contactMessage" name="message" rows="5" required 
+                                              placeholder="Cuéntanos en qué podemos ayudarte..."></textarea>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                                        <i class="fas fa-paper-plane"></i> Enviar Mensaje
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Información Importante</h5>
+                                <p class="mb-0">Nuestro equipo de soporte se pondrá en contacto contigo lo antes posible. Para consultas urgentes, te recomendamos contactarnos directamente por WhatsApp.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ubicación -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h3 class="text-center mb-4 fw-bold">Nuestra Ubicación</h3>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p class="text-center mb-3">
+                                        <i class="fas fa-map-marker-alt text-danger fa-2x"></i>
+                                    </p>
+                                    <h5 class="text-center">Oficina Principal</h5>
+                                    <p class="text-center text-muted">
+                                        Av. Balta 456, Chiclayo, Lambayeque<br>
+                                        Perú
+                                    </p>
+                                    <div class="text-center">
+                                        <a href="https://maps.google.com/?q=Chiclayo+Peru" target="_blank" class="btn btn-outline-primary">
+                                            <i class="fas fa-map"></i> Ver en Google Maps
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+services:
+  # Servicio 1: Tu Aplicación Spring Boot
+  mi-app:
+    build: .
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/db_foodix?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - APP_UPLOAD_DIR=uploads
+      # Configuración de correo (GMAIL)
+      - SPRING_MAIL_HOST=smtp.gmail.com
+      - SPRING_MAIL_PORT=587
+      - SPRING_MAIL_USERNAME=sistemafoodix@gmail.com
+      - SPRING_MAIL_PASSWORD=spdtspyvzwczljgz
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=true
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_TRUST=smtp.gmail.com
+      
+      # Logging para debugging
+      - SPRING_PROFILES_ACTIVE=dev
+      - LOGGING_LEVEL_COM_EXAMPLE=DEBUG
+      
+      # Configuración de API externa (DNI/RUC) - IMPORTANTE: Sin espacios
+      - API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1NjksImV4cCI6MTc2MzU5NTU2OH0.3ItfHTxxl_OrfkZN8UrxK26nVh7LztIPda2kigV5B7A
+    volumes:
+      - app-uploads:/uploads
+    # --- MODIFICACIÓN AQUÍ ---
+    # 'depends_on' ahora espera a que la 'condition' sea 'service_healthy'
+    depends_on:
+      db:
+        condition: service_healthy
+    # --------------------------
+
+  # Servicio 2: Tu Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE=db_foodix
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    # --- AÑADIDO AQUÍ ---
+    # Esta sección le dice a Docker cómo saber si MySQL está listo
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # ---------------------
+
+volumes:
+  db-data:
+  app-uploads:

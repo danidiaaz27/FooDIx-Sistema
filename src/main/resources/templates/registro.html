@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registro - FoodIx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .password-mismatch {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        }
+        .invalid-input {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        }
+        .form-text {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barra de Navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">
+            <i class="fas fa-utensils"></i> FoodIx
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
+                        <i class="fas fa-question-circle"></i> Tutorial
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login" th:href="@{/login}">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">Contacto</a>
+                </li>             
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido Principal -->
+<main style="padding-top: 80px; padding-bottom: 40px; min-height: 100vh; background: linear-gradient(360deg, #FFD700 0%, #a0002a 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="card shadow-lg mt-4">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">Regístrate</h2>
+                            <p class="text-muted">Llena los datos para crear tu cuenta</p>
+                        </div>
+
+                        <!-- Mensajes de notificación -->
+                        <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <span th:text="${message}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <span th:text="${error}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <form action="/registro" th:action="@{/registro}" method="post" id="registerForm">
+                            
+                            <!-- Campo oculto para Rol (Usuario = 2) -->
+                            <input type="hidden" name="CodigoRol" value="2">
+                            
+                            <!-- Tipo y Número de Documento (PRIMERO para auto-completar) -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="CodigoTipoDocumento" class="form-label">Tipo de Documento *</label>
+                                    <select class="form-select" id="CodigoTipoDocumento" name="CodigoTipoDocumento" required>
+                                        <option value="">Seleccionar</option>
+                                        <option value="1" selected>DNI</option>
+                                        <option value="2">Carnet de Extranjería</option>
+                                        <option value="3">Pasaporte</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="NumeroDocumento" class="form-label">Número de Documento *</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="NumeroDocumento" name="NumeroDocumento" 
+                                               required maxlength="8" pattern="[0-9]{8}"
+                                               title="Debe contener exactamente 8 dígitos">
+                                        <button class="btn btn-outline-primary" type="button" id="btnVerificarDNI" style="display: none;">
+                                            <i class="fas fa-search"></i> Verificar
+                                        </button>
+                                    </div>
+                                    <div class="form-text text-muted" id="docNumberHelp">8 dígitos numéricos - Se autocompletará al escribir</div>
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status" id="dniSpinner" style="display: none;">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Nombre y Apellidos (se auto-completan con DNI) -->
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="Nombre" class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="Nombre" name="Nombre" 
+                                           required maxlength="50"
+                                           pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                           title="Solo se permiten letras y espacios">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="ApellidoPaterno" class="form-label">Apellido Paterno *</label>
+                                    <input type="text" class="form-control" id="ApellidoPaterno" name="ApellidoPaterno" 
+                                           required maxlength="50"
+                                           pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                           title="Solo se permiten letras y espacios">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="ApellidoMaterno" class="form-label">Apellido Materno *</label>
+                                    <input type="text" class="form-control" id="ApellidoMaterno" name="ApellidoMaterno" 
+                                           required maxlength="50"
+                                           pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                           title="Solo se permiten letras y espacios">
+                                </div>
+                            </div>
+                            
+                            <!-- Fecha de Nacimiento (REQUERIDO en BD) -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="FechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                                    <input type="date" class="form-control" id="FechaNacimiento" name="FechaNacimiento" required>
+                                    <div class="form-text text-muted">Debes ser mayor de 18 años</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="Telefono" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="Telefono" name="Telefono" 
+                                           maxlength="9"
+                                           pattern="[0-9]{9}" 
+                                           title="Debe contener exactamente 9 dígitos">
+                                    <div class="form-text text-muted">9 dígitos</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Email y Contraseñas - Versión Compacta -->
+                            <div class="row">
+                                <!-- Email -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="CorreoElectronico" class="form-label">Correo Electrónico *</label>
+                                    <input type="email" class="form-control" id="CorreoElectronico" name="CorreoElectronico" 
+                                        th:value="${verifiedEmail ?: ''}"
+                                        th:readonly="${verifiedEmail != null}"
+                                        th:style="${verifiedEmail != null ? 'background-color: #e7f5e7;' : ''}"
+                                        required maxlength="50">
+                                    <div class="form-text" th:classappend="${verifiedEmail != null ? 'text-success' : 'text-muted'}">
+                                        <span th:if="${verifiedEmail != null}">✓ Email verificado</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contraseña -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="Contrasena" class="form-label">Contraseña *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="Contrasena" name="Contrasena" 
+                                            required minlength="8" maxlength="255">
+                                        <button class="btn btn-outline-secondary" type="button" id="toggleContrasena">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Confirmar Contraseña y Validaciones -->
+                            <div class="row">
+                                <!-- Confirmar Contraseña -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="ConfirmarContrasena" class="form-label">Confirmar Contraseña *</label>
+                                    <input type="password" class="form-control" id="ConfirmarContrasena" required>
+                                    <div class="form-text text-muted" id="passwordMatchText">Las contraseñas deben coincidir</div>
+                                </div>
+                                
+                                <!-- Validaciones de Contraseña -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">Requisitos de contraseña:</label>
+                                    <div id="contrasenaFeedback" class="form-text">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div id="reqLength" class="text-muted small">✗ 8+ caracteres</div>
+                                                <div id="reqUppercase" class="text-muted small">✗ 1 mayúscula</div>
+                                                <div id="reqLowercase" class="text-muted small">✗ 1 minúscula</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div id="reqNumber" class="text-muted small">✗ 1 número</div>
+                                                <div id="reqSymbol" class="text-muted small">✗ 1 símbolo</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                                                       
+                            <!-- Ubicación (Departamento, Provincia, Distrito) -->
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="CodigoDepartamento" class="form-label">Departamento *</label>
+                                    <select class="form-select" id="CodigoDepartamento" required>
+                                        <option value="">Seleccionar</option>
+                                        <!-- Cargar desde BD con Thymeleaf -->
+                                        <option th:each="dept : ${departamentos}" 
+                                                th:value="${dept.codigo}" 
+                                                th:text="${dept.nombre}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="CodigoProvincia" class="form-label">Provincia *</label>
+                                    <select class="form-select" id="CodigoProvincia" required disabled>
+                                        <option value="">Seleccione departamento primero</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="CodigoDistrito" class="form-label">Distrito *</label>
+                                    <select class="form-select" id="CodigoDistrito" name="CodigoDistrito" required disabled>
+                                        <option value="">Seleccione provincia primero</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Dirección -->
+                             <div class="row">
+                                <div class="mb-3">
+                                    <label for="Direccion" class="form-label">Dirección</label>
+                                    <textarea class="form-control" id="Direccion" name="Direccion" rows="2" 
+                                            maxlength="100"
+                                            placeholder="Ej: Av. Balta 123, Chiclayo"></textarea>
+                                    <div class="form-text text-muted">Máximo 100 caracteres</div>
+                                </div>
+                             </div>
+                            
+                            
+                            <!-- Términos y Condiciones -->
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="termsUser" required>
+                                <label class="form-check-label" for="termsUser">
+                                    Acepto los <a href="#" class="text-decoration-none">Términos y Condiciones</a> y la <a href="#" class="text-decoration-none">Política de Privacidad</a>
+                                </label>
+                            </div>
+                            
+                            <!-- Botón de Registro -->
+                            <button type="submit" class="btn btn-success w-100 mb-3">
+                                <i class="fas fa-user-plus"></i> Registrarme como Cliente
+                            </button>
+                        </form>
+
+                        <div class="text-center">
+                            <p class="mb-0">¿Ya tienes cuenta? 
+                                <a href="/login" th:href="@{/login}" class="text-decoration-none">
+                                    Inicia sesión aquí
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/registro.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const docTypeSelect = document.getElementById('CodigoTipoDocumento');
+        const docNumberInput = document.getElementById('NumeroDocumento');
+        const docNumberHelp = document.getElementById('docNumberHelp');
+        const passwordInput = document.getElementById('Contrasena');
+        const confirmPasswordInput = document.getElementById('ConfirmarContrasena');
+        const passwordMatchText = document.getElementById('passwordMatchText');
+        const nameInput = document.getElementById('Nombre');
+        const paternalInput = document.getElementById('ApellidoPaterno');
+        const maternalInput = document.getElementById('ApellidoMaterno');
+        const phoneInput = document.getElementById('Telefono');
+        const birthDateInput = document.getElementById('FechaNacimiento');
+        const deptSelect = document.getElementById('CodigoDepartamento');
+        const provSelect = document.getElementById('CodigoProvincia');
+        const distSelect = document.getElementById('CodigoDistrito');
+        
+        // Validación de edad mínima (18 años)
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        birthDateInput.max = maxDate.toISOString().split('T')[0];
+        
+        // Validación de tipo de documento y número
+        docTypeSelect.addEventListener('change', function() {
+            const selectedType = this.value;
+            const btnVerificar = document.getElementById('btnVerificarDNI');
+            
+            if (selectedType === '1') { // DNI
+                docNumberInput.setAttribute('maxlength', '8');
+                docNumberInput.setAttribute('pattern', '[0-9]{8}');
+                docNumberInput.setAttribute('title', 'Debe contener exactamente 8 dígitos');
+                docNumberHelp.textContent = '8 dígitos numéricos - Se autocompletará al escribir';
+                btnVerificar.style.display = 'block'; // Mostrar botón de verificar
+            } else if (selectedType === '2' || selectedType === '3') { // CE o Pasaporte
+                docNumberInput.setAttribute('maxlength', '15');
+                docNumberInput.setAttribute('pattern', '[A-Za-z0-9]{1,15}');
+                docNumberInput.setAttribute('title', 'Máximo 15 caracteres alfanuméricos');
+                docNumberHelp.textContent = 'Máximo 15 caracteres alfanuméricos';
+                btnVerificar.style.display = 'none'; // Ocultar botón
+            } else {
+                docNumberInput.removeAttribute('maxlength');
+                docNumberInput.removeAttribute('pattern');
+                docNumberInput.removeAttribute('title');
+                docNumberHelp.textContent = 'Ingrese el número de documento';
+                btnVerificar.style.display = 'none';
+            }
+            
+            docNumberInput.value = '';
+            // Limpiar campos auto-completados
+            nameInput.value = '';
+            paternalInput.value = '';
+            maternalInput.value = '';
+            nameInput.readOnly = false;
+            paternalInput.readOnly = false;
+            maternalInput.readOnly = false;
+            nameInput.style.backgroundColor = '';
+            paternalInput.style.backgroundColor = '';
+            maternalInput.style.backgroundColor = '';
+        });
+        
+        // ========================================
+        // AUTO-COMPLETADO DE DNI
+        // ========================================
+        async function consultarDNI(dni) {
+            const spinner = document.getElementById('dniSpinner');
+            const btnVerificar = document.getElementById('btnVerificarDNI');
+            
+            try {
+                spinner.style.display = 'inline-block';
+                btnVerificar.disabled = true;
+                docNumberHelp.textContent = '🔍 Consultando DNI...';
+                docNumberHelp.className = 'form-text text-primary';
+                
+                const response = await fetch(`/api/validation/dni/${dni}`);
+                
+                if (!response.ok) {
+                    throw new Error('DNI no encontrado o error en la consulta');
+                }
+                
+                const data = await response.json();
+                
+                // Auto-completar los campos
+                nameInput.value = data.nombres || '';
+                paternalInput.value = data.apellidoPaterno || '';
+                maternalInput.value = data.apellidoMaterno || '';
+                
+                // Hacer los campos de solo lectura y cambiar color
+                nameInput.readOnly = true;
+                paternalInput.readOnly = true;
+                maternalInput.readOnly = true;
+                nameInput.style.backgroundColor = '#e7f5e7';
+                paternalInput.style.backgroundColor = '#e7f5e7';
+                maternalInput.style.backgroundColor = '#e7f5e7';
+                
+                // Mensaje de éxito
+                docNumberHelp.textContent = '✓ DNI verificado correctamente';
+                docNumberHelp.className = 'form-text text-success';
+                
+                // Animación de éxito
+                docNumberInput.classList.add('is-valid');
+                
+            } catch (error) {
+                console.error('Error consultando DNI:', error);
+                
+                // Limpiar campos
+                nameInput.value = '';
+                paternalInput.value = '';
+                maternalInput.value = '';
+                nameInput.readOnly = false;
+                paternalInput.readOnly = false;
+                maternalInput.readOnly = false;
+                nameInput.style.backgroundColor = '';
+                paternalInput.style.backgroundColor = '';
+                maternalInput.style.backgroundColor = '';
+                
+                // Mensaje de error
+                docNumberHelp.textContent = '✗ DNI no encontrado. Ingrese los datos manualmente';
+                docNumberHelp.className = 'form-text text-danger';
+                
+                docNumberInput.classList.remove('is-valid');
+                docNumberInput.classList.add('is-invalid');
+                
+            } finally {
+                spinner.style.display = 'none';
+                btnVerificar.disabled = false;
+            }
+        }
+        
+        // Auto-consultar cuando se complete el DNI (8 dígitos)
+        docNumberInput.addEventListener('input', function() {
+            if (docTypeSelect.value === '1') { // Solo para DNI
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                // Limpiar clases de validación
+                this.classList.remove('is-valid', 'is-invalid');
+                
+                if (this.value.length === 8) {
+                    // Auto-consultar cuando tenga 8 dígitos
+                    consultarDNI(this.value);
+                } else if (this.value.length > 0) {
+                    docNumberHelp.textContent = `Ingresa ${8 - this.value.length} dígitos más`;
+                    docNumberHelp.className = 'form-text text-muted';
+                }
+            }
+        });
+        
+        // Botón manual de verificación
+        document.getElementById('btnVerificarDNI').addEventListener('click', function() {
+            const dni = docNumberInput.value;
+            if (dni.length === 8) {
+                consultarDNI(dni);
+            } else {
+                alert('Por favor ingrese un DNI válido de 8 dígitos');
+            }
+        });
+        
+        // Permitir edición manual de campos si se limpia el DNI
+        docNumberInput.addEventListener('blur', function() {
+            if (this.value.length === 0) {
+                // Si se borra el DNI, permitir edición manual
+                nameInput.readOnly = false;
+                paternalInput.readOnly = false;
+                maternalInput.readOnly = false;
+                nameInput.style.backgroundColor = '';
+                paternalInput.style.backgroundColor = '';
+                maternalInput.style.backgroundColor = '';
+                this.classList.remove('is-valid', 'is-invalid');
+                docNumberHelp.textContent = '8 dígitos numéricos - Se autocompletará al escribir';
+                docNumberHelp.className = 'form-text text-muted';
+            }
+        });
+        
+        // ========================================
+        // FIN AUTO-COMPLETADO DE DNI
+        // ========================================
+        
+        // Validación de coincidencia de contraseñas
+        function validatePasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (confirmPassword === '') {
+                confirmPasswordInput.classList.remove('password-mismatch');
+                passwordMatchText.textContent = 'Las contraseñas deben coincidir';
+                passwordMatchText.className = 'form-text text-muted';
+                return;
+            }
+            
+            if (password === confirmPassword) {
+                confirmPasswordInput.classList.remove('password-mismatch');
+                passwordMatchText.textContent = '✓ Las contraseñas coinciden';
+                passwordMatchText.className = 'form-text text-success';
+            } else {
+                confirmPasswordInput.classList.add('password-mismatch');
+                passwordMatchText.textContent = '✗ Las contraseñas no coinciden';
+                passwordMatchText.className = 'form-text text-danger';
+            }
+        }
+        
+        passwordInput.addEventListener('input', validatePasswordMatch);
+        confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+        
+        // Validación de solo letras para nombres y apellidos
+        function validateLettersOnly(input) {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑ\s]/g, '');
+            });
+        }
+        
+        validateLettersOnly(nameInput);
+        validateLettersOnly(paternalInput);
+        validateLettersOnly(maternalInput);
+        
+        // Validación de solo números para teléfono
+        phoneInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+        
+        // Cascada Departamento -> Provincia -> Distrito
+        deptSelect.addEventListener('change', async function() {
+            const deptId = this.value;
+            provSelect.disabled = true;
+            distSelect.disabled = true;
+            provSelect.innerHTML = '<option value="">Cargando...</option>';
+            distSelect.innerHTML = '<option value="">Seleccione provincia primero</option>';
+            
+            if (deptId) {
+                try {
+                    // Llamada AJAX para cargar provincias
+                    const response = await fetch(`/api/provincias/${deptId}`);
+                    const provincias = await response.json();
+                    
+                    provSelect.innerHTML = '<option value="">Seleccionar</option>';
+                    provincias.forEach(prov => {
+                        provSelect.innerHTML += `<option value="${prov.codigo}">${prov.nombre}</option>`;
+                    });
+                    provSelect.disabled = false;
+                } catch (error) {
+                    console.error('Error cargando provincias:', error);
+                    provSelect.innerHTML = '<option value="">Error al cargar</option>';
+                }
+            } else {
+                provSelect.innerHTML = '<option value="">Seleccione departamento primero</option>';
+            }
+        });
+        
+        provSelect.addEventListener('change', async function() {
+            const provId = this.value;
+            distSelect.disabled = true;
+            distSelect.innerHTML = '<option value="">Cargando...</option>';
+            
+            if (provId) {
+                try {
+                    // Llamada AJAX para cargar distritos
+                    const response = await fetch(`/api/distritos/${provId}`);
+                    const distritos = await response.json();
+                    
+                    distSelect.innerHTML = '<option value="">Seleccionar</option>';
+                    distritos.forEach(dist => {
+                        distSelect.innerHTML += `<option value="${dist.codigo}">${dist.nombre}</option>`;
+                    });
+                    distSelect.disabled = false;
+                } catch (error) {
+                    console.error('Error cargando distritos:', error);
+                    distSelect.innerHTML = '<option value="">Error al cargar</option>';
+                }
+            } else {
+                distSelect.innerHTML = '<option value="">Seleccione provincia primero</option>';
+            }
+        });
+        
+        // Validación del formulario antes de enviar
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            let isValid = true;
+            const errors = [];
+            
+            // Validar coincidencia de contraseñas
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordInput.classList.add('password-mismatch');
+                errors.push('Las contraseñas no coinciden');
+                isValid = false;
+            }
+            
+            // Validar edad mínima
+            const birthDate = new Date(birthDateInput.value);
+            const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+            if (age < 18) {
+                birthDateInput.classList.add('invalid-input');
+                errors.push('Debes ser mayor de 18 años');
+                isValid = false;
+            }
+            
+            // Validar documento según tipo
+            const docType = docTypeSelect.value;
+            const docNumber = docNumberInput.value;
+            
+            if (docType === '1' && !/^[0-9]{8}$/.test(docNumber)) {
+                docNumberInput.classList.add('invalid-input');
+                errors.push('El DNI debe tener exactamente 8 dígitos');
+                isValid = false;
+            }
+            
+            if ((docType === '2' || docType === '3') && !/^[A-Za-z0-9]{1,15}$/.test(docNumber)) {
+                docNumberInput.classList.add('invalid-input');
+                errors.push('Número de documento inválido');
+                isValid = false;
+            }
+            
+            // Validar teléfono si se ingresó
+            if (phoneInput.value && !/^[0-9]{9}$/.test(phoneInput.value)) {
+                phoneInput.classList.add('invalid-input');
+                errors.push('El teléfono debe tener exactamente 9 dígitos');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                event.preventDefault();
+                alert('Errores en el formulario:\n- ' + errors.join('\n- '));
+            }
+        });
+
+        // Autocompletar email desde URL (para verificación)
+        const urlParams = new URLSearchParams(window.location.search);
+        const verifiedEmail = urlParams.get('email');
+        if (verifiedEmail) {
+            const emailInput = document.getElementById('CorreoElectronico');
+            emailInput.value = verifiedEmail;
+            emailInput.readOnly = true;
+            emailInput.style.backgroundColor = '#e9ecef';
+        }
+    });
+</script>
+</body>
+</html>

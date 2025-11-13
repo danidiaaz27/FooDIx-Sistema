@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChiclaYapa Delivery</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="delivery-app">
+    
+    <!-- Header -->
+    <header class="delivery-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="delivery-logo">
+                            <i class="fas fa-motorcycle text-primary me-2"></i>
+                            <span class="fw-bold">ChiclaYapa Delivery</span>
+                        </div>
+                        <div class="ms-3">
+                            <span class="online-status">
+                                <i class="fas fa-circle text-success"></i> En línea
+                            </span>
+                            <div class="delivery-name">¡Hola Carlos Delivery!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="delivery-earnings me-3">
+                        <span class="earnings-label">Hoy: S/</span>
+                        <span class="earnings-amount">45.80</span>
+                        <small class="text-muted">3 entregas</small>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="delivery-nav">
+        <div class="container-fluid">
+            <ul class="nav nav-tabs delivery-tabs" id="deliveryTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="disponibles-tab" data-bs-toggle="tab" 
+                            data-bs-target="#disponibles" type="button" role="tab">
+                        <i class="fas fa-home"></i> Disponibles <span class="badge bg-primary ms-1">2</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="entregas-tab" data-bs-toggle="tab" 
+                            data-bs-target="#entregas" type="button" role="tab">
+                        <i class="fas fa-box"></i> Mis Entregas <span class="badge bg-warning ms-1">1</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="estadisticas-tab" data-bs-toggle="tab" 
+                            data-bs-target="#estadisticas" type="button" role="tab">
+                        <i class="fas fa-chart-bar"></i> Estadísticas
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content delivery-content" id="deliveryTabsContent">
+        
+        <!-- DISPONIBLES TAB -->
+        <div class="tab-pane fade show active" id="disponibles" role="tabpanel">
+            <div class="container-fluid py-4">
+                
+                <!-- Pedido 1 -->
+                <div class="order-card available-order" data-order-id="FOD-123456">
+                    <div class="order-header">
+                        <div class="restaurant-info">
+                            <h5 class="restaurant-name">Burger Master</h5>
+                            <span class="order-id">#FOD-123456</span>
+                            <span class="priority-badge normal">Normal</span>
+                        </div>
+                        <div class="order-earnings">
+                            <div class="earning-amount">S/ 5.90</div>
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <div class="location-time">
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <span>San Isidro • 3.2 km</span>
+                            </div>
+                            <div class="estimated-time">
+                                <i class="fas fa-clock text-warning"></i>
+                                <span>25-30 min</span>
+                            </div>
+                        </div>
+                        <div class="order-value">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>2 productos</span>
+                            <span class="total-value">Efectivo (S/ 46.30)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="action-buttons mt-3">
+                        <button class="btn btn-success btn-sm accept-order me-2" data-order-id="FOD-123456">
+                            <i class="fas fa-check"></i> Aceptar Entrega
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm reject-order" data-order-id="FOD-123456">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pedido 2 -->
+                <div class="order-card available-order" data-order-id="FOD-123457">
+                    <div class="order-header">
+                        <div class="restaurant-info">
+                            <h5 class="restaurant-name">Pizza Palace</h5>
+                            <span class="order-id">#FOD-123457</span>
+                            <span class="priority-badge high">Alta</span>
+                        </div>
+                        <div class="order-earnings">
+                            <div class="earning-amount">S/ 5.90</div>
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <div class="location-time">
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <span>San Isidro • 2.8 km</span>
+                            </div>
+                            <div class="estimated-time">
+                                <i class="fas fa-clock text-warning"></i>
+                                <span>30-35 min</span>
+                            </div>
+                        </div>
+                        <div class="order-value">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>1 productos</span>
+                            <span class="payment-method">Tarjeta</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="action-buttons mt-3">
+                        <button class="btn btn-success btn-sm accept-order me-2" data-order-id="FOD-123457">
+                            <i class="fas fa-check"></i> Aceptar Entrega
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm reject-order" data-order-id="FOD-123457">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- MIS ENTREGAS TAB -->
+        <div class="tab-pane fade" id="entregas" role="tabpanel">
+            <div class="container-fluid py-4">
+                
+                <!-- Entrega en Progreso -->
+                <div class="order-card my-delivery accepted">
+                    <div class="order-header">
+                        <div class="restaurant-info">
+                            <h5 class="restaurant-name">Sushi Zen</h5>
+                            <span class="order-id">#FOD-123458</span>
+                            <span class="status-badge accepted">Aceptado</span>
+                        </div>
+                        <div class="order-earnings">
+                            <div class="earning-amount">+S/ 7.90</div>
+                            <div class="distance">4.5 km</div>
+                        </div>
+                    </div>
+                    
+                    <div class="delivery-addresses">
+                        <div class="address-section">
+                            <h6>Recoger en:</h6>
+                            <p class="address">Av. La Paz 567, Miraflores</p>
+                            <p class="phone"><i class="fas fa-phone"></i> 01-456-7890</p>
+                        </div>
+                        <div class="address-section">
+                            <h6>Entregar a:</h6>
+                            <p class="customer-name">Ana Rodríguez</p>
+                            <p class="address">Calle Los Olivos 789, Barranco</p>
+                            <p class="phone"><i class="fas fa-phone"></i> 999 666 555</p>
+                        </div>
+                    </div>
+                    
+                    <div class="special-notes">
+                        <div class="note-item">
+                            <span class="note-label">Referencia:</span>
+                            <span class="note-text">Casa amarilla con portón negro</span>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-warning btn-sm mark-picked-up me-2" data-order-id="FOD-123458">
+                            <i class="fas fa-box"></i> Marcar como Recogido
+                        </button>
+                        <button class="btn btn-success btn-sm mark-delivered me-2" data-order-id="FOD-123458" style="display: none;">
+                            <i class="fas fa-check-circle"></i> Marcar como Entregado
+                        </button>
+                        <button class="btn btn-outline-secondary btn-navigate">
+                            <i class="fas fa-directions"></i> Navegar
+                        </button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS TAB -->
+        <div class="tab-pane fade" id="estadisticas" role="tabpanel">
+            <div class="container-fluid py-4">
+                
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon bg-success">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stats-info">
+                                <h6>Ganancias Hoy</h6>
+                                <h3>S/ 45.80</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon bg-primary">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stats-info">
+                                <h6>Entregas Hoy</h6>
+                                <h3>3</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon bg-warning">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stats-info">
+                                <h6>Calificación</h6>
+                                <h3>4.8 ⭐</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon bg-info">
+                                <i class="fas fa-target"></i>
+                            </div>
+                            <div class="stats-info">
+                                <h6>Tasa de Éxito</h6>
+                                <h3>98%</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Section -->
+                <div class="progress-section mb-4">
+                    <h5>Progreso Semanal</h5>
+                    <div class="progress-info">
+                        <span>Ganancias esta semana</span>
+                        <span class="fw-bold">S/ 312.50</span>
+                    </div>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 65%"></div>
+                    </div>
+                    <small class="text-muted">65% de tu meta semanal (S/ 500)</small>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="summary-stats">
+                    <h5>Resumen Total</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="summary-item">
+                                <span class="summary-label">Total de entregas</span>
+                                <span class="summary-value">156</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="summary-item">
+                                <span class="summary-label">Promedio por entrega</span>
+                                <span class="summary-value">S/ 104.17</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="summary-item">
+                                <span class="summary-label">Tiempo promedio</span>
+                                <span class="summary-value">28 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalles del Pedido -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel">Detalles del Pedido</h5>
+                    <span class="priority-badge normal ms-2">Normal</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Restaurante</h6>
+                            <p class="restaurant-name">Burger Master</p>
+                            <p class="restaurant-address">Av. Larco 1234, Miraflores</p>
+                            <p class="restaurant-phone">01-234-5678</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Cliente</h6>
+                            <p class="customer-name">María González</p>
+                            <p class="customer-phone">999 888 777</p>
+                            <p class="payment-method">Efectivo</p>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mt-3">Dirección de Entrega</h6>
+                    <p class="delivery-address">Jr. Las Flores 456, Apt 302<br>San Isidro</p>
+                    <p class="delivery-reference">Ref: Edificio azul, frente al parque</p>
+                    
+                    <h6 class="mt-3">Productos</h6>
+                    <div class="products-list">
+                        <div class="d-flex justify-content-between">
+                            <span>2x Burger Clásica</span>
+                            <span>S/ 37.80</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>1x Papas Fritas</span>
+                            <span>S/ 8.50</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total del pedido</span>
+                            <span>S/ 46.30</span>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mt-3">Notas especiales</h6>
+                    <p class="order-notes">Sin cebolla en las hamburguesas</p>
+                    
+                    <div class="delivery-earnings-info mt-3 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-success fw-bold">Tu ganancia: S/ 5.90</span>
+                            <span class="text-muted">Tiempo: 25-30 min</span>
+                        </div>
+                        <div class="distance">Distancia: 3.2 km</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Rechazar
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Aceptar Entrega
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/main.js}"></script>
+    <!-- Delivery JavaScript -->
+    <script th:src="@{/js/delivery.js}"></script>
+    
+    <script>
+        // Event listeners para los pedidos disponibles
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hacer clic en pedidos disponibles para ver detalles
+            document.querySelectorAll('.available-order').forEach(order => {
+                order.addEventListener('click', function() {
+                    const orderModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                    orderModal.show();
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

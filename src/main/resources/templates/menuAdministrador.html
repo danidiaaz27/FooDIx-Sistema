@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Panel de Administrador - FoodIx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .hover-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+            border-color: var(--bs-primary);
+        }
+        
+        .hover-card .fa-4x {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-card:hover .fa-4x {
+            transform: scale(1.1);
+        }
+    </style>
+    <script>
+    // Función GLOBAL para cambiar secciones - DEFINIDA ANTES DE CARGAR EL BODY
+    function showSection(sectionName) {
+        console.log('>>> Cambiando a sección:', sectionName);
+        
+        // Ocultar todas las secciones
+        var sections = document.querySelectorAll('.menu-section');
+        sections.forEach(function(section) {
+            section.classList.remove('active');
+        });
+        
+        // Mostrar la sección seleccionada
+        var targetSection = document.getElementById(sectionName + '-content');
+        if (targetSection) {
+            targetSection.classList.add('active');
+            console.log('✓ Sección mostrada:', sectionName + '-content');
+        } else {
+            console.error('✗ No se encontró la sección:', sectionName + '-content');
+        }
+        
+        // Actualizar links activos en el sidebar
+        var links = document.querySelectorAll('.sidebar .nav-link');
+        links.forEach(function(link) {
+            link.classList.remove('active');
+            if (link.getAttribute('data-section') === sectionName) {
+                link.classList.add('active');
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+
+<!-- Barra de Navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">FoodIx Admin</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-shield"></i> <span>Administrador</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
+                                    <button type="submit" class="dropdown-item" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Mensajes Flash como Modales -->
+<!-- <div th:replace="fragments/flash-messages :: flashMessages"></div> -->
+
+<!-- Contenido Principal -->
+<main class="container-fluid" style="padding-top: 90px;">
+
+    <div class="row">
+        <!-- Sidebar de navegación -->
+        <div class="col-md-3 col-lg-2 sidebar">
+            <div class="sidebar-content">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-shield fa-3x"></i>
+                    </div>
+                    <h5>Administrador</h5>
+                </div>
+
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="javascript:void(0)" onclick="showSection('usuarios')" data-section="usuarios">
+                            <i class="fas fa-users"></i> Gestión de Usuarios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" onclick="showSection('restaurantes')" data-section="restaurantes">
+                            <i class="fas fa-store"></i> Restaurantes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" onclick="showSection('delivery')" data-section="delivery">
+                            <i class="fas fa-motorcycle"></i> Repartidores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" onclick="showSection('reportes')" data-section="reportes">
+                            <i class="fas fa-chart-bar"></i> Reportes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" onclick="showSection('configuracion')" data-section="configuracion">
+                            <i class="fas fa-cog"></i> Configuración
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="col-md-9 col-lg-10 main-content">
+            <!-- Sección Usuarios -->
+            <section id="usuarios-content" class="menu-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Gestión de Usuarios</h2>
+                    <p class="text-muted">Administra los usuarios de la plataforma</p>
+                </div>
+
+                <!-- Tabla de usuarios -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="user : ${users}">
+                                        <td th:text="${user.id}">1</td>
+                                        <td th:text="${user.name + ' ' + user.lastName}">John Doe</td>
+                                        <td th:text="${user.email}">john@example.com</td>
+                                        <td><span class="badge bg-primary" th:text="${user.role}">CUSTOMER</span></td>
+                                        <td>
+                                            <span th:class="${user.enabled != null and user.enabled ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${user.enabled != null and user.enabled ? 'Activo' : 'Inactivo'}">
+                                                Activo
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <!-- Botón Modificar -->
+                                            <button type="button" class="btn btn-sm btn-info" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editUserModal"
+                                                    th:data-id="${user.id}"
+                                                    th:data-name="${user.name}"
+                                                    th:data-lastname="${user.lastName}"
+                                                    th:data-email="${user.email}"
+                                                    th:data-phone="${user.phone}"
+                                                    th:data-address="${user.address}"
+                                                    title="Modificar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            
+                                            <!-- Botón Cambiar Estado -->
+                                            <form th:action="@{/menuAdministrador/user/{id}/toggle-status(id=${user.id})}" 
+                                                  method="post" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm btn-warning" title="Cambiar Estado">
+                                                    <i class="fas fa-toggle-on"></i>
+                                                </button>
+                                            </form>
+                                            
+                                            <!-- Botón Eliminar -->
+                                            <form th:action="@{/menuAdministrador/user/{id}/delete(id=${user.id})}" 
+                                                  method="post" style="display: inline;"
+                                                  onsubmit="return confirm('¿Está seguro de eliminar este usuario?');">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Restaurantes -->
+            <section id="restaurantes-content" class="menu-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-store"></i> Gestión de Restaurantes</h2>
+                    <p class="text-muted">Administra los restaurantes asociados</p>
+                </div>
+
+                <!-- Lista de restaurantes-->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 5%;">ID</th>
+                                        <th style="width: 25%;">Nombre Comercial</th>
+                                        <th style="width: 15%;">RUC</th>
+                                        <th style="width: 20%;">Email</th>
+                                        <th style="width: 10%;" class="text-center">Estado</th>
+                                        <th style="width: 25%;" class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Restaurantes Pendientes -->
+                                    <tr th:if="${pendingRestaurants != null and !pendingRestaurants.isEmpty()}" 
+                                        class="table-warning">
+                                        <td colspan="6" class="text-center fw-bold py-3">
+                                            <i class="fas fa-clock fa-lg"></i> RESTAURANTES PENDIENTES DE APROBACIÓN
+                                        </td>
+                                    </tr>
+                                    <tr th:each="restaurant : ${pendingRestaurants}">
+                                        <td class="fw-bold" th:text="${restaurant.codigo}">1</td>
+                                        <td>
+                                            <div class="fw-bold" th:text="${restaurant.nombre}">Restaurante A</div>
+                                            <small class="text-muted" th:text="${restaurant.razonSocial}">Razón Social</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${restaurant.ruc}">20131312955</span>
+                                        </td>
+                                        <td>
+                                            <small th:text="${restaurant.correoElectronico}">restaurante@example.com</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-warning text-dark px-3 py-2">
+                                                <i class="fas fa-clock"></i> Pendiente
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <!-- Botón Ver Detalles -->
+                                                <button type="button" class="btn btn-sm btn-info" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#viewRestaurantModal"
+                                                        th:data-id="${restaurant.codigo}"
+                                                        th:data-nombre="${restaurant.nombre}"
+                                                        th:data-razon="${restaurant.razonSocial}"
+                                                        th:data-ruc="${restaurant.ruc}"
+                                                        th:data-email="${restaurant.correoElectronico}"
+                                                        th:data-telefono="${restaurant.telefono}"
+                                                        th:data-direccion="${restaurant.direccion}"
+                                                        title="Ver Detalles y Documentos">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </button>
+                                                
+                                                <!-- Botón Aprobar -->
+                                                <button type="button" class="btn btn-sm btn-success" 
+                                                        onclick="aprobarRestaurante(this)"
+                                                        th:data-id="${restaurant.codigo}"
+                                                        th:data-nombre="${restaurant.nombre}"
+                                                        title="Aprobar Restaurante">
+                                                    <i class="fas fa-check"></i> Aprobar
+                                                </button>
+                                                
+                                                <!-- Botón Rechazar -->
+                                                <button type="button" class="btn btn-sm btn-danger" 
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#rejectRestaurantModal"
+                                                        th:data-id="${restaurant.codigo}"
+                                                        th:data-nombre="${restaurant.nombre}"
+                                                        title="Rechazar Restaurante">
+                                                    <i class="fas fa-times"></i> Rechazar
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Restaurantes Aprobados -->
+                                    <tr th:if="${approvedRestaurants != null and !approvedRestaurants.isEmpty()}" 
+                                        class="table-success">
+                                        <td colspan="6" class="text-center fw-bold py-3">
+                                            <i class="fas fa-check-circle fa-lg"></i> RESTAURANTES APROBADOS
+                                        </td>
+                                    </tr>
+                                    <tr th:each="restaurant : ${approvedRestaurants}">
+                                        <td class="fw-bold" th:text="${restaurant.codigo}">1</td>
+                                        <td>
+                                            <div class="fw-bold" th:text="${restaurant.nombre}">Restaurante B</div>
+                                            <small class="text-muted" th:text="${restaurant.razonSocial}">Razón Social</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${restaurant.ruc}">20131312955</span>
+                                        </td>
+                                        <td>
+                                            <small th:text="${restaurant.correoElectronico}">restaurante@example.com</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success px-3 py-2">
+                                                <i class="fas fa-check-circle"></i> Aprobado
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <!-- Botón Ver Detalles -->
+                                                <button type="button" class="btn btn-sm btn-info" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#viewRestaurantModal"
+                                                        th:data-id="${restaurant.codigo}"
+                                                        th:data-nombre="${restaurant.nombre}"
+                                                        th:data-razon="${restaurant.razonSocial}"
+                                                        th:data-ruc="${restaurant.ruc}"
+                                                        th:data-email="${restaurant.correoElectronico}"
+                                                        th:data-telefono="${restaurant.telefono}"
+                                                        th:data-direccion="${restaurant.direccion}"
+                                                        title="Ver Detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                
+                                                <!-- Botón Cambiar Estado -->
+                                                <button type="button" class="btn btn-sm btn-warning" 
+                                                        onclick="toggleEstadoRestaurante(this)"
+                                                        th:data-id="${restaurant.codigo}"
+                                                        th:data-estado="${restaurant.estado}"
+                                                        title="Activar/Desactivar">
+                                                    <i class="fas fa-toggle-on"></i>
+                                                </button>
+                                                
+                                                <!-- Botón Eliminar -->
+                                                <button type="button" class="btn btn-sm btn-danger" 
+                                                        onclick="eliminarRestaurante(this)"
+                                                        th:data-id="${restaurant.codigo}"
+                                                        th:data-nombre="${restaurant.nombre}"
+                                                        title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Mensaje si no hay restaurantes -->
+                                    <tr th:if="${(pendingRestaurants == null or pendingRestaurants.isEmpty()) and (approvedRestaurants == null or approvedRestaurants.isEmpty())}">
+                                        <td colspan="6" class="text-center text-muted">
+                                            <i class="fas fa-info-circle"></i> No hay restaurantes registrados
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Delivery -->
+            <section id="delivery-content" class="menu-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-motorcycle"></i> Gestión de Repartidores</h2>
+                    <p class="text-muted">Administra los repartidores de la plataforma</p>
+                </div>
+
+                <!-- Lista de repartidores (usuarios con rol DELIVERY) -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Rol</th>
+                                        <th>Estado Aprobación</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="delivery : ${deliveryUsers}">
+                                        <td th:text="${delivery.id}">1</td>
+                                        <td th:text="${delivery.name + ' ' + delivery.lastName}">Juan Pérez</td>
+                                        <td th:text="${delivery.email}">delivery@example.com</td>
+                                        <td><span class="badge bg-success" th:text="${delivery.role}">DELIVERY</span></td>
+                                        <td>
+                                            <!-- Manejar NULL en approvalStatus -->
+                                            <span th:if="${delivery.approvalStatus == null}" class="badge bg-secondary">Sin Estado</span>
+                                            <span th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'PENDING'}" class="badge bg-warning text-dark">Pendiente</span>
+                                            <span th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'APPROVED'}" class="badge bg-success">Aprobado</span>
+                                            <span th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'REJECTED'}" class="badge bg-danger">Rechazado</span>
+                                        </td>
+                                        <td>
+                                            <span th:class="${delivery.enabled != null and delivery.enabled ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${delivery.enabled != null and delivery.enabled ? 'Activo' : 'Inactivo'}">
+                                                Activo
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <!-- Botones para NULL o PENDIENTE -->
+                                            <div th:if="${delivery.approvalStatus == null or delivery.approvalStatus.name() == 'PENDING'}">
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/approve(id=${delivery.id})}" 
+                                                      method="post" style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-success" title="Aprobar">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/reject(id=${delivery.id})}" 
+                                                      method="post" style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Rechazar">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            
+                                            <!-- Botones para APROBADO -->
+                                            <div th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'APPROVED'}">
+                                                <button type="button" class="btn btn-sm btn-info" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editDeliveryModal"
+                                                        th:data-id="${delivery.id}"
+                                                        th:data-name="${delivery.name}"
+                                                        th:data-lastname="${delivery.lastName}"
+                                                        th:data-email="${delivery.email}"
+                                                        th:data-phone="${delivery.phone}"
+                                                        th:data-address="${delivery.address}"
+                                                        title="Modificar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/toggle-status(id=${delivery.id})}" 
+                                                      method="post" style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-warning" title="Cambiar Estado">
+                                                        <i class="fas fa-toggle-on"></i>
+                                                    </button>
+                                                </form>
+                                                
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.id})}" 
+                                                      method="post" style="display: inline;"
+                                                      onsubmit="return confirm('¿Está seguro de eliminar este repartidor?');">
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            
+                                            <!-- Botones para RECHAZADO -->
+                                            <div th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'REJECTED'}">
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.id})}" 
+                                                      method="post" style="display: inline;"
+                                                      onsubmit="return confirm('¿Está seguro de eliminar este repartidor rechazado?');">
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Reportes -->
+            <section id="reportes-content" class="menu-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> Reportes y Estadísticas</h2>
+                    <p class="text-muted">Visualiza las estadísticas de la plataforma</p>
+                </div>
+
+                <!-- Tarjetas de resumen -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h5>Usuarios Totales</h5>
+                                <h3 th:text="${stats != null and stats.totalUsers != null ? stats.totalUsers : 0}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h5>Ventas del Mes</h5>
+                                <h3 th:text="${stats != null and stats.monthSales != null ? stats.monthSales : 0}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <h5>Pedidos Activos</h5>
+                                <h3 th:text="${stats != null and stats.activeOrders != null ? stats.activeOrders : 0}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <h5>Restaurantes</h5>
+                                <h3 th:text="${stats != null and stats.totalRestaurants != null ? stats.totalRestaurants : 0}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Configuración -->
+            <section id="configuracion-content" class="menu-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
+                    <p class="text-muted">Administra la configuración general de la plataforma</p>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Tarjeta Categorías -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <i class="fas fa-tags fa-4x text-primary"></i>
+                                </div>
+                                <h5 class="card-title">Categorías</h5>
+                                <p class="card-text text-muted">Gestiona las categorías de restaurantes y productos</p>
+                                <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#manageCategoriesModal">
+                                    <i class="fas fa-cog"></i> Gestionar Categorías
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Administradores -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <i class="fas fa-users-cog fa-4x text-success"></i>
+                                </div>
+                                <h5 class="card-title">Administradores</h5>
+                                <p class="card-text text-muted">Administra los usuarios con rol de administrador</p>
+                                <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#manageAdminsModal">
+                                    <i class="fas fa-cog"></i> Gestionar Administradores
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Roles -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <i class="fas fa-user-tag fa-4x text-warning"></i>
+                                </div>
+                                <h5 class="card-title">Roles</h5>
+                                <p class="card-text text-muted">Visualiza y gestiona los roles del sistema</p>
+                                <button type="button" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#manageRolesModal">
+                                    <i class="fas fa-cog"></i> Ver Roles
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<!-- Modal para editar usuario -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel"><i class="fas fa-user-edit"></i> Modificar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editUserForm" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editUserName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="editUserName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editUserLastName" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="editUserLastName" name="lastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editUserEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editUserEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editUserPhone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="editUserPhone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editUserAddress" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="editUserAddress" name="address">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar repartidor -->
+<div class="modal fade" id="editDeliveryModal" tabindex="-1" aria-labelledby="editDeliveryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editDeliveryModalLabel"><i class="fas fa-motorcycle"></i> Modificar Repartidor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editDeliveryForm" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editDeliveryName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="editDeliveryName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDeliveryLastName" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="editDeliveryLastName" name="lastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDeliveryEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editDeliveryEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDeliveryPhone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="editDeliveryPhone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDeliveryAddress" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="editDeliveryAddress" name="address">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalles del restaurante -->
+<div class="modal fade" id="viewRestaurantModal" tabindex="-1" aria-labelledby="viewRestaurantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="viewRestaurantModalLabel">
+                    <i class="fas fa-store"></i> Detalles del Restaurante
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Información General -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="fas fa-info-circle text-primary"></i> Información General
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Nombre Comercial:</dt>
+                            <dd class="col-sm-7 fw-bold" id="viewRestaurantNombre">-</dd>
+                            
+                            <dt class="col-sm-5">Razón Social:</dt>
+                            <dd class="col-sm-7" id="viewRestaurantRazon">-</dd>
+                            
+                            <dt class="col-sm-5">RUC:</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge bg-secondary" id="viewRestaurantRuc">-</span>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Email:</dt>
+                            <dd class="col-sm-7" id="viewRestaurantEmail">-</dd>
+                            
+                            <dt class="col-sm-5">Teléfono:</dt>
+                            <dd class="col-sm-7" id="viewRestaurantTelefono">-</dd>
+                            
+                            <dt class="col-sm-5">Dirección:</dt>
+                            <dd class="col-sm-7" id="viewRestaurantDireccion">-</dd>
+                        </dl>
+                    </div>
+                </div>
+                
+                <!-- Documentos -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="fas fa-file-alt text-success"></i> Documentos de Verificación
+                        </h5>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    <!-- Carta del Restaurante -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-utensils fa-3x text-warning mb-3"></i>
+                                <h6 class="card-title">Carta del Restaurante</h6>
+                                <p class="card-text text-muted small">Menú y oferta gastronómica</p>
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100" 
+                                        onclick="verDocumento('CARTA_RESTAURANTE', document.getElementById('viewRestaurantModal').dataset.restaurantId)">
+                                    <i class="fas fa-eye"></i> Ver Documento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Carnet de Sanidad -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-notes-medical fa-3x text-success mb-3"></i>
+                                <h6 class="card-title">Carnet de Sanidad</h6>
+                                <p class="card-text text-muted small">Certificado sanitario vigente</p>
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100" 
+                                        onclick="verDocumento('CarnetSanidad', document.getElementById('viewRestaurantModal').dataset.restaurantId)">
+                                    <i class="fas fa-eye"></i> Ver Documento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Licencia de Funcionamiento -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-certificate fa-3x text-info mb-3"></i>
+                                <h6 class="card-title">Licencia de Funcionamiento</h6>
+                                <p class="card-text text-muted small">Autorización municipal</p>
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100" 
+                                        onclick="verDocumento('LicenciaFuncionamiento', document.getElementById('viewRestaurantModal').dataset.restaurantId)">
+                                    <i class="fas fa-eye"></i> Ver Documento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Nota:</strong> Todos los documentos son obligatorios para la aprobación del restaurante. 
+                    Verifica que estén completos y actualizados antes de aprobar.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para rechazar restaurante -->
+<div class="modal fade" id="rejectRestaurantModal" tabindex="-1" aria-labelledby="rejectRestaurantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="rejectRestaurantModalLabel"><i class="fas fa-times-circle"></i> Rechazar Restaurante</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="rejectRestaurantForm" method="post">
+                <div class="modal-body">
+                    <p>¿Está seguro de rechazar el restaurante <strong id="rejectRestaurantNombre"></strong>?</p>
+                    <div class="mb-3">
+                        <label for="motivoRechazo" class="form-label">Motivo del Rechazo <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="motivoRechazo" name="motivo" rows="4" 
+                                  placeholder="Explique el motivo del rechazo (mínimo 10 caracteres)" 
+                                  required minlength="10"></textarea>
+                        <div class="form-text">Este motivo será visible para el restaurante.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Rechazar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar restaurante -->
+<div class="modal fade" id="editRestaurantModal" tabindex="-1" aria-labelledby="editRestaurantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRestaurantModalLabel"><i class="fas fa-edit"></i> Modificar Restaurante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editRestaurantForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editRestaurantId" name="id">
+                    <div class="mb-3">
+                        <label for="editRestaurantName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="editRestaurantName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRestaurantLastName" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="editRestaurantLastName" name="lastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRestaurantEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editRestaurantEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRestaurantPhone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="editRestaurantPhone" name="phone">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para gestionar categorías -->
+<div class="modal fade" id="manageCategoriesModal" tabindex="-1" aria-labelledby="manageCategoriesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="manageCategoriesModalLabel">
+                    <i class="fas fa-tags"></i> Gestión de Categorías
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Formulario para crear categoría -->
+                    <div class="col-md-5">
+                        <h6 class="mb-3"><i class="fas fa-plus-circle"></i> Crear Nueva Categoría</h6>
+                        <form action="/menuAdministrador/create-category" th:action="@{/menuAdministrador/create-category}" method="post">
+                            <div class="mb-3">
+                                <label for="categoryName" class="form-label">Nombre de Categoría *</label>
+                                <input type="text" class="form-control" id="categoryName" name="nombre" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="categoryDescription" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="categoryDescription" name="descripcion" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="categoryIcon" class="form-label">Icono (FontAwesome)</label>
+                                <input type="text" class="form-control" id="categoryIcon" name="icono" placeholder="fa-utensils">
+                                <small class="text-muted">Ejemplo: fa-utensils, fa-pizza-slice, fa-fish, fa-hamburger</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-plus"></i> Crear Categoría
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Lista de categorías existentes -->
+                    <div class="col-md-7">
+                        <h6 class="mb-3"><i class="fas fa-list"></i> Categorías Existentes</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Icono</th>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="category : ${categories}">
+                                        <td><i th:class="'fas ' + ${category.icono} + ' fa-lg'"></i></td>
+                                        <td><strong th:text="${category.nombre}">Pollería</strong></td>
+                                        <td><small th:text="${category.descripcion}">Descripción</small></td>
+                                        <td>
+                                            <span th:class="${category.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${category.estado ? 'Activo' : 'Inactivo'}">
+                                                Activo
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <form th:action="@{/menuAdministrador/category/{id}/toggle-status(id=${category.codigo})}" 
+                                                  method="post" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm btn-warning" title="Cambiar Estado">
+                                                    <i class="fas fa-toggle-on"></i>
+                                                </button>
+                                            </form>
+                                            <form th:action="@{/menuAdministrador/category/{id}/delete(id=${category.codigo})}" 
+                                                  method="post" style="display: inline;"
+                                                  onsubmit="return confirm('¿Está seguro de eliminar esta categoría?');">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para gestionar administradores -->
+<div class="modal fade" id="manageAdminsModal" tabindex="-1" aria-labelledby="manageAdminsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="manageAdminsModalLabel">
+                    <i class="fas fa-users-cog"></i> Gestión de Administradores
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Formulario para crear administrador -->
+                    <div class="col-md-5">
+                        <h6 class="mb-3"><i class="fas fa-user-plus"></i> Crear Nuevo Administrador</h6>
+                        <form action="/menuAdministrador/create-admin" th:action="@{/menuAdministrador/create-admin}" method="post">
+                            <div class="mb-3">
+                                <label for="adminName" class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="adminName" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="adminLastName" class="form-label">Apellido *</label>
+                                <input type="text" class="form-control" id="adminLastName" name="lastName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="adminEmail" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="adminEmail" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="adminPassword" class="form-label">Contraseña *</label>
+                                <input type="password" class="form-control" id="adminPassword" name="password" minlength="6" required>
+                                <small class="text-muted">Mínimo 6 caracteres</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="adminPhone" class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" id="adminPhone" name="phone">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-user-plus"></i> Crear Administrador
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Lista de administradores existentes -->
+                    <div class="col-md-7">
+                        <h6 class="mb-3"><i class="fas fa-list"></i> Administradores Registrados</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre Completo</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="admin : ${adminUsers}">
+                                        <td th:text="${admin.id}">1</td>
+                                        <td><strong th:text="${admin.name + ' ' + admin.lastName}">Admin User</strong></td>
+                                        <td th:text="${admin.email}">admin@example.com</td>
+                                        <td th:text="${admin.phone != null ? admin.phone : 'N/A'}">999999999</td>
+                                        <td>
+                                            <span th:class="${admin.enabled != null and admin.enabled ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${admin.enabled != null and admin.enabled ? 'Activo' : 'Inactivo'}">
+                                                Activo
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para visualizar roles del sistema -->
+<div class="modal fade" id="manageRolesModal" tabindex="-1" aria-labelledby="manageRolesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="manageRolesModalLabel">
+                    <i class="fas fa-user-tag"></i> Roles del Sistema
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Los roles son definidos por el sistema y no se pueden modificar.
+                </div>
+                
+                <div class="row g-3">
+                    <!-- Rol ADMIN -->
+                    <div class="col-md-6">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0"><i class="fas fa-user-shield"></i> ADMINISTRADOR</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><strong>Código:</strong> 1</p>
+                                <p class="mb-2"><strong>Permisos:</strong></p>
+                                <ul class="small">
+                                    <li>Gestión completa de usuarios</li>
+                                    <li>Aprobación de restaurantes y repartidores</li>
+                                    <li>Gestión de categorías</li>
+                                    <li>Visualización de reportes</li>
+                                    <li>Configuración del sistema</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Rol RESTAURANT -->
+                    <div class="col-md-6">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0"><i class="fas fa-store"></i> RESTAURANTE</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><strong>Código:</strong> 2</p>
+                                <p class="mb-2"><strong>Permisos:</strong></p>
+                                <ul class="small">
+                                    <li>Gestión de menú y productos</li>
+                                    <li>Administración de pedidos</li>
+                                    <li>Gestión de promociones</li>
+                                    <li>Visualización de estadísticas propias</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Rol DELIVERY -->
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="fas fa-motorcycle"></i> REPARTIDOR</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><strong>Código:</strong> 3</p>
+                                <p class="mb-2"><strong>Permisos:</strong></p>
+                                <ul class="small">
+                                    <li>Visualización de pedidos asignados</li>
+                                    <li>Actualización de estado de entrega</li>
+                                    <li>Gestión de ubicación en tiempo real</li>
+                                    <li>Historial de entregas</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Rol CUSTOMER -->
+                    <div class="col-md-6">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0"><i class="fas fa-user"></i> CLIENTE</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><strong>Código:</strong> 4</p>
+                                <p class="mb-2"><strong>Permisos:</strong></p>
+                                <ul class="small">
+                                    <li>Realizar pedidos</li>
+                                    <li>Gestionar direcciones de entrega</li>
+                                    <li>Visualizar historial de pedidos</li>
+                                    <li>Calificar servicios</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para listar categorías (antiguo - mantener por compatibilidad) -->
+<div class="modal fade" id="categoryListModal" tabindex="-1" aria-labelledby="categoryListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryListModalLabel"><i class="fas fa-tags"></i> Lista de Categorías</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Icono</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="category : ${categories}">
+                                <td th:text="${category.codigo}">1</td>
+                                <td th:text="${category.nombre}">Pollería</td>
+                                <td th:text="${category.descripcion}">Descripción</td>
+                                <td><i th:class="'fas ' + ${category.icono}"></i> <span th:text="${category.icono}"></span></td>
+                                <td>
+                                    <span th:class="${category.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                          th:text="${category.estado ? 'Activo' : 'Inactivo'}">
+                                        Activo
+                                    </span>
+                                </td>
+                                <td>
+                                    <form th:action="@{/menuAdministrador/category/{id}/toggle-status(id=${category.codigo})}" 
+                                          method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-warning" title="Cambiar Estado">
+                                            <i class="fas fa-toggle-on"></i>
+                                        </button>
+                                    </form>
+                                    <form th:action="@{/menuAdministrador/category/{id}/delete(id=${category.codigo})}" 
+                                          method="post" style="display: inline;"
+                                          onsubmit="return confirm('¿Está seguro de eliminar esta categoría?');">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+// ========== FUNCIONES PARA GESTIÓN DE RESTAURANTES ==========
+
+// Función para aprobar restaurante
+function aprobarRestaurante(button) {
+    const id = button.dataset.id;
+    const nombre = button.dataset.nombre;
+    
+    if (confirm(`¿Está seguro de aprobar el restaurante "${nombre}"?\n\nEsto permitirá que puedan acceder al sistema.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/menuAdministrador/restaurant/${id}/approve`;
+        
+        // Agregar token CSRF
+        const csrfToken = document.querySelector('meta[name="_csrf"]');
+        if (csrfToken) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = '_csrf';
+            input.value = csrfToken.getAttribute('content');
+            form.appendChild(input);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Función para cambiar estado de restaurante
+function toggleEstadoRestaurante(button) {
+    const id = button.dataset.id;
+    const estadoActual = button.dataset.estado === 'true';
+    const nuevoEstado = estadoActual ? 'desactivar' : 'activar';
+    
+    if (confirm(`¿Está seguro de ${nuevoEstado} este restaurante?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/menuAdministrador/restaurant/${id}/toggle-status`;
+        
+        // Agregar token CSRF
+        const csrfToken = document.querySelector('meta[name="_csrf"]');
+        if (csrfToken) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = '_csrf';
+            input.value = csrfToken.getAttribute('content');
+            form.appendChild(input);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Función para eliminar restaurante
+function eliminarRestaurante(button) {
+    const id = button.dataset.id;
+    const nombre = button.dataset.nombre;
+    
+    if (confirm(`⚠️ ADVERTENCIA ⚠️\n\n¿Está seguro de ELIMINAR el restaurante "${nombre}"?\n\nEsta acción NO se puede deshacer.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/menuAdministrador/restaurant/${id}/delete`;
+        
+        // Agregar token CSRF
+        const csrfToken = document.querySelector('meta[name="_csrf"]');
+        if (csrfToken) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = '_csrf';
+            input.value = csrfToken.getAttribute('content');
+            form.appendChild(input);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Función para ver documentos del restaurante
+function verDocumento(tipoDocumento, restauranteId) {
+    // Construir URL del documento
+    const url = `/uploads/restaurante/${restauranteId}/${tipoDocumento}`;
+    
+    // Abrir en nueva ventana
+    window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+}
+
+// ========== EVENT LISTENERS PARA MODALES Y CONFIRMACIONES ==========
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== MENU ADMINISTRADOR CARGADO ===');
+    console.log('showSection está definida:', typeof showSection);
+    
+    // ========== CONFIRMACIONES PARA APROBAR/RECHAZAR ==========
+    // Delegación de eventos para botones dinámicos
+    document.body.addEventListener('submit', function(e) {
+        var form = e.target;
+        
+        // Confirmar aprobación de repartidor
+        if (form.action && form.action.includes('/approve')) {
+            if (!confirm('¿Está seguro de aprobar este repartidor?')) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        // Confirmar rechazo de repartidor
+        if (form.action && form.action.includes('/reject')) {
+            if (!confirm('¿Está seguro de rechazar este repartidor?')) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+    
+    // ========== MODAL DE EDICIÓN DE USUARIO ==========
+    var editUserModal = document.getElementById('editUserModal');
+    if (editUserModal) {
+        editUserModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var lastname = button.getAttribute('data-lastname');
+            var email = button.getAttribute('data-email');
+            var phone = button.getAttribute('data-phone');
+            var address = button.getAttribute('data-address');
+            
+            document.getElementById('editUserName').value = name;
+            document.getElementById('editUserLastName').value = lastname;
+            document.getElementById('editUserEmail').value = email;
+            document.getElementById('editUserPhone').value = phone || '';
+            document.getElementById('editUserAddress').value = address || '';
+            
+            var form = document.getElementById('editUserForm');
+            form.action = '/menuAdministrador/user/' + id + '/update';
+        });
+    }
+
+    // ========== MODAL VER DETALLES RESTAURANTE ==========
+    var viewRestaurantModal = document.getElementById('viewRestaurantModal');
+    if (viewRestaurantModal) {
+        viewRestaurantModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var restaurantId = button.getAttribute('data-id');
+            
+            // Guardar ID en el modal para los botones de documentos
+            viewRestaurantModal.dataset.restaurantId = restaurantId;
+            
+            // Llenar información
+            document.getElementById('viewRestaurantNombre').textContent = button.getAttribute('data-nombre') || 'N/A';
+            document.getElementById('viewRestaurantRazon').textContent = button.getAttribute('data-razon') || 'N/A';
+            document.getElementById('viewRestaurantRuc').textContent = button.getAttribute('data-ruc') || 'N/A';
+            document.getElementById('viewRestaurantEmail').textContent = button.getAttribute('data-email') || 'N/A';
+            document.getElementById('viewRestaurantTelefono').textContent = button.getAttribute('data-telefono') || 'N/A';
+            document.getElementById('viewRestaurantDireccion').textContent = button.getAttribute('data-direccion') || 'N/A';
+        });
+    }
+
+    // ========== MODAL RECHAZAR RESTAURANTE ==========
+    var rejectRestaurantModal = document.getElementById('rejectRestaurantModal');
+    if (rejectRestaurantModal) {
+        rejectRestaurantModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var nombre = button.getAttribute('data-nombre');
+            
+            document.getElementById('rejectRestaurantNombre').textContent = nombre;
+            document.getElementById('motivoRechazo').value = '';
+            
+            var form = document.getElementById('rejectRestaurantForm');
+            form.action = '/menuAdministrador/restaurant/' + id + '/reject';
+        });
+    }
+
+    // ========== MODAL DE EDICIÓN DE REPARTIDOR ==========
+    var editDeliveryModal = document.getElementById('editDeliveryModal');
+    if (editDeliveryModal) {
+        editDeliveryModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var lastname = button.getAttribute('data-lastname');
+            var email = button.getAttribute('data-email');
+            var phone = button.getAttribute('data-phone');
+            var address = button.getAttribute('data-address');
+            
+            document.getElementById('editDeliveryName').value = name;
+            document.getElementById('editDeliveryLastName').value = lastname;
+            document.getElementById('editDeliveryEmail').value = email;
+            document.getElementById('editDeliveryPhone').value = phone || '';
+            document.getElementById('editDeliveryAddress').value = address || '';
+            
+            var form = document.getElementById('editDeliveryForm');
+            form.action = '/menuAdministrador/delivery/' + id + '/update';
+        });
+    }
+
+    // ========== MODAL DE EDICIÓN DE RESTAURANTE ==========
+    var editRestaurantModal = document.getElementById('editRestaurantModal');
+    if (editRestaurantModal) {
+        editRestaurantModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var lastname = button.getAttribute('data-lastname');
+            var email = button.getAttribute('data-email');
+            var phone = button.getAttribute('data-phone');
+            
+            document.getElementById('editRestaurantId').value = id;
+            document.getElementById('editRestaurantName').value = name;
+            document.getElementById('editRestaurantLastName').value = lastname;
+            document.getElementById('editRestaurantEmail').value = email;
+            document.getElementById('editRestaurantPhone').value = phone || '';
+            
+            var form = document.getElementById('editRestaurantForm');
+            form.action = '/menuAdministrador/restaurant/' + id + '/update';
+        });
+    }
+    
+    console.log('=== INICIALIZACIÓN COMPLETADA ===');
+});
+</script>
+</body>
+</html>

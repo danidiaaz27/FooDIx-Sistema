@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mi Menú - FoodIx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Barra de Navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">FoodIx</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/" th:href="@{/}">Inicio</a></li>
+                <li class="nav-item">
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> <span th:text="${currentUser.name}">Usuario</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/menu" th:href="@{/menu}">
+                                <i class="fas fa-utensils"></i> Mi Menú
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#perfilModal">
+                                <i class="fas fa-user-cog"></i> Configurar Perfil
+                            </a></li>
+                            <li><a class="dropdown-item" href="/auth/logout" th:href="@{/auth/logout}">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Mensajes Flash como Modales -->
+<div th:replace="fragments/flash-messages :: flashMessages"></div>
+
+<!-- Contenido Principal -->
+<main class="container-fluid" style="padding-top: 90px;">
+
+    <div class="row">
+        <!-- Sidebar de navegación -->
+        <div class="col-md-3 col-lg-2 sidebar">
+            <div class="sidebar-content">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-circle fa-3x"></i>
+                    </div>
+                    <h5 th:text="${currentUser.name + ' ' + currentUser.lastName}">Usuario</h5>
+                    <p class="text-muted" th:text="${currentUser.email}">email@ejemplo.com</p>
+                </div>
+
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#promociones" data-section="promociones">
+                            <i class="fas fa-fire"></i> Promociones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#carrito" data-section="carrito">
+                            <i class="fas fa-shopping-cart"></i> 
+                            Carrito 
+                            <span class="badge bg-primary ms-2" th:text="${cartItemCount}" th:if="${cartItemCount > 0}">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#historial" data-section="historial">
+                            <i class="fas fa-history"></i> Historial
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#perfil" data-section="perfil">
+                            <i class="fas fa-user"></i> Perfil
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="col-md-9 col-lg-10 main-content">
+            <!-- Sección Promociones -->
+            <section id="promociones-content" class="menu-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-fire text-warning"></i> Promociones Especiales</h2>
+                    <p class="text-muted">Descubre las mejores ofertas en comida de Chiclayo</p>
+                </div>
+
+                <!-- Filtros -->
+                <div class="filters-section">
+                    <form method="post" action="/menu/filter" th:action="@{/menu/filter}" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="categoryFilter" class="form-label">Categoría</label>
+                            <select class="form-select" id="categoryFilter" name="category">
+                                <option value="">Todas las categorías</option>
+                                <option th:each="cat : ${categories}" th:value="${cat.key}" th:text="${cat.value}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="priceFilter" class="form-label">Precio máximo</label>
+                            <select class="form-select" id="priceFilter" name="maxPrice">
+                                <option value="">Cualquier precio</option>
+                                <option value="10">Hasta S/ 10</option>
+                                <option value="20">Hasta S/ 20</option>
+                                <option value="30">Hasta S/ 30</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Grid de productos -->
+                <div class="products-grid" id="productsGrid">
+                    <div class="product-card" th:each="product : ${products}">
+                        <img th:src="${product.image}" th:alt="${product.name}" class="product-image">
+                        <div class="product-info">
+                            <span class="product-category" th:text="${categories.get(product.category)}">Categoría</span>
+                            <h3 class="product-name" th:text="${product.name}">Nombre del producto</h3>
+                            <p class="product-restaurant">
+                                <i class="fas fa-store"></i> <span th:text="${product.restaurant}">Restaurante</span>
+                            </p>
+                            <p class="product-description" th:text="${product.description}">Descripción</p>
+                            <div class="product-prices">
+                                <span class="original-price" th:text="'S/ ' + ${#numbers.formatDecimal(product.originalPrice, 1, 2)}">S/ 0.00</span>
+                                <span class="sale-price" th:text="'S/ ' + ${#numbers.formatDecimal(product.salePrice, 1, 2)}">S/ 0.00</span>
+                                <span class="discount-badge" th:text="'-' + ${product.discount} + '%'">-0%</span>
+                            </div>
+                            <form method="post" th:action="@{/cart/add/{id}(id=${product.id})}">
+                                <button type="submit" class="add-to-cart-btn">
+                                    <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Carrito -->
+            <section id="carrito-content" class="menu-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-shopping-cart"></i> Mi Carrito</h2>
+                    <p class="text-muted">Revisa tus productos antes de realizar el pedido</p>
+                </div>
+
+                <!-- Indicador de carga del carrito -->
+                <div id="cart-loading" class="text-center py-5" style="display: block;">
+                    <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+                    <h5>Cargando carrito...</h5>
+                    <p class="text-muted">Obteniendo tus productos...</p>
+                </div>
+
+                <!-- Carrito vacío -->
+                <div class="empty-cart-message" style="display: none;" th:if="${cartItems == null or cartItems.isEmpty()}">
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+                        <h4>Tu carrito está vacío</h4>
+                        <p class="text-muted mb-4">¡Agrega algunos productos deliciosos desde nuestro menú!</p>
+                        <button type="button" class="btn btn-primary" onclick="showMenuSection('promociones')">
+                            <i class="fas fa-utensils"></i> Ver Promociones
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Carrito con productos -->
+                <div class="cart-content" th:if="${cartItems != null and !cartItems.isEmpty()}">
+                    <div class="cart-items">
+                        <div class="cart-item" th:each="item : ${cartItems}">
+                            <img th:src="${item.image}" th:alt="${item.productName}" class="cart-item-image">
+                            <div class="cart-item-info">
+                                <h5 th:text="${item.productName}">Producto</h5>
+                                <p th:text="${item.restaurant}">Restaurante</p>
+                                <div class="quantity-controls">
+                                    <form method="post" th:action="@{/cart/update/{id}(id=${item.productId})}" style="display: inline;">
+                                        <input type="hidden" name="quantity" th:value="${item.quantity - 1}">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
+                                    </form>
+                                    <span class="quantity" th:text="${item.quantity}">1</span>
+                                    <form method="post" th:action="@{/cart/update/{id}(id=${item.productId})}" style="display: inline;">
+                                        <input type="hidden" name="quantity" th:value="${item.quantity + 1}">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="cart-item-price">
+                                <p th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">S/ 0.00</p>
+                                <form method="post" th:action="@{/cart/remove/{id}(id=${item.productId})}">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cart-summary">
+                        <div class="cart-total">
+                            <h4>Total: <span th:text="'S/ ' + ${#numbers.formatDecimal(cartTotal, 1, 2)}">S/ 0.00</span></h4>
+                        </div>
+                        <div class="payment-methods">
+                            <form method="post" action="/cart/checkout" th:action="@{/cart/checkout}">
+                                <div class="mb-3">
+                                    <label class="form-label">Método de pago:</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" value="efectivo" id="efectivo" checked>
+                                        <label class="form-check-label" for="efectivo">Efectivo</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" value="tarjeta" id="tarjeta">
+                                        <label class="form-check-label" for="tarjeta">Tarjeta</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" value="yape" id="yape">
+                                        <label class="form-check-label" for="yape">Yape</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="fas fa-credit-card"></i> Realizar Pedido
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${cartItems == null or cartItems.isEmpty()}" class="empty-cart">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h4>Tu carrito está vacío</h4>
+                    <p class="text-muted">Agrega algunos productos para comenzar</p>
+                </div>
+            </section>
+
+            <!-- Sección Historial -->
+            <section id="historial-content" class="menu-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Historial de Pedidos</h2>
+                    <p class="text-muted">Revisa tus pedidos anteriores</p>
+                </div>
+
+                <div class="orders-list" th:if="${orders != null and !orders.isEmpty()}">
+                    <div class="order-card" th:each="order : ${orders}">
+                        <div class="order-header">
+                            <h5 th:text="${order.orderNumber}">Número de orden</h5>
+                            <span class="badge" 
+                                  th:classappend="${order.status.name() == 'COMPLETADO'} ? 'bg-success' : (${order.status.name() == 'EN_PROCESO'} ? 'bg-warning' : 'bg-danger')"
+                                  th:text="${order.status}">Estado</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Fecha:</strong> <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Fecha</span></p>
+                            <p><strong>Total:</strong> <span th:text="'S/ ' + ${#numbers.formatDecimal(order.total, 1, 2)}">S/ 0.00</span></p>
+                            <p><strong>Método de pago:</strong> <span th:text="${order.paymentMethod}">Método</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${orders == null or orders.isEmpty()}" class="empty-history">
+                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                    <h4>No tienes pedidos anteriores</h4>
+                    <p class="text-muted">Tus pedidos aparecerán aquí una vez que realices tu primera compra</p>
+                </div>
+            </section>
+
+            <!-- Sección Perfil -->
+            <section id="perfil-content" class="menu-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-user"></i> Mi Perfil</h2>
+                    <p class="text-muted">Administra tu información personal</p>
+                </div>
+
+                <div class="profile-info">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-card">
+                                <h5>Información Personal</h5>
+                                <p><strong>Nombre:</strong> <span th:text="${currentUser.name + ' ' + currentUser.lastName}">Nombre completo</span></p>
+                                <p><strong>Email:</strong> <span th:text="${currentUser.email}">email@ejemplo.com</span></p>
+                                <p><strong>Teléfono:</strong> <span th:text="${currentUser.phone ?: 'No especificado'}">Teléfono</span></p>
+                                <p><strong>Dirección:</strong> <span th:text="${currentUser.address ?: 'No especificada'}">Dirección</span></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h5>Estadísticas</h5>
+                                <p><strong>Pedidos realizados:</strong> <span th:text="${orders != null ? orders.size() : 0}">0</span></p>
+                                <p><strong>Productos en carrito:</strong> <span th:text="${cartItemCount ?: 0}">0</span></p>
+                                <p><strong>Total gastado:</strong> S/ 0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+    </div>
+</div>
+
+<!-- Botón Flotante del Carrito -->
+<div class="floating-cart-btn" id="floatingCartBtn" style="display: none;">
+    <button class="btn btn-primary btn-floating" data-bs-toggle="modal" data-bs-target="#cartPreviewModal">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="floatingCartCount">0</span>
+        <div class="cart-total" id="floatingCartTotal">S/ 0.00</div>
+    </button>
+</div>
+
+<!-- Modal de Preview del Carrito -->
+<div class="modal fade" id="cartPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-shopping-cart"></i> Mi Carrito - Resumen
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cartPreviewContent">
+                    <!-- Contenido dinámico del carrito -->
+                    <div class="text-center text-muted py-4" id="emptyCartMessage">
+                        <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                        <p>Tu carrito está vacío</p>
+                        <p>¡Agrega algunos productos deliciosos!</p>
+                    </div>
+                    
+                    <div id="cartItemsList" style="display: none;">
+                        <!-- Los items se cargarán aquí dinámicamente -->
+                    </div>
+                    
+                    <div id="cartSummary" style="display: none;">
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Total a pagar:</h5>
+                            <h4 class="text-primary mb-0" id="modalCartTotal">S/ 0.00</h4>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">
+                                    <i class="fas fa-arrow-left"></i> Seguir Comprando
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-success w-100" id="proceedToCheckout">
+                                    <i class="fas fa-credit-card"></i> Realizar Pago
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Perfil -->
+<div class="modal fade" id="perfilModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-cog"></i> Configurar Perfil
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/auth/update-profile" th:action="@{/auth/update-profile}" method="post">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Actualiza tu información personal
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="profileName" class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" id="profileName" name="name" 
+                                   th:value="${currentUser?.name}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="profileLastName" class="form-label">Apellido *</label>
+                            <input type="text" class="form-control" id="profileLastName" name="lastName" 
+                                   th:value="${currentUser?.lastName}" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="profileEmail" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="profileEmail" name="email" 
+                                   th:value="${currentUser?.email}" required readonly>
+                            <div class="form-text">El email no se puede cambiar</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="profilePhone" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="profilePhone" name="phone" 
+                                   th:value="${currentUser?.phone}" placeholder="Ej: +51 987654321">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="profileGender" class="form-label">Género</label>
+                            <select class="form-select" id="profileGender" name="gender">
+                                <option value="">Seleccionar</option>
+                                <option value="masculino" th:selected="${currentUser?.gender == 'masculino'}">Masculino</option>
+                                <option value="femenino" th:selected="${currentUser?.gender == 'femenino'}">Femenino</option>
+                                <option value="otro" th:selected="${currentUser?.gender == 'otro'}">Otro</option>
+                                <option value="prefiero_no_decir" th:selected="${currentUser?.gender == 'prefiero_no_decir'}">Prefiero no decir</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="profileBirthdate" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="profileBirthdate" name="birthdate" 
+                                   th:value="${currentUser?.birthdate}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="profileAvatar" class="form-label">Avatar</label>
+                            <input type="text" class="form-control" id="profileAvatar" name="avatar" 
+                                   th:value="${currentUser?.avatar}" placeholder="URL de imagen o nombre">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="profileNewPassword" class="form-label">Nueva Contraseña</label>
+                            <input type="password" class="form-control" id="profileNewPassword" name="newPassword" 
+                                   placeholder="Dejar vacío para no cambiar" minlength="6">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profileAddress" class="form-label">Dirección</label>
+                        <textarea class="form-control" id="profileAddress" name="address" rows="2" 
+                                  th:text="${currentUser?.address}" placeholder="Ej: Av. Balta 123, Chiclayo"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

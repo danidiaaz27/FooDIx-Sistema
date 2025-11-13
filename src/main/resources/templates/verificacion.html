@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Verificación - FoodIx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/verificacion.css}">
+</head>
+<body>
+
+<!-- Barra de Navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">
+            <i class="fas fa-utensils"></i> FoodIx
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
+                        <i class="fas fa-question-circle"></i> Tutorial
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login" th:href="@{/login}">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">Contacto</a>
+                </li>             
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido Principal -->
+<main class="verificacion-main">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card shadow-lg mt-5">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">Verificación</h2>
+                            <p class="text-muted">Verifica tu correo electrónico</p>
+                        </div>
+
+                        <!-- Mensajes de notificación -->
+                        <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <span th:text="${message}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <span th:text="${error}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <!-- Formulario de correo electrónico -->
+                        <form id="emailForm" action="/auth/send-code" th:action="@{/auth/send-code}" method="post" class="needs-validation">
+                            <input type="hidden" id="tipoRegistro" name="tipo" th:value="${tipoRegistro != null ? tipoRegistro : 'usuario'}">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3">
+                                <i class="fas fa-paper-plane"></i> Enviar código
+                            </button>
+                        </form>
+
+                        <!-- Formulario de verificación (inicialmente oculto) -->
+                        <form id="verificationForm" action="/auth/verify-code" th:action="@{/auth/verify-code}" method="post" class="needs-validation" style="display: none;">
+                            <div class="mb-3">
+                                <label for="code" class="form-label">Código de Verificación</label>
+                                <input type="text" class="form-control" id="code" name="code" required 
+                                       pattern="[0-9]{6}" maxlength="6" placeholder="Ingrese el código de 6 dígitos">
+                                <div class="form-text">
+                                    Ingrese el código enviado a su correo electrónico
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3">
+                                <i class="fas fa-check"></i> Verificar código
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary w-100" onclick="showEmailForm()">
+                                <i class="fas fa-envelope"></i> Cambiar correo
+                            </button>
+                        </form>
+
+                        <!-- Enlace para volver -->
+                        <div class="text-center mt-3">
+                            <a href="/login" th:href="@{/login}" class="text-decoration-none">
+                                <i class="fas fa-arrow-left"></i> Volver al inicio de sesión
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal de animación correo -->
+<div class="modal fade" id="codeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="codeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <!-- Animación Correo -->
+                <div class="delivery-animation">
+                    <div class="restaurant-building">
+                        <i class="fas fa-store fa-2x"></i>
+                        <div class="restaurant-label">FoodIx</div>
+                    </div>
+                    
+                    <div class="delivery-path">
+                        <div class="path-line"></div>
+                        <div class="mail-icon" id="animatedMail">
+                            <i class="fas fa-envelope-square fa-2x"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="email-inbox">
+                        <i class="fas fa-inbox fa-2x"></i>
+                        <div class="inbox-label">Tu Correo</div>
+                    </div>
+                </div>
+                
+                <h5 class="modal-title mb-3 mt-4" id="codeModalLabel">Enviando código...</h5>
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3 mb-0 text-muted">El código está en camino a tu bandeja de entrada</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/verificacion.js}"></script>
+</body>
+</html>

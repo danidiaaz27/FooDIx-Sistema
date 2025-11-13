@@ -1,0 +1,155 @@
+        /* Estilos específicos para la página de verificación */
+        .verificacion-main {
+            padding-top: 80px; 
+            min-height: 100vh; 
+            background: linear-gradient(360deg, #FFD700 0%, #a0002a 100%);
+        }
+
+        /* Animación de entrega de correo */
+        .delivery-animation {
+            position: relative;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .restaurant-building, 
+        .email-inbox {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .restaurant-building i, 
+        .email-inbox i {
+            color: #a0002a;
+            margin-bottom: 5px;
+        }
+
+        .restaurant-label, 
+        .inbox-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .delivery-path {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            transform: translateY(-50%);
+        }
+
+        .path-line {
+            position: absolute;
+            top: 50%;
+            left: 60px;
+            right: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #a0002a, #FFD700);
+            border-radius: 2px;
+            transform: translateY(-50%);
+        }
+
+        .mail-icon {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: deliverMail 2s ease-in-out infinite;
+        }
+
+        .mail-icon i {
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: mailFly 0.5s ease-in-out infinite alternate;
+        }
+
+        /* Animaciones clave */
+        @keyframes deliverMail {
+            0% {
+                left: 60px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                left: calc(100% - 80px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes mailFly {
+            0% {
+                transform: translateY(-5px) rotate(-5deg);
+            }
+            100% {
+                transform: translateY(5px) rotate(5deg);
+            }
+        }
+
+        /* Efectos adicionales */
+        .restaurant-building i {
+            animation: restaurantGlow 2s ease-in-out infinite;
+        }
+
+        .email-inbox i {
+            animation: inboxPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes restaurantGlow {
+            0%, 100% {
+                transform: scale(1);
+                color: #a0002a;
+            }
+            50% {
+                transform: scale(1.1);
+                color: #ff6b6b;
+            }
+        }
+
+        @keyframes inboxPulse {
+            0%, 100% {
+                transform: scale(1);
+                color: #a0002a;
+            }
+            50% {
+                transform: scale(1.1);
+                color: #4ecdc4;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .delivery-animation {
+                height: 100px;
+                padding: 0 10px;
+            }
+            
+            .restaurant-building i,
+            .email-inbox i {
+                font-size: 1.5rem;
+            }
+            
+            .path-line {
+                left: 40px;
+                right: 40px;
+            }
+            
+            .mail-icon {
+                left: 40px;
+            }
+            
+            @keyframes deliverMail {
+                100% {
+                    left: calc(100% - 60px);
+                }
+            }
+        }
