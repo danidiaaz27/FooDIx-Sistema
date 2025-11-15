@@ -38,8 +38,9 @@ public class UsuarioController {
             currentUser.put("name", usuario.getNombre());
             currentUser.put("lastName", usuario.getApellidoPaterno());
             currentUser.put("email", usuario.getCorreoElectronico());
-            currentUser.put("phone", usuario.getTelefono());
-            currentUser.put("address", usuario.getDireccion());
+            currentUser.put("phone", usuario.getTelefono() != null ? usuario.getTelefono() : "");
+            currentUser.put("address", usuario.getDireccion() != null ? usuario.getDireccion() : "");
+            currentUser.put("birthdate", usuario.getFechaNacimiento() != null ? usuario.getFechaNacimiento().toString() : "");
             
             // Agregar datos al modelo
             model.addAttribute("usuario", usuario);

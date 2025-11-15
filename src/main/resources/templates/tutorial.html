@@ -34,7 +34,9 @@
                     </a>
                 </li>
                 <li class="nav-item" th:if="${currentUser == null}">
-                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">Contacto</a>
+                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">
+                        <i class="fas fa-envelope"></i> Contacto
+                    </a>
                 </li>
 
                 <!-- Opciones para usuarios autenticados -->

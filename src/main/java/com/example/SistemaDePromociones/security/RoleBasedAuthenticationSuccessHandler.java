@@ -1,9 +1,11 @@
 package com.example.SistemaDePromociones.security;
 
 import com.example.SistemaDePromociones.model.Rol;
+import com.example.SistemaDePromociones.model.Usuario;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -23,8 +25,19 @@ public class RoleBasedAuthenticationSuccessHandler implements AuthenticationSucc
                                        HttpServletResponse response,
                                        Authentication authentication) throws IOException, ServletException {
         
+        // Guardar el objeto Usuario en la sesión para que Thymeleaf pueda acceder
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Usuario usuario = userDetails.getUsuario();
+        
+        HttpSession session = request.getSession();
+        session.setAttribute("usuario", usuario);
+        
+        System.out.println("✅ [AUTH] Usuario guardado en sesión: " + usuario.getNombre() + " (Rol: " + usuario.getCodigoRol() + ")");
+        
         // Obtener el rol del usuario autenticado
         String redirectUrl = determineTargetUrl(authentication);
+        
+        System.out.println("🔀 [AUTH] Redirigiendo a: " + redirectUrl);
         
         // Redirigir al usuario
         response.sendRedirect(redirectUrl);

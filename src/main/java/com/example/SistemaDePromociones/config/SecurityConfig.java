@@ -43,6 +43,7 @@ public class SecurityConfig {
                     "/api/roles/**",            // API de roles (específicos)
                     "/api/provincias/**",       // API de provincias
                     "/api/distritos/**",        // API de distritos
+                    "/api/tipos-vehiculo",      // API de tipos de vehículo
                     "/api/validation/**",       // API de validación
                     "/menuAdministrador/test-password",  // Test de passwords
                     "/css/**",                  // Recursos estáticos CSS
@@ -80,7 +81,7 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
+                .logoutSuccessUrl("/?logout=true")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
