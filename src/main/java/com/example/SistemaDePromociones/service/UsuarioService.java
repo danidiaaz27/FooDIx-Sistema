@@ -60,4 +60,24 @@ public class UsuarioService {
             codigoDistrito
         );
     }
+    
+    /**
+     * Verificar si un correo electrónico existe en el sistema
+     */
+    public boolean existeEmail(String correoElectronico) {
+        return usuarioRepository.existsByCorreoElectronico(correoElectronico);
+    }
+    
+    /**
+     * Actualizar la contraseña de un usuario
+     */
+    @Transactional
+    public void actualizarPassword(String correoElectronico, String nuevaPasswordEncriptada) {
+        if (!existeEmail(correoElectronico)) {
+            throw new RuntimeException("El correo electrónico no está registrado");
+        }
+        
+        usuarioRepository.actualizarPassword(correoElectronico, nuevaPasswordEncriptada);
+        System.out.println("✅ [SERVICE] Contraseña actualizada para: " + correoElectronico);
+    }
 }

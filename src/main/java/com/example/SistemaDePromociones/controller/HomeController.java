@@ -69,14 +69,6 @@ public class HomeController {
     }
     
     /**
-     * Página de recuperación de contraseña
-     */
-    @GetMapping("/recuperar-password")
-    public String recuperarPassword() {
-        return "recuperar-password";
-    }
-    
-    /**
      * Página de contacto
      */
     @GetMapping("/contacto")
