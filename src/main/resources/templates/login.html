@@ -65,6 +65,11 @@
                             Has cerrado sesión correctamente
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
+                        <div th:if="${param.passwordChanged}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle"></i> 
+                            Tu contraseña ha sido actualizada correctamente. Por favor, inicia sesión con tu nueva contraseña.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
                         <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
                             <span th:text="${message}"></span>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

@@ -6,7 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     // DETECCIÓN DE SELECCIÓN PREVIA DESDE INDEX
     // =============================================
-    const businessType = localStorage.getItem('selectedBusinessType');
+    // Detectar tipo desde parámetro URL o localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipoFromUrl = urlParams.get('tipo');
+    const businessType = tipoFromUrl || localStorage.getItem('selectedBusinessType');
     
     // =============================================
     // REFERENCIAS A ELEMENTOS DEL DOM
@@ -615,7 +618,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     // AUTOCOMPLETAR EMAIL DESDE URL (VERIFICACIÓN)
     // =============================================
-    const urlParams = new URLSearchParams(window.location.search);
     const verifiedEmail = urlParams.get('email');
     if (verifiedEmail) {
         const emailInput = document.getElementById('CorreoElectronico');

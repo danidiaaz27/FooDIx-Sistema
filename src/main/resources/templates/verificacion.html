@@ -7,143 +7,584 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/verificacion.css}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .verification-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(160, 0, 42, 0.3);
+        }
+
+        .logo-icon i {
+            font-size: 40px;
+            color: white;
+        }
+
+        h1 {
+            color: #a0002a;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #a0002a;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(160, 0, 42, 0.1);
+        }
+
+        /* Code inputs styles */
+        .code-inputs {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .code-input {
+            width: 60px;
+            height: 70px;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #a0002a;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(160, 0, 42, 0.1);
+        }
+
+        .code-input.filled {
+            border-color: #a0002a;
+            background-color: #fff8dc;
+        }
+
+        .code-input.error {
+            border-color: #dc3545;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a0002a 0%, #c71636 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 0, 42, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(160, 0, 42, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e0e0e0;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #a0002a;
+            color: #a0002a;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert i {
+            font-size: 20px;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: auto;
+            opacity: 0.5;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            color: #a0002a;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #FFD700;
+            transform: translateX(-5px);
+        }
+
+        .form-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .timer {
+            color: #6c757d;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .resend-link {
+            color: #a0002a;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .resend-link:hover {
+            text-decoration: underline;
+            color: #FFD700;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .delivery-animation {
+            position: relative;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .restaurant-building,
+        .email-inbox {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .restaurant-building i,
+        .email-inbox i {
+            color: #a0002a;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .restaurant-label,
+        .inbox-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .delivery-path {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            transform: translateY(-50%);
+        }
+
+        .path-line {
+            position: absolute;
+            top: 50%;
+            left: 60px;
+            right: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #a0002a, #FFD700);
+            border-radius: 2px;
+            transform: translateY(-50%);
+        }
+
+        .mail-icon {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: deliverMail 2s ease-in-out infinite;
+        }
+
+        .mail-icon i {
+            color: #FFD700;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: mailFly 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes deliverMail {
+            0% {
+                left: 60px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                left: calc(100% - 80px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes mailFly {
+            0% {
+                transform: translateY(-5px) rotate(-5deg);
+            }
+            100% {
+                transform: translateY(5px) rotate(5deg);
+            }
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #a0002a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .verification-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .logo-icon i {
+                font-size: 30px;
+            }
+
+            .code-inputs {
+                gap: 5px;
+            }
+
+            .code-input {
+                width: 45px;
+                height: 55px;
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Barra de Navegación -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-        <a class="navbar-brand" href="/" th:href="@{/}">
-            <i class="fas fa-utensils"></i> FoodIx
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
-            <span class="navbar-toggler-icon"></span>
+<div class="verification-container">
+    <!-- Logo y Título -->
+    <div class="logo-container">
+        <div class="logo-icon">
+            <i class="fas fa-utensils"></i>
+        </div>
+        <h1>Verificación de Correo</h1>
+        <p class="subtitle">Verifica tu cuenta de FoodIx</p>
+    </div>
+
+    <!-- Contenedor dinámico de alertas -->
+    <div id="alertContainer"></div>
+
+    <!-- Modales de notificación del servidor -->
+    <div th:if="${message}" class="modal show" id="serverSuccessModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <i class="fas fa-check-circle" style="font-size: 60px; color: #28a745; margin-bottom: 20px;"></i>
+            <h3 style="color: #28a745; margin-bottom: 15px; font-size: 24px;">¡Éxito!</h3>
+            <p style="color: #666; margin-bottom: 25px;" th:text="${message}"></p>
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('serverSuccessModal').classList.remove('show')" style="width: auto; padding: 10px 30px;">
+                Aceptar
+            </button>
+        </div>
+    </div>
+    
+    <div th:if="${error}" class="modal show" id="serverErrorModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <i class="fas fa-exclamation-circle" style="font-size: 60px; color: #dc3545; margin-bottom: 20px;"></i>
+            <h3 style="color: #dc3545; margin-bottom: 15px; font-size: 24px;">Error</h3>
+            <p style="color: #666; margin-bottom: 25px;" th:text="${error}"></p>
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('serverErrorModal').classList.remove('show')" style="width: auto; padding: 10px 30px;">
+                Aceptar
+            </button>
+        </div>
+    </div>
+
+    <!-- Formulario de correo electrónico -->
+    <form id="emailForm" action="/auth/send-code" th:action="@{/auth/send-code}" method="post">
+        <input type="hidden" id="tipoRegistro" name="tipo" th:value="${tipoRegistro != null ? tipoRegistro : 'usuario'}">
+        
+        <div class="form-group">
+            <label for="email">
+                <i class="fas fa-envelope"></i> Correo Electrónico
+            </label>
+            <input type="email" id="email" name="email" required placeholder="correo@ejemplo.com">
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i>
+            Enviar código
         </button>
-        <div class="collapse navbar-collapse" id="menuNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
-                        <i class="fas fa-question-circle"></i> Tutorial
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login" th:href="@{/login}">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">
-                        <i class="fas fa-envelope"></i> Contacto
-                    </a>
-                </li>             
-            </ul>
-        </div>
-    </div>
-</nav>
+    </form>
 
-<!-- Contenido Principal -->
-<main class="verificacion-main">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5 col-lg-4">
-                <div class="card shadow-lg mt-5">
-                    <div class="card-body p-4">
-                        <div class="text-center mb-4">
-                            <h2 class="fw-bold">Verificación</h2>
-                            <p class="text-muted">Verifica tu correo electrónico</p>
-                        </div>
-
-                        <!-- Mensajes de notificación -->
-                        <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
-                            <span th:text="${message}"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <span th:text="${error}"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-
-                        <!-- Formulario de correo electrónico -->
-                        <form id="emailForm" action="/auth/send-code" th:action="@{/auth/send-code}" method="post" class="needs-validation">
-                            <input type="hidden" id="tipoRegistro" name="tipo" th:value="${tipoRegistro != null ? tipoRegistro : 'usuario'}">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <i class="fas fa-paper-plane"></i> Enviar código
-                            </button>
-                        </form>
-
-                        <!-- Formulario de verificación (inicialmente oculto) -->
-                        <form id="verificationForm" action="/auth/verify-code" th:action="@{/auth/verify-code}" method="post" class="needs-validation" style="display: none;">
-                            <div class="mb-3">
-                                <label for="code" class="form-label">Código de Verificación</label>
-                                <input type="text" class="form-control" id="code" name="code" required 
-                                       pattern="[0-9]{6}" maxlength="6" placeholder="Ingrese el código de 6 dígitos">
-                                <div class="form-text">
-                                    Ingrese el código enviado a su correo electrónico
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <i class="fas fa-check"></i> Verificar código
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary w-100" onclick="showEmailForm()">
-                                <i class="fas fa-envelope"></i> Cambiar correo
-                            </button>
-                        </form>
-
-                        <!-- Enlace para volver -->
-                        <div class="text-center mt-3">
-                            <a href="/login" th:href="@{/login}" class="text-decoration-none">
-                                <i class="fas fa-arrow-left"></i> Volver al inicio de sesión
-                            </a>
-                        </div>
-                    </div>
-                </div>
+    <!-- Formulario de verificación (inicialmente oculto) -->
+    <form id="verificationForm" action="/auth/verify-code" th:action="@{/auth/verify-code}" method="post" style="display: none;">
+        <div class="form-group">
+            <label>
+                <i class="fas fa-key"></i> Código de Verificación
+            </label>
+            <div class="code-inputs">
+                <input type="text" class="code-input" maxlength="1" id="digit1" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="digit2" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="digit3" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="digit4" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="digit5" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="digit6" autocomplete="off">
+            </div>
+            <input type="hidden" id="code" name="code">
+            <div class="form-text">
+                <i class="fas fa-info-circle"></i> 
+                Ingrese el código enviado a su correo electrónico
             </div>
         </div>
-    </div>
-</main>
 
-<!-- Modal de animación correo -->
-<div class="modal fade" id="codeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="codeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center p-4">
-                <!-- Animación Correo -->
-                <div class="delivery-animation">
-                    <div class="restaurant-building">
-                        <i class="fas fa-store fa-2x"></i>
-                        <div class="restaurant-label">FoodIx</div>
-                    </div>
-                    
-                    <div class="delivery-path">
-                        <div class="path-line"></div>
-                        <div class="mail-icon" id="animatedMail">
-                            <i class="fas fa-envelope-square fa-2x"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="email-inbox">
-                        <i class="fas fa-inbox fa-2x"></i>
-                        <div class="inbox-label">Tu Correo</div>
-                    </div>
-                </div>
-                
-                <h5 class="modal-title mb-3 mt-4" id="codeModalLabel">Enviando código...</h5>
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-3 mb-0 text-muted">El código está en camino a tu bandeja de entrada</p>
-            </div>
+        <button type="submit" class="btn btn-primary" id="btnVerificar" disabled>
+            <i class="fas fa-check"></i>
+            Verificar código
+        </button>
+
+        <div class="text-center mt-3">
+            <p class="mb-2">
+                <span class="timer" id="timer" style="display: none;">Reenviar código en <span id="countdown">60</span>s</span>
+            </p>
+            <a href="#" class="resend-link" id="resendLink" style="display: none;">
+                <i class="fas fa-redo me-1"></i>Reenviar código
+            </a>
         </div>
+
+        <button type="button" class="btn btn-secondary" onclick="showEmailForm()">
+            <i class="fas fa-envelope"></i>
+            Cambiar correo
+        </button>
+    </form>
+
+    <!-- Enlace para volver -->
+    <div class="back-link">
+        <a href="/login" th:href="@{/login}">
+            <i class="fas fa-arrow-left"></i>
+            Volver al inicio de sesión
+        </a>
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- Modal de loading verificación -->
+<div class="modal" id="loadingModal">
+    <div class="modal-content" style="max-width: 300px;">
+        <div class="spinner-border"></div>
+        <h3 style="color: #a0002a; margin: 20px 0 10px; font-size: 20px;">Verificando código...</h3>
+        <p style="color: #666; font-size: 14px;">Por favor espera</p>
+    </div>
+</div>
+
+<!-- Modal de animación correo -->
+<div class="modal" id="codeModal">
+    <div class="modal-content">
+        <!-- Animación Correo -->
+        <div class="delivery-animation">
+            <div class="restaurant-building">
+                <i class="fas fa-store"></i>
+                <div class="restaurant-label">FoodIx</div>
+            </div>
+            
+            <div class="delivery-path">
+                <div class="path-line"></div>
+                <div class="mail-icon">
+                    <i class="fas fa-envelope-square"></i>
+                </div>
+            </div>
+            
+            <div class="email-inbox">
+                <i class="fas fa-inbox"></i>
+                <div class="inbox-label">Tu Correo</div>
+            </div>
+        </div>
+        
+        <h2 style="color: #a0002a; margin: 20px 0 10px;">Enviando código...</h2>
+        <div class="spinner-border"></div>
+        <p style="color: #666; margin-top: 20px;">El código está en camino a tu bandeja de entrada</p>
+    </div>
+</div>
+
 <script th:src="@{/js/verificacion.js}"></script>
 </body>
 </html>

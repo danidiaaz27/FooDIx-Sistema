@@ -23,26 +23,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /**
  * Selecciona el tipo de negocio (restaurante o repartidor)
- * y muestra el modal de confirmación
+ * y redirige a verificacion.html
  */
 function selectBusinessType(type) {
     console.log('📌 Tipo de negocio seleccionado:', type);
     
-    // Guardar en localStorage
+    // Guardar en localStorage para uso posterior si es necesario
     localStorage.setItem('selectedBusinessType', type);
     console.log('💾 Guardado en localStorage:', type);
     
-    // Cerrar modal de selección
-    const negocioModal = bootstrap.Modal.getInstance(document.getElementById('negocioModal'));
-    if (negocioModal) {
-        negocioModal.hide();
-    }
-    
-    // Mostrar modal de confirmación después de un pequeño delay
-    setTimeout(() => {
-        const confirmacionModal = new bootstrap.Modal(document.getElementById('confirmacionModal'));
-        confirmacionModal.show();
-    }, 300);
+    // Redirigir directamente a verificacion (sin parámetros)
+    window.location.href = '/verificacion';
 }
 
 /**

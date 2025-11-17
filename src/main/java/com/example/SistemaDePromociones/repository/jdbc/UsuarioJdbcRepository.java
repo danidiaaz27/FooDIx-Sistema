@@ -83,4 +83,17 @@ public class UsuarioJdbcRepository {
         
         return keyHolder.getKey().longValue();
     }
+    
+    /**
+     * Actualizar la contraseña de un usuario
+     */
+    public int actualizarPassword(String correoElectronico, String nuevaPasswordEncriptada) {
+        String sql = "UPDATE usuario SET contrasena = ?, fecha_modificacion = NOW() " +
+                    "WHERE correo_electronico = ?";
+        
+        int filasActualizadas = jdbcTemplate.update(sql, nuevaPasswordEncriptada, correoElectronico);
+        System.out.println("📝 [REPOSITORY] Contraseña actualizada. Filas afectadas: " + filasActualizadas);
+        
+        return filasActualizadas;
+    }
 }
