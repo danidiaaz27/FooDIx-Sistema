@@ -45,6 +45,7 @@ services:
       - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql
+      - ./datos_iniciales.sql:/docker-entrypoint-initdb.d/datos_iniciales.sql
     # --- AÑADIDO AQUÍ ---
     # Esta sección le dice a Docker cómo saber si MySQL está listo
     healthcheck:

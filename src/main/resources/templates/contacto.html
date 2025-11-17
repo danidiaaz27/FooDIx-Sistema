@@ -29,10 +29,14 @@
                     </a>
                 </li>
                 <li class="nav-item" th:if="${currentUser == null}">
-                    <a class="nav-link" href="/login" th:href="@{/login}">Iniciar Sesión</a>
+                    <a class="nav-link" href="/login" th:href="@{/login}">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
                 </li>
                 <li class="nav-item" th:if="${currentUser == null}">
-                    <a class="nav-link active" href="/contacto" th:href="@{/contacto}">Contacto</a>
+                    <a class="nav-link active" href="/contacto" th:href="@{/contacto}">
+                        <i class="fas fa-envelope"></i> Contacto
+                    </a>
                 </li>
 
                 <!-- Opciones para usuarios autenticados -->

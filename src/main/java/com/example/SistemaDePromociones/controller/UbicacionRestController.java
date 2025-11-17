@@ -2,8 +2,10 @@ package com.example.SistemaDePromociones.controller;
 
 import com.example.SistemaDePromociones.model.Distrito;
 import com.example.SistemaDePromociones.model.Provincia;
+import com.example.SistemaDePromociones.model.TipoVehiculo;
 import com.example.SistemaDePromociones.repository.jdbc.DistritoJdbcRepository;
 import com.example.SistemaDePromociones.repository.jdbc.ProvinciaJdbcRepository;
+import com.example.SistemaDePromociones.repository.TipoVehiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST Controller para APIs de ubicación (provincias y distritos)
+ * REST Controller para APIs de ubicación (provincias y distritos) y tipos de vehículo
  * Usa JdbcTemplate para SQL directo sin Hibernate
  */
 @RestController
@@ -23,6 +25,9 @@ public class UbicacionRestController {
     
     @Autowired
     private DistritoJdbcRepository distritoRepository;
+    
+    @Autowired
+    private TipoVehiculoRepository tipoVehiculoRepository;
     
     /**
      * Obtener provincias por departamento
@@ -50,5 +55,17 @@ public class UbicacionRestController {
         System.out.println("🏘️ API: Distritos encontrados: " + distritos.size());
         distritos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
         return ResponseEntity.ok(distritos);
+    }
+    
+    /**
+     * Obtener tipos de vehículo activos
+     * GET /api/tipos-vehiculo
+     */
+    @GetMapping("/tipos-vehiculo")
+    public ResponseEntity<List<TipoVehiculo>> obtenerTiposVehiculo() {
+        System.out.println("🚗 API: Obteniendo tipos de vehículo activos");
+        List<TipoVehiculo> tipos = tipoVehiculoRepository.findByEstadoTrue();
+        System.out.println("🚗 API: Tipos de vehículo encontrados: " + tipos.size());
+        return ResponseEntity.ok(tipos);
     }
 }
