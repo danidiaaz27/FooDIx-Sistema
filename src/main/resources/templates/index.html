@@ -332,39 +332,39 @@
 <div class="modal fade" id="negocioModal" tabindex="-1" aria-labelledby="negocioModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="negocioModalLabel">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%); border: none;">
+                <h5 class="modal-title fw-bold" id="negocioModalLabel">
                     <i class="fas fa-briefcase me-2"></i>¿Tienes un negocio?
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <p class="text-center lead mb-4">Únete a FoodIx y aumenta tus ventas con nuestras promociones</p>
-                <div class="row g-4">
+                <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="card h-100 shadow-sm hover-card" style="border: 2px solid #28a745; cursor: pointer;" onclick="selectBusinessType('restaurante')">
+                        <div class="card h-100 shadow-sm hover-card border-2" style="cursor: pointer; border-color: #28a745;" onclick="selectBusinessType('restaurante')">
                             <div class="card-body text-center p-4">
                                 <div class="mb-3">
                                     <i class="fas fa-store fa-4x text-success"></i>
                                 </div>
-                                <h4 class="fw-bold text-success">Soy Restaurante</h4>
-                                <p class="text-muted">Registra tu negocio y empieza a vender con descuentos exclusivos</p>
-                                <button class="btn btn-success btn-lg w-100 mt-3" onclick="selectBusinessType('restaurante'); event.stopPropagation();">
-                                    <i class="fas fa-arrow-right me-2"></i>Registrar Restaurante
+                                <h5 class="fw-bold text-success mb-2">Restaurante</h5>
+                                <p class="text-muted small mb-3">Aumenta tus ventas con nuestras promociones</p>
+                                <button type="button" class="btn btn-success btn-sm w-100" onclick="selectBusinessType('restaurante'); event.stopPropagation();">
+                                    Seleccionar
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="card h-100 shadow-sm hover-card" style="border: 2px solid #17a2b8; cursor: pointer;" onclick="selectBusinessType('repartidor')">
+                        <div class="card h-100 shadow-sm hover-card border-2" style="cursor: pointer; border-color: #17a2b8;" onclick="selectBusinessType('repartidor')">
                             <div class="card-body text-center p-4">
                                 <div class="mb-3">
                                     <i class="fas fa-motorcycle fa-4x text-info"></i>
                                 </div>
-                                <h4 class="fw-bold text-info">Quiero ser Repartidor</h4>
-                                <p class="text-muted">Gana dinero extra repartiendo comida en tus tiempos libres</p>
-                                <button class="btn btn-info btn-lg w-100 mt-3" onclick="selectBusinessType('repartidor'); event.stopPropagation();">
-                                    <i class="fas fa-arrow-right me-2"></i>Registrarme como Repartidor
+                                <h5 class="fw-bold text-info mb-2">Delivery</h5>
+                                <p class="text-muted small mb-3">Gana dinero extra repartiendo comida</p>
+                                <button type="button" class="btn btn-info btn-sm w-100" onclick="selectBusinessType('repartidor'); event.stopPropagation();">
+                                    Seleccionar
                                 </button>
                             </div>
                         </div>

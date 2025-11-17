@@ -36,9 +36,12 @@ public class SecurityConfig {
                     "/verificacion",            // Verificación de email
                     "/auth/send-code",          // Envío de código de verificación
                     "/auth/verify-code",        // Verificación de código
+                    "/recuperar-password",      // Recuperar contraseña
+                    "/verificar-codigo",        // Verificar código de recuperación
+                    "/cambiar-password",        // Cambiar contraseña
+                    "/auth/recovery/**",        // Endpoints de recuperación de contraseña
                     "/contacto",                // Página de contacto
                     "/tutorial",                // Tutorial
-                    "/recuperar-password",      // Recuperación de contraseña
                     "/api/roles",               // API de roles (para formularios)
                     "/api/roles/**",            // API de roles (específicos)
                     "/api/provincias/**",       // API de provincias
@@ -90,6 +93,7 @@ public class SecurityConfig {
                 .ignoringRequestMatchers(
                     "/auth/send-code",
                     "/auth/verify-code",
+                    "/auth/recovery/**",
                     "/api/**"
                 )
             )
