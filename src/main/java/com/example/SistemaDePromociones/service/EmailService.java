@@ -2,13 +2,13 @@ package com.example.SistemaDePromociones.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class EmailService {
@@ -41,44 +41,8 @@ public class EmailService {
             throw new RuntimeException("No se pudo enviar el correo de verificación: " + e.getMessage());
         }
     }
-    
+
     /**
-<<<<<<< HEAD
-     * Envía notificación de rechazo al restaurante
-     */
-    public void sendRestaurantRejectionNotification(String to, String nombreRestaurante, String motivoRechazo) {
-        logger.info("Enviando notificación de rechazo a restaurante: {}", to);
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(to);
-            message.setSubject("Notificación sobre su solicitud de registro - FoodIx");
-            
-            String emailBody = String.format(
-                "Estimado(a) propietario(a) de %s,\n\n" +
-                "Lamentamos informarle que su solicitud de registro en la plataforma FoodIx ha sido rechazada.\n\n" +
-                "Motivo del rechazo:\n%s\n\n" +
-                "Si desea obtener más información o considerar una nueva solicitud, " +
-                "por favor contacte con nuestro equipo de soporte.\n\n" +
-                "Gracias por su interés en FoodIx.\n\n" +
-                "Atentamente,\n" +
-                "Equipo de FoodIx\n" +
-                "soporte@foodix.com",
-                nombreRestaurante,
-                motivoRechazo
-            );
-            
-            message.setText(emailBody);
-            
-            emailSender.send(message);
-            logger.info("Notificación de rechazo enviada exitosamente a: {}", to);
-        } catch (Exception e) {
-            logger.error("Error al enviar notificación de rechazo a: " + to, e);
-            // No lanzar excepción para no detener el proceso de rechazo
-            logger.warn("El restaurante fue rechazado pero no se pudo enviar el correo");
-        }
-    }
-=======
      * Enviar código de verificación con HTML para recuperación de contraseña
      */
     public void enviarCodigoVerificacion(String destinatario, String codigo) throws MessagingException {
@@ -182,7 +146,7 @@ public class EmailService {
             </html>
             """;
     }
-    
+
     /**
      * Construir HTML del correo de verificación para recuperación de contraseña
      */
@@ -262,5 +226,4 @@ public class EmailService {
             </html>
             """;
     }
->>>>>>> 59fbe85265c8c22762bbefd85ee389a0d513f8ab
 }
