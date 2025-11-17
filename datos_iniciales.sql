@@ -562,3 +562,127 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-13  3:47:22
+
+-- =====================================================
+-- SISTEMA DE PERMISOS GRANULARES
+-- Permisos específicos para cada acción en cada sección
+-- Fecha: 2025-11-17
+-- =====================================================
+
+-- Crear tabla de permisos
+CREATE TABLE IF NOT EXISTS `permiso` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` varchar(200) DEFAULT NULL,
+  `seccion` varchar(50) NOT NULL COMMENT 'Sección del menú: usuarios, clientes, restaurantes, delivery, categorias, configuracion',
+  `accion` varchar(50) DEFAULT NULL COMMENT 'Acción: Ver, Crear, Editar, Eliminar, Aprobar, Rechazar',
+  `estado` bit(1) NOT NULL DEFAULT b'1',
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `UK_nombre_permiso` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Crear tabla intermedia para relación ManyToMany entre Rol y Permiso
+CREATE TABLE IF NOT EXISTS `rol_permiso` (
+  `rol_codigo` bigint NOT NULL,
+  `permiso_codigo` bigint NOT NULL,
+  PRIMARY KEY (`rol_codigo`,`permiso_codigo`),
+  KEY `FK_rol_permiso_permiso` (`permiso_codigo`),
+  CONSTRAINT `FK_rol_permiso_permiso` FOREIGN KEY (`permiso_codigo`) REFERENCES `permiso` (`codigo`) ON DELETE CASCADE,
+  CONSTRAINT `FK_rol_permiso_rol` FOREIGN KEY (`rol_codigo`) REFERENCES `rol` (`codigo`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Limpiar permisos existentes (si los hay)
+DELETE FROM rol_permiso;
+DELETE FROM permiso;
+
+-- =====================================================
+-- PERMISOS PARA USUARIOS DEL SISTEMA
+-- =====================================================
+INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) VALUES
+('USUARIOS_VER', 'Ver lista de usuarios del sistema', 'usuarios', 'Ver', b'1'),
+('USUARIOS_CREAR', 'Crear nuevos usuarios del sistema', 'usuarios', 'Crear', b'1'),
+('USUARIOS_EDITAR', 'Editar información de usuarios existentes', 'usuarios', 'Editar', b'1'),
+('USUARIOS_ELIMINAR', 'Eliminar usuarios del sistema', 'usuarios', 'Eliminar', b'1'),
+('USUARIOS_CAMBIAR_ESTADO', 'Activar/desactivar usuarios', 'usuarios', 'Gestionar', b'1'),
+('USUARIOS_ASIGNAR_ROL', 'Cambiar el rol de un usuario', 'usuarios', 'Gestionar', b'1');
+
+-- =====================================================
+-- PERMISOS PARA CLIENTES
+-- =====================================================
+INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) VALUES
+('CLIENTES_VER', 'Ver lista de clientes registrados', 'clientes', 'Ver', b'1'),
+('CLIENTES_VER_DETALLE', 'Ver información detallada de un cliente', 'clientes', 'Ver', b'1'),
+('CLIENTES_EDITAR', 'Editar información de clientes', 'clientes', 'Editar', b'1'),
+('CLIENTES_ELIMINAR', 'Eliminar clientes del sistema', 'clientes', 'Eliminar', b'1'),
+('CLIENTES_CAMBIAR_ESTADO', 'Activar/desactivar clientes', 'clientes', 'Gestionar', b'1');
+
+-- =====================================================
+-- PERMISOS PARA RESTAURANTES
+-- =====================================================
+INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) VALUES
+('RESTAURANTES_VER', 'Ver lista de restaurantes registrados', 'restaurantes', 'Ver', b'1'),
+('RESTAURANTES_VER_DETALLE', 'Ver información detallada de un restaurante', 'restaurantes', 'Ver', b'1'),
+('RESTAURANTES_APROBAR', 'Aprobar solicitudes de registro de restaurantes', 'restaurantes', 'Aprobar', b'1'),
+('RESTAURANTES_RECHAZAR', 'Rechazar solicitudes de registro de restaurantes', 'restaurantes', 'Rechazar', b'1'),
+('RESTAURANTES_EDITAR', 'Editar información de restaurantes', 'restaurantes', 'Editar', b'1'),
+('RESTAURANTES_ELIMINAR', 'Eliminar restaurantes del sistema', 'restaurantes', 'Eliminar', b'1'),
+('RESTAURANTES_CAMBIAR_ESTADO', 'Activar/desactivar restaurantes', 'restaurantes', 'Gestionar', b'1');
+
+-- =====================================================
+-- PERMISOS PARA REPARTIDORES (DELIVERY)
+-- =====================================================
+INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) VALUES
+('DELIVERY_VER', 'Ver lista de repartidores registrados', 'delivery', 'Ver', b'1'),
+('DELIVERY_VER_DETALLE', 'Ver información detallada de un repartidor', 'delivery', 'Ver', b'1'),
+('DELIVERY_APROBAR', 'Aprobar solicitudes de registro de repartidores', 'delivery', 'Aprobar', b'1'),
+('DELIVERY_RECHAZAR', 'Rechazar solicitudes de registro de repartidores', 'delivery', 'Rechazar', b'1'),
+('DELIVERY_EDITAR', 'Editar información de repartidores', 'delivery', 'Editar', b'1'),
+('DELIVERY_ELIMINAR', 'Eliminar repartidores del sistema', 'delivery', 'Eliminar', b'1'),
+('DELIVERY_CAMBIAR_ESTADO', 'Activar/desactivar repartidores', 'delivery', 'Gestionar', b'1');
+
+-- =====================================================
+-- PERMISOS PARA CATEGORÍAS
+-- =====================================================
+INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) VALUES
+('CATEGORIAS_VER', 'Ver lista de categorías de productos', 'categorias', 'Ver', b'1'),
+('CATEGORIAS_CREAR', 'Crear nuevas categorías', 'categorias', 'Crear', b'1'),
+('CATEGORIAS_EDITAR', 'Editar categorías existentes', 'categorias', 'Editar', b'1'),
+('CATEGORIAS_ELIMINAR', 'Eliminar categorías', 'categorias', 'Eliminar', b'1'),
+('CATEGORIAS_CAMBIAR_ESTADO', 'Activar/desactivar categorías', 'categorias', 'Gestionar', b'1');
+
+-- =====================================================
+-- PERMISOS PARA CONFIGURACIÓN Y ROLES
+-- =====================================================
+INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) VALUES
+('CONFIGURACION_VER', 'Ver sección de configuración del sistema', 'configuracion', 'Ver', b'1'),
+('ROLES_VER', 'Ver lista de roles del sistema', 'configuracion', 'Ver', b'1'),
+('ROLES_CREAR', 'Crear nuevos roles', 'configuracion', 'Crear', b'1'),
+('ROLES_EDITAR', 'Editar roles existentes', 'configuracion', 'Editar', b'1'),
+('ROLES_ELIMINAR', 'Eliminar roles', 'configuracion', 'Eliminar', b'1'),
+('ROLES_ASIGNAR_PERMISOS', 'Asignar/modificar permisos de roles', 'configuracion', 'Gestionar', b'1'),
+('ROLES_CAMBIAR_ESTADO', 'Activar/desactivar roles', 'configuracion', 'Gestionar', b'1');
+
+-- =====================================================
+-- ASIGNAR TODOS LOS PERMISOS AL ROL ADMINISTRADOR
+-- =====================================================
+INSERT INTO `rol_permiso` (`rol_codigo`, `permiso_codigo`)
+SELECT 1, codigo FROM permiso WHERE estado = b'1';
+
+-- =====================================================
+-- VERIFICACIÓN DE PERMISOS
+-- =====================================================
+-- Ejecutar estas queries para verificar la correcta instalación:
+
+-- Ver todos los permisos creados por sección
+-- SELECT seccion, COUNT(*) as total_permisos FROM permiso WHERE estado = b'1' GROUP BY seccion;
+
+-- Ver permisos del administrador
+-- SELECT r.nombre AS rol, COUNT(p.codigo) as total_permisos 
+-- FROM rol r 
+-- INNER JOIN rol_permiso rp ON r.codigo = rp.rol_codigo 
+-- INNER JOIN permiso p ON rp.permiso_codigo = p.codigo 
+-- WHERE r.codigo = 1;
+
+-- =====================================================
+-- FIN DEL SCRIPT DE DATOS INICIALES
+-- =====================================================

@@ -37,4 +37,40 @@ public class EmailService {
             throw new RuntimeException("No se pudo enviar el correo de verificación: " + e.getMessage());
         }
     }
+    
+    /**
+     * Envía notificación de rechazo al restaurante
+     */
+    public void sendRestaurantRejectionNotification(String to, String nombreRestaurante, String motivoRechazo) {
+        logger.info("Enviando notificación de rechazo a restaurante: {}", to);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(to);
+            message.setSubject("Notificación sobre su solicitud de registro - FoodIx");
+            
+            String emailBody = String.format(
+                "Estimado(a) propietario(a) de %s,\n\n" +
+                "Lamentamos informarle que su solicitud de registro en la plataforma FoodIx ha sido rechazada.\n\n" +
+                "Motivo del rechazo:\n%s\n\n" +
+                "Si desea obtener más información o considerar una nueva solicitud, " +
+                "por favor contacte con nuestro equipo de soporte.\n\n" +
+                "Gracias por su interés en FoodIx.\n\n" +
+                "Atentamente,\n" +
+                "Equipo de FoodIx\n" +
+                "soporte@foodix.com",
+                nombreRestaurante,
+                motivoRechazo
+            );
+            
+            message.setText(emailBody);
+            
+            emailSender.send(message);
+            logger.info("Notificación de rechazo enviada exitosamente a: {}", to);
+        } catch (Exception e) {
+            logger.error("Error al enviar notificación de rechazo a: " + to, e);
+            // No lanzar excepción para no detener el proceso de rechazo
+            logger.warn("El restaurante fue rechazado pero no se pudo enviar el correo");
+        }
+    }
 }
