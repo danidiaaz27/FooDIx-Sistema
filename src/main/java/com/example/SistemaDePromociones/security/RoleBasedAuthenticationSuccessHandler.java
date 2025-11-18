@@ -1,6 +1,4 @@
 package com.example.SistemaDePromociones.security;
-
-import com.example.SistemaDePromociones.model.Rol;
 import com.example.SistemaDePromociones.model.Usuario;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

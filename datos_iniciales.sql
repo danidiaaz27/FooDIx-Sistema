@@ -1,4 +1,4 @@
-﻿-- MySQL dump 10.13  Distrib 8.0.44, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.44, for Linux (x86_64)
 --
 -- Host: localhost    Database: db_foodix
 -- ------------------------------------------------------
@@ -38,18 +38,18 @@ CREATE TABLE `categoria` (
 
 LOCK TABLES `categoria` WRITE;
 /*!40000 ALTER TABLE `categoria` DISABLE KEYS */;
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (1,'Pollo a la brasa y parrillas',_binary '','fa-drumstick-bite','Poller????a');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (2,'Ceviches y comida marina',_binary '','fa-fish','Cevicher????a');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (3,'Comida norte????a y chicharrones',_binary '','fa-utensils','Chaufer????a');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (4,'Restaurantes de mariscos',_binary '','fa-shrimp','Mariscos');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (5,'Platos tradicionales peruanos',_binary '','fa-plate-wheat','Comida Criolla');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (6,'Comida fusi????n chino-peruana',_binary '','fa-bowl-rice','Chifa');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (7,'Pizzas y comida italiana',_binary '','fa-pizza-slice','Pizzer????a');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (8,'Hamburguesas y fast food',_binary '','fa-burger','Hamburguesas');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (9,'Helader????as y postres',_binary '','fa-ice-cream','Postres');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (10,'Caf????s y bebidas',_binary '','fa-mug-hot','Cafeter????a');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (11,'Opciones vegetarianas y veganas',_binary '','fa-leaf','Comida Vegetariana');
-INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (12,'Comida japonesa',_binary '','fa-fish-fins','Sushi');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (1,'Pollo a la brasa y parrillas',_binary '','fa-drumstick-bite','Pollería');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (2,'Ceviches y comida marina',_binary '','fa-fish','Cevichería');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (3,'Comida norteña y chicharrones',_binary '','fa-utensils','Chaufería');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (4,'Restaurantes de mariscos',_binary '','fa-shrimp','Mariscos');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (5,'Platos tradicionales peruanos',_binary '','fa-plate-wheat','Comida Criolla');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (6,'Comida fusión chino-peruana',_binary '','fa-bowl-rice','Chifa');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (7,'Pizzas y comida italiana',_binary '','fa-pizza-slice','Pizzería');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (8,'Hamburguesas y fast food',_binary '','fa-burger','Hamburguesas');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (9,'Heladerías y postres',_binary '','fa-ice-cream','Postres');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (10,'Cafés y bebidas',_binary '','fa-mug-hot','Cafetería');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (11,'Opciones vegetarianas y veganas',_binary '','fa-leaf','Comida Vegetariana');
+INSERT INTO `categoria` (`codigo`, `descripcion`, `estado`, `icono`, `nombre`) VALUES (12,'Comida japonesa',_binary '','fa-fish-fins','Sushi');
 /*!40000 ALTER TABLE `categoria` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -126,44 +126,44 @@ CREATE TABLE `distrito` (
 
 LOCK TABLES `distrito` WRITE;
 /*!40000 ALTER TABLE `distrito` DISABLE KEYS */;
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (1,1,_binary '','Chiclayo');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (2,1,_binary '','Chongoyape');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (3,1,_binary '','Eten');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (4,1,_binary '','Eten Puerto');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (5,1,_binary '','Jos?? Leonardo Ortiz');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (6,1,_binary '','La Victoria');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (7,1,_binary '','Lagunas');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (8,1,_binary '','Monsef??');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (9,1,_binary '','Nueva Arica');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (10,1,_binary '','Oyot??n');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (11,1,_binary '','P??tapo');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (12,1,_binary '','Picsi');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (13,1,_binary '','Pimentel');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (14,1,_binary '','Pomalca');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (15,1,_binary '','Pucal??');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (16,1,_binary '','Reque');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (17,1,_binary '','Santa Rosa');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (18,1,_binary '','Sa??a');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (19,1,_binary '','Cayalt??');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (20,1,_binary '','Tum??n');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (21,2,_binary '','Lambayeque');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (22,2,_binary '','Ch??chope');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (23,2,_binary '','Illimo');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (24,2,_binary '','Jayanca');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (25,2,_binary '','Mochumi');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (26,2,_binary '','M??rrope');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (27,2,_binary '','Motupe');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (28,2,_binary '','Olmos');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (29,2,_binary '','Pacora');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (30,2,_binary '','Salas');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (31,2,_binary '','San Jos??');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (32,2,_binary '','T??cume');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (33,3,_binary '','Ferre??afe');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (34,3,_binary '','Ca??aris');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (35,3,_binary '','Incahuasi');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (36,3,_binary '','Manuel Antonio Mesones Muro');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (37,3,_binary '','P??tipo');
-INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (38,3,_binary '','Pueblo Nuevo');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (1,1,_binary '','Chiclayo');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (2,1,_binary '','Chongoyape');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (3,1,_binary '','Eten');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (4,1,_binary '','Eten Puerto');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (5,1,_binary '','José Leonardo Ortiz');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (6,1,_binary '','La Victoria');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (7,1,_binary '','Lagunas');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (8,1,_binary '','Monsefú');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (9,1,_binary '','Nueva Arica');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (10,1,_binary '','Oyotún');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (11,1,_binary '','Pátapo');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (12,1,_binary '','Picsi');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (13,1,_binary '','Pimentel');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (14,1,_binary '','Pomalca');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (15,1,_binary '','Pucalá');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (16,1,_binary '','Reque');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (17,1,_binary '','Santa Rosa');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (18,1,_binary '','Saña');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (19,1,_binary '','Cayaltí');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (20,1,_binary '','Tumán');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (21,2,_binary '','Lambayeque');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (22,2,_binary '','Chóchope');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (23,2,_binary '','Illimo');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (24,2,_binary '','Jayanca');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (25,2,_binary '','Mochumi');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (26,2,_binary '','Mórrope');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (27,2,_binary '','Motupe');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (28,2,_binary '','Olmos');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (29,2,_binary '','Pacora');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (30,2,_binary '','Salas');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (31,2,_binary '','San José');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (32,2,_binary '','Túcume');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (33,3,_binary '','Ferreñafe');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (34,3,_binary '','Cañaris');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (35,3,_binary '','Incahuasi');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (36,3,_binary '','Manuel Antonio Mesones Muro');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (37,3,_binary '','Pítipo');
+INSERT INTO `distrito` (`codigo`, `codigo_provincia`, `estado`, `nombre`) VALUES (38,3,_binary '','Pueblo Nuevo');
 /*!40000 ALTER TABLE `distrito` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -249,30 +249,10 @@ CREATE TABLE `estado_aprobacion` (
 
 LOCK TABLES `estado_aprobacion` WRITE;
 /*!40000 ALTER TABLE `estado_aprobacion` DISABLE KEYS */;
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (7,'Solicitud en revisi??n',_binary '','Pendiente');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (8,'Solicitud aprobada',_binary '','Aprobado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (9,'Solicitud rechazada',_binary '','Rechazado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (10,'Solicitud en revisi????n',_binary '','Pendiente');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (11,'Solicitud aprobada',_binary '','Aprobado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (12,'Solicitud rechazada',_binary '','Rechazado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (13,'Solicitud en revisi????n',_binary '','Pendiente');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (14,'Solicitud aprobada',_binary '','Aprobado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (15,'Solicitud rechazada',_binary '','Rechazado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (16,'Solicitud en revisi????n',_binary '','Pendiente');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (17,'Solicitud aprobada',_binary '','Aprobado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (18,'Solicitud rechazada',_binary '','Rechazado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (19,'Solicitud en revisi????n',_binary '','Pendiente');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (20,'Solicitud aprobada',_binary '','Aprobado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (21,'Solicitud rechazada',_binary '','Rechazado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (22,'Solicitud en revisi????n',_binary '','Pendiente');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (23,'Solicitud aprobada',_binary '','Aprobado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (24,'Solicitud rechazada',_binary '','Rechazado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (25,'Solicitud en revisi??n',_binary '','Pendiente');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (26,'Solicitud aprobada',_binary '','Aprobado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (27,'Solicitud rechazada',_binary '','Rechazado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (28,'Solicitud en revisi??n',_binary '','Pendiente');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (29,'Solicitud aprobada',_binary '','Aprobado');
-INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (30,'Solicitud rechazada',_binary '','Rechazado');
+INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (7,'Solicitud en revisión',_binary '','Pendiente');
+INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (8,'Solicitud aprobada',_binary '','Aprobado');
+INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (9,'Solicitud rechazada',_binary '','Rechazado');
+INSERT INTO `estado_aprobacion` (`codigo`, `descripcion`, `estado`, `nombre`) VALUES (10,'Solicitud en revisión',_binary '','Pendiente');
 /*!40000 ALTER TABLE `estado_aprobacion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -328,9 +308,9 @@ CREATE TABLE `provincia` (
 
 LOCK TABLES `provincia` WRITE;
 /*!40000 ALTER TABLE `provincia` DISABLE KEYS */;
-INSERT INTO `provincia` (`codigo`, `codigo_departamento`, `estado`, `nombre`) VALUES (1,11,_binary '','Chiclayo');
-INSERT INTO `provincia` (`codigo`, `codigo_departamento`, `estado`, `nombre`) VALUES (2,11,_binary '','Lambayeque');
-INSERT INTO `provincia` (`codigo`, `codigo_departamento`, `estado`, `nombre`) VALUES (3,11,_binary '','Ferre??afe');
+INSERT INTO `provincia` (`codigo`, `codigo_departamento`, `estado`, `nombre`) VALUES (1,11,_binary '','Chiclayo');
+INSERT INTO `provincia` (`codigo`, `codigo_departamento`, `estado`, `nombre`) VALUES (2,11,_binary '','Lambayeque');
+INSERT INTO `provincia` (`codigo`, `codigo_departamento`, `estado`, `nombre`) VALUES (3,11,_binary '','Ferreñafe');
 /*!40000 ALTER TABLE `provincia` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -474,36 +454,9 @@ LOCK TABLES `tipo_vehiculo` WRITE;
 /*!40000 ALTER TABLE `tipo_vehiculo` DISABLE KEYS */;
 INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (9,_binary '','Bicicleta');
 INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (10,_binary '','Motocicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (11,_binary '','Scooter El??ctrico');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (12,_binary '','Autom??vil');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (13,_binary '','Bicicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (14,_binary '','Motocicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (15,_binary '','Scooter El????ctrico');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (16,_binary '','Autom????vil');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (17,_binary '','Bicicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (18,_binary '','Motocicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (19,_binary '','Scooter El????ctrico');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (20,_binary '','Autom????vil');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (21,_binary '','Bicicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (22,_binary '','Motocicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (23,_binary '','Scooter El????ctrico');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (24,_binary '','Autom????vil');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (25,_binary '','Bicicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (26,_binary '','Motocicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (27,_binary '','Scooter El????ctrico');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (28,_binary '','Autom????vil');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (29,_binary '','Bicicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (30,_binary '','Motocicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (31,_binary '','Scooter El????ctrico');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (32,_binary '','Autom????vil');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (33,_binary '','Bicicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (34,_binary '','Motocicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (35,_binary '','Scooter El??ctrico');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (36,_binary '','Autom??vil');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (37,_binary '','Bicicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (38,_binary '','Motocicleta');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (39,_binary '','Scooter El??ctrico');
-INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (40,_binary '','Autom??vil');
+INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (11,_binary '','Scooter Eléctrico');
+INSERT INTO `tipo_vehiculo` (`codigo`, `estado`, `nombre`) VALUES (12,_binary '','Automóvil');
+
 /*!40000 ALTER TABLE `tipo_vehiculo` ENABLE KEYS */;
 UNLOCK TABLES;
 

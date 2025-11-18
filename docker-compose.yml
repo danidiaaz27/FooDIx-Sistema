@@ -5,6 +5,8 @@ services:
     restart: always
     ports:
       - "8080:8080"
+    networks:
+      - app-network
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/db_foodix?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
       - SPRING_DATASOURCE_USERNAME=root
@@ -38,6 +40,8 @@ services:
   db:
     image: mysql:8.0
     restart: always
+    networks:
+      - app-network
     environment:
       - MYSQL_DATABASE=db_foodix
       - MYSQL_ROOT_PASSWORD=root
@@ -58,3 +62,7 @@ services:
 volumes:
   db-data:
   app-uploads:
+
+networks:
+  app-network:
+    driver: bridge

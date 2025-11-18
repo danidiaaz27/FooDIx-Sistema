@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -31,9 +31,9 @@
         }
     </style>
     <script>
-    // FunciÃ³n GLOBAL para cambiar secciones - DEFINIDA ANTES DE CARGAR EL BODY
+    // Funcion GLOBAL para cambiar secciones - DEFINIDA ANTES DE CARGAR EL BODY
     function showSection(sectionName) {
-        console.log('>>> Cambiando a secciÃ³n:', sectionName);
+        console.log('>>> Cambiando a seccion:', sectionName);
         
         // Ocultar todas las secciones
         var sections = document.querySelectorAll('.menu-section');
@@ -41,13 +41,13 @@
             section.classList.remove('active');
         });
         
-        // Mostrar la secciÃ³n seleccionada
+        // Mostrar la sección seleccionada
         var targetSection = document.getElementById(sectionName + '-content');
         if (targetSection) {
             targetSection.classList.add('active');
-            console.log('âœ“ SecciÃ³n mostrada:', sectionName + '-content');
+            console.log('Sección mostrada:', sectionName + '-content');
         } else {
-            console.error('âœ— No se encontrÃ³ la secciÃ³n:', sectionName + '-content');
+            console.error('No se encontró la sección:', sectionName + '-content');
         }
         
         // Actualizar links activos en el sidebar
@@ -63,7 +63,7 @@
 </head>
 <body>
 
-<!-- Barra de NavegaciÃ³n -->
+<!-- Barra de Navegación -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container">
         <a class="navbar-brand" href="/" th:href="@{/}">FoodIx Admin</a>
@@ -81,7 +81,7 @@
                             <li>
                                 <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
                                     <button type="submit" class="dropdown-item" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
-                                        <i class="fas fa-sign-out-alt"></i> Cerrar SesiÃ³n
+                                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesion
                                     </button>
                                 </form>
                             </li>
@@ -100,7 +100,7 @@
 <main class="container-fluid" style="padding-top: 90px;">
 
     <div class="row">
-        <!-- Sidebar de navegaciÃ³n -->
+        <!-- Sidebar de navegación -->
         <div class="col-md-3 col-lg-2 sidebar">
             <div class="sidebar-content">
                 <div class="user-info">
@@ -132,17 +132,17 @@
                         </a>
                     </li>
                     
-                    <!-- Reportes - Visible para todos (o agregar permiso especÃ­fico) -->
+                    <!-- Reportes - Visible para todos (o agregar permiso específico) -->
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('reportes')" data-section="reportes">
                             <i class="fas fa-chart-bar"></i> Reportes
                         </a>
                     </li>
                     
-                    <!-- ConfiguraciÃ³n - Solo si tiene permiso 'configuracion' -->
+                    <!-- Configuración - Solo si tiene permiso 'configuracion' -->
                     <li class="nav-item" th:if="${permisosUsuario.contains('configuracion')}">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('configuracion')" data-section="configuracion">
-                            <i class="fas fa-cog"></i> ConfiguraciÃ³n
+                            <i class="fas fa-cog"></i> Configuración
                         </a>
                     </li>
                 </ul>
@@ -151,7 +151,7 @@
 
         <!-- Contenido principal -->
         <div class="col-md-9 col-lg-10 main-content">
-            <!-- SecciÃ³n Usuarios/Clientes - Solo si tiene permiso -->
+            <!-- Sección Usuarios/Clientes - Solo si tiene permiso -->
             <section id="usuarios-content" class="menu-section" th:classappend="${permisosUsuario.contains('clientes') ? 'active' : ''}" th:if="${permisosUsuario.contains('clientes')}">
                 <div class="section-header">
                     <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
@@ -171,7 +171,7 @@
                             <div class="col-md-3">
                                 <label for="filterClienteDni" class="form-label"><i class="fas fa-id-card"></i> DNI</label>
                                 <input type="text" class="form-control" id="filterClienteDni" name="clienteDni" 
-                                       placeholder="NÃºmero de documento...">
+                                       placeholder="Número de documento...">
                             </div>
                             <div class="col-md-3">
                                 <label for="filterClienteEstado" class="form-label"><i class="fas fa-toggle-on"></i> Estado</label>
@@ -195,7 +195,7 @@
                                         <th>ID</th>
                                         <th>Nombre</th>
                                         <th>DNI</th>
-                                        <th>TelÃ©fono</th>
+                                        <th>Teléfono</th>
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -213,7 +213,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <!-- BotÃ³n Ver Detalles -->
+                                            <!-- Botón Ver Detalles -->
                                             <button type="button" class="btn btn-sm btn-outline-primary" 
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#viewClientModal"
@@ -227,7 +227,7 @@
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                             
-                                            <!-- BotÃ³n Modificar -->
+                                            <!-- Botón Modificar -->
                                             <button type="button" class="btn btn-sm btn-info" 
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#editUserModal"
@@ -241,7 +241,7 @@
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             
-                                            <!-- BotÃ³n Cambiar Estado -->
+                                            <!-- Botón Cambiar Estado -->
                                             <form th:action="@{/menuAdministrador/user/{id}/toggle-status(id=${user.codigo})}" 
                                                   method="post" style="display: inline;">
                                                 <button type="submit" class="btn btn-sm btn-warning" 
@@ -250,7 +250,7 @@
                                                 </button>
                                             </form>
                                             
-                                            <!-- BotÃ³n Eliminar -->
+                                            <!-- Botón Eliminar -->
                                             <form th:action="@{/menuAdministrador/user/{id}/delete(id=${user.codigo})}" 
                                                   method="post" style="display: inline;"
                                                   onsubmit="return confirm('¿Está seguro de eliminar este cliente?');">
@@ -272,14 +272,14 @@
                 </div>
             </section>
 
-            <!-- SecciÃ³n Restaurantes - Solo si tiene permiso -->
+            <!-- Sección Restaurantes - Solo si tiene permiso -->
             <section id="restaurantes-content" class="menu-section" th:if="${permisosUsuario.contains('restaurantes')}">
                 <div class="section-header">
                     <h2><i class="fas fa-store"></i> Gestión de Restaurantes</h2>
                     <p class="text-muted">Administra los restaurantes asociados</p>
                 </div>
 
-                <!-- Filtros de bÃºsqueda en tiempo real -->
+                <!-- Filtros de búsqueda en tiempo real -->
                 <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title mb-3"><i class="fas fa-filter"></i> Filtros</h5>
@@ -287,12 +287,12 @@
                             <div class="col-md-4">
                                 <label for="filterRestaurantName" class="form-label"><i class="fas fa-search"></i> Buscar por Nombre</label>
                                 <input type="text" class="form-control" id="filterRestaurantName" name="restaurantName" 
-                                       placeholder="Nombre comercial o razÃ³n social...">
+                                       placeholder="Nombre comercial o razón social...">
                             </div>
                             <div class="col-md-3">
                                 <label for="filterRestaurantRuc" class="form-label"><i class="fas fa-id-card"></i> RUC</label>
                                 <input type="text" class="form-control" id="filterRestaurantRuc" name="restaurantRuc" 
-                                       placeholder="NÃºmero de RUC...">
+                                       placeholder="Número de RUC...">
                             </div>
                             <div class="col-md-3">
                                 <label for="filterRestaurantEstado" class="form-label"><i class="fas fa-check-circle"></i> Estado</label>
@@ -334,7 +334,7 @@
                                         <td class="fw-bold" th:text="${restaurant.codigo}">1</td>
                                         <td>
                                             <div class="fw-bold" th:text="${restaurant.nombre}">Restaurante A</div>
-                                            <small class="text-muted" th:text="${restaurant.razonSocial}">RazÃ³n Social</small>
+                                            <small class="text-muted" th:text="${restaurant.razonSocial}">Razon Social</small>
                                         </td>
                                         <td>
                                             <span class="badge bg-secondary" th:text="${restaurant.ruc}">20131312955</span>
@@ -349,7 +349,7 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <!-- BotÃ³n Ver Detalles -->
+                                                <!-- Botón Ver Detalles -->
                                                 <button type="button" class="btn btn-sm btn-info" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#viewRestaurantModal"
@@ -363,8 +363,8 @@
                                                         title="Ver Detalles y Documentos">
                                                     <i class="fas fa-eye"></i> Ver
                                                 </button>
-                                                
-                                                <!-- BotÃ³n Aprobar -->
+
+                                                <!-- Botón Aprobar -->
                                                 <button type="button" class="btn btn-sm btn-success" 
                                                         onclick="aprobarRestaurante(this)"
                                                         th:data-id="${restaurant.codigo}"
@@ -373,7 +373,7 @@
                                                     <i class="fas fa-check"></i> Aprobar
                                                 </button>
                                                 
-                                                <!-- BotÃ³n Rechazar -->
+                                                <!-- Botón Rechazar -->
                                                 <button type="button" class="btn btn-sm btn-danger" 
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#rejectRestaurantModal"
@@ -397,7 +397,7 @@
                                         <td class="fw-bold" th:text="${restaurant.codigo}">1</td>
                                         <td>
                                             <div class="fw-bold" th:text="${restaurant.nombre}">Restaurante B</div>
-                                            <small class="text-muted" th:text="${restaurant.razonSocial}">RazÃ³n Social</small>
+                                            <small class="text-muted" th:text="${restaurant.razonSocial}">Razon Social</small>
                                         </td>
                                         <td>
                                             <span class="badge bg-secondary" th:text="${restaurant.ruc}">20131312955</span>
@@ -412,7 +412,7 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <!-- BotÃ³n Ver Detalles -->
+                                                <!-- Botón Ver Detalles -->
                                                 <button type="button" class="btn btn-sm btn-info" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#viewRestaurantModal"
@@ -427,7 +427,7 @@
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                                 
-                                                <!-- BotÃ³n Cambiar Estado -->
+                                                <!-- Botón Cambiar Estado -->
                                                 <button type="button" class="btn btn-sm btn-warning" 
                                                         onclick="toggleEstadoRestaurante(this)"
                                                         th:data-id="${restaurant.codigo}"
@@ -436,7 +436,7 @@
                                                     <i class="fas fa-toggle-on"></i>
                                                 </button>
                                                 
-                                                <!-- BotÃ³n Eliminar -->
+                                                <!-- Botón Eliminar -->
                                                 <button type="button" class="btn btn-sm btn-danger" 
                                                         onclick="eliminarRestaurante(this)"
                                                         th:data-id="${restaurant.codigo}"
@@ -466,14 +466,14 @@
                 </div>
             </section>
 
-            <!-- SecciÃ³n Delivery - Solo si tiene permiso -->
+            <!-- Sección Delivery - Solo si tiene permiso -->
             <section id="delivery-content" class="menu-section" th:if="${permisosUsuario.contains('delivery')}">
                 <div class="section-header">
                     <h2><i class="fas fa-motorcycle"></i> Gestión de Repartidores</h2>
                     <p class="text-muted">Administra los repartidores de la plataforma</p>
                 </div>
 
-                <!-- Filtros de bÃºsqueda en tiempo real -->
+                <!-- Filtros de búsqueda en tiempo real -->
                 <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title mb-3"><i class="fas fa-filter"></i> Filtros</h5>
@@ -521,7 +521,7 @@
                                 <tbody>
                                     <tr th:each="delivery : ${repartidores}">
                                         <td th:text="${delivery.codigo}">1</td>
-                                        <td th:text="${delivery.usuario != null ? delivery.usuario.nombreCompleto : 'N/A'}">Juan PÃ©rez</td>
+                                        <td th:text="${delivery.usuario != null ? delivery.usuario.nombreCompleto : 'N/A'}">Juan Pérez</td>
                                         <td th:text="${delivery.usuario != null ? delivery.usuario.correoElectronico : 'N/A'}">delivery@example.com</td>
                                         <td th:text="${delivery.usuario != null and delivery.usuario.telefono != null ? delivery.usuario.telefono : 'N/A'}">999999999</td>
                                         <td th:text="${delivery.numeroLicencia}">ABC123456</td>
@@ -589,7 +589,7 @@
                                             <div th:if="${delivery.codigoEstadoAprobacion == 9}">
                                                 <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.codigo})}" 
                                                       method="post" style="display: inline;"
-                                                      onsubmit="return confirm('Â¿EstÃ¡ seguro de eliminar este repartidor rechazado?');">
+                                                      onsubmit="return confirm('¿Está seguro de eliminar este repartidor rechazado?');">
                                                     <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
@@ -609,11 +609,11 @@
                 </div>
             </section>
 
-            <!-- Seccion Reportes -->
+            <!-- Sección Reportes -->
             <section id="reportes-content" class="menu-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-chart-bar"></i> Reportes y EstadÃ­sticas</h2>
-                    <p class="text-muted">Visualiza las estadÃ­sticas de la plataforma</p>
+                    <h2><i class="fas fa-chart-bar"></i> Reportes y Estadísticas</h2>
+                    <p class="text-muted">Visualiza las estadísticas de la plataforma</p>
                 </div>
 
                 <!-- Tarjetas de resumen -->
@@ -661,17 +661,17 @@
                 </div>
 
                 <div class="row g-4">
-                    <!-- Tarjeta CategorÃ­as -->
+                    <!-- Tarjeta Categorías -->
                     <div class="col-md-4">
                         <div class="card h-100 shadow-sm hover-card">
                             <div class="card-body text-center">
                                 <div class="mb-3">
                                     <i class="fas fa-tags fa-4x text-primary"></i>
                                 </div>
-                                <h5 class="card-title">CategorÃ­as</h5>
-                                <p class="card-text text-muted">Gestiona las categorÃ­as de restaurantes y productos</p>
+                                <h5 class="card-title">Categorías</h5>
+                                <p class="card-text text-muted">Gestiona las categorías de restaurantes y productos</p>
                                 <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#manageCategoriesModal">
-                                    <i class="fas fa-cog"></i> Gestionar CategorÃ­as
+                                    <i class="fas fa-cog"></i> Gestionar Categorías
                                 </button>
                             </div>
                         </div>
@@ -737,7 +737,7 @@
                         <input type="email" class="form-control" id="editUserEmail" name="email" required>
                     </div>
                     <div class="mb-3">
-                        <label for="editUserPhone" class="form-label">TelÃ©fono</label>
+                        <label for="editUserPhone" class="form-label">Teléfono</label>
                         <input type="text" class="form-control" id="editUserPhone" name="phone">
                     </div>
                     <div class="mb-3">
@@ -788,7 +788,7 @@
                     </div>
                     <div class="col-md-6">
                         <dl class="row">
-                            <dt class="col-sm-5">TelÃ©fono:</dt>
+                            <dt class="col-sm-5">Teléfono:</dt>
                             <dd class="col-sm-7" id="viewClientPhone">-</dd>
                             
                             <dt class="col-sm-5">Dirección:</dt>
@@ -829,7 +829,7 @@
                         <input type="email" class="form-control" id="editDeliveryEmail" name="email" required>
                     </div>
                     <div class="mb-3">
-                        <label for="editDeliveryPhone" class="form-label">TelÃ©fono</label>
+                        <label for="editDeliveryPhone" class="form-label">Teléfono</label>
                         <input type="text" class="form-control" id="editDeliveryPhone" name="phone">
                     </div>
                     <div class="mb-3">
@@ -978,9 +978,9 @@
                     <div class="mb-3">
                         <label for="motivoRechazo" class="form-label">Motivo del Rechazo <span class="text-danger">*</span></label>
                         <textarea class="form-control" id="motivoRechazo" name="motivo" rows="4" 
-                                  placeholder="Explique el motivo del rechazo (mÃ­nimo 10 caracteres)" 
+                                  placeholder="Explique el motivo del rechazo (mínimo 10 caracteres)" 
                                   required minlength="10"></textarea>
-                        <div class="form-text">Este motivo serÃ¡ visible para el restaurante.</div>
+                        <div class="form-text">Este motivo será visible para el restaurante.</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1016,7 +1016,7 @@
                         <input type="email" class="form-control" id="editRestaurantEmail" name="email" required>
                     </div>
                     <div class="mb-3">
-                        <label for="editRestaurantPhone" class="form-label">TelÃ©fono</label>
+                        <label for="editRestaurantPhone" class="form-label">Teléfono</label>
                         <input type="text" class="form-control" id="editRestaurantPhone" name="phone">
                     </div>
                 </div>
@@ -1166,7 +1166,7 @@
                             </div>
                             
                             <div class="mb-3">
-                                <label for="adminPassword" class="form-label">ContraseÃ±a *</label>
+                                <label for="adminPassword" class="form-label">Contraseña *</label>
                                 <div class="input-group">
                                     <input type="password" class="form-control" id="adminPassword" name="password" minlength="6" required>
                                     <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('adminPassword', this)">
@@ -1185,7 +1185,7 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="adminPhone" class="form-label">TelÃ©fono</label>
+                                <label for="adminPhone" class="form-label">Teléfono</label>
                                 <input type="text" class="form-control" id="adminPhone" name="phone">
                             </div>
                             <button type="submit" class="btn btn-success w-100">
@@ -1240,7 +1240,7 @@
 <div class="modal fade" id="manageRolesModal" tabindex="-1" aria-labelledby="manageRolesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content shadow-lg border-0">
-            <div class="modal-header bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);">
                 <h5 class="modal-title" id="manageRolesModalLabel">
                     <i class="fas fa-user-shield me-2"></i> Gestión de Roles del Sistema
                 </h5>
@@ -1668,7 +1668,7 @@
                         </div>
                     </div>
                     
-                    <!-- Inputs ocultos para los permisos seleccionados en ediciÃ³n -->
+                    <!-- Inputs ocultos para los permisos seleccionados en edición -->
                     <div id="editHiddenPermisosContainer"></div>
                 </div>
                 <div class="modal-footer bg-light">
@@ -1895,9 +1895,9 @@
     </div>
 </div>
 
-<!-- ContinuaciÃ³n de permisos ocultos antiguos eliminada -->
+<!-- Continuacion de permisos ocultos antiguos eliminada -->
                 
-<!-- Cierre de modales antiguos de ediciÃ³n -->
+<!-- Cierre de modales antiguos de edicion -->
 
 <!-- Modal para ver permisos de un rol -->
 <div class="modal fade" id="viewPermisosModal" tabindex="-1" aria-labelledby="viewPermisosModalLabel" aria-hidden="true" style="z-index: 1060;">
@@ -1911,7 +1911,7 @@
             </div>
             <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
                 <div id="permisosContent" class="row g-3">
-                    <!-- Se llenarÃ¡ dinÃ¡micamente con JavaScript -->
+                    <!-- Se llenará dinámicamente con JavaScript -->
                 </div>
             </div>
             <div class="modal-footer">
@@ -1926,7 +1926,7 @@
     </div>
 </div>
 
-<!-- Modal para listar categorÃ­as (antiguo - mantener por compatibilidad) -->
+<!-- Modal para listar categorías (antiguo - mantener por compatibilidad) -->
 <div class="modal fade" id="categoryListModal" tabindex="-1" aria-labelledby="categoryListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -1968,7 +1968,7 @@
                                     </form>
                                     <form th:action="@{/menuAdministrador/category/{id}/delete(id=${category.codigo})}" 
                                           method="post" style="display: inline;"
-                                          onsubmit="return confirm('Â¿EstÃ¡ seguro de eliminar esta categorÃ­a?');">
+                                          onsubmit="return confirm('¿Está seguro de eliminar esta categoría?');">
                                         <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -1997,7 +1997,7 @@
 // Configuración global con variables del servidor
 window.ADMIN_CONFIG = {
     activeSection: /*[[${activeSection}]]*/ 'usuarios',
-    permisos: [[${permisos}]] || []
+    permisos: /*[[${permisos}]]*/ []
 };
 
 // Mapear permisos para el sistema
@@ -2014,13 +2014,13 @@ try {
                 seccion: p.seccion || 'general'
             };
         });
-        console.log('âœ… Permisos cargados:', window.todosLosPermisos.length);
+        console.log('Permisos cargados:', window.todosLosPermisos.length);
     } else {
-        console.warn('âš ï¸ No hay permisos disponibles del servidor');
+        console.warn('No hay permisos disponibles del servidor');
         window.todosLosPermisos = [];
     }
 } catch(error) {
-    console.error('âŒ Error procesando permisos:', error);
+    console.error(' Error procesando permisos:', error);
     window.todosLosPermisos = [];
 }
 
