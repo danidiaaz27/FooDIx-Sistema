@@ -3,6 +3,9 @@ package com.example.SistemaDePromociones.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Entidad Rol - Representa los roles del sistema
  * (ADMINISTRADOR, RESTAURANTE, REPARTIDOR, USUARIO)
@@ -25,6 +28,15 @@ public class Rol {
     
     @Column(name = "estado", nullable = false)
     private Boolean estado = true;
+    
+    // Relación ManyToMany con Permiso
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "rol_permiso",
+        joinColumns = @JoinColumn(name = "rol_codigo"),
+        inverseJoinColumns = @JoinColumn(name = "permiso_codigo")
+    )
+    private Set<Permiso> permisos = new HashSet<>();
     
     // Constantes para facilitar el manejo de roles
     public static final Long ADMINISTRADOR = 1L;

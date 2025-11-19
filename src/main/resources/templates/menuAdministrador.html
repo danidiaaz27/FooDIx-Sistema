@@ -31,9 +31,9 @@
         }
     </style>
     <script>
-    // Función GLOBAL para cambiar secciones - DEFINIDA ANTES DE CARGAR EL BODY
+    // Funcion GLOBAL para cambiar secciones - DEFINIDA ANTES DE CARGAR EL BODY
     function showSection(sectionName) {
-        console.log('>>> Cambiando a sección:', sectionName);
+        console.log('>>> Cambiando a seccion:', sectionName);
         
         // Ocultar todas las secciones
         var sections = document.querySelectorAll('.menu-section');
@@ -45,9 +45,9 @@
         var targetSection = document.getElementById(sectionName + '-content');
         if (targetSection) {
             targetSection.classList.add('active');
-            console.log('✓ Sección mostrada:', sectionName + '-content');
+            console.log('Sección mostrada:', sectionName + '-content');
         } else {
-            console.error('✗ No se encontró la sección:', sectionName + '-content');
+            console.error('No se encontró la sección:', sectionName + '-content');
         }
         
         // Actualizar links activos en el sidebar
@@ -81,7 +81,7 @@
                             <li>
                                 <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
                                     <button type="submit" class="dropdown-item" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
-                                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesion
                                     </button>
                                 </form>
                             </li>
@@ -111,27 +111,36 @@
                 </div>
 
                 <ul class="nav nav-pills flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="javascript:void(0)" onclick="showSection('usuarios')" data-section="usuarios">
-                            <i class="fas fa-users"></i> Gestión de Usuarios
+                    <!-- Gestion de Clientes - Solo si tiene permiso 'clientes' -->
+                    <li class="nav-item" th:if="${permisosUsuario.contains('clientes')}">
+                        <a class="nav-link" href="javascript:void(0)" onclick="showSection('usuarios')" data-section="usuarios">
+                            <i class="fas fa-users"></i> Gestión de Clientes
                         </a>
                     </li>
-                    <li class="nav-item">
+                    
+                    <!-- Restaurantes - Solo si tiene permiso 'restaurantes' -->
+                    <li class="nav-item" th:if="${permisosUsuario.contains('restaurantes')}">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('restaurantes')" data-section="restaurantes">
                             <i class="fas fa-store"></i> Restaurantes
                         </a>
                     </li>
-                    <li class="nav-item">
+                    
+                    <!-- Repartidores - Solo si tiene permiso 'delivery' -->
+                    <li class="nav-item" th:if="${permisosUsuario.contains('delivery')}">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('delivery')" data-section="delivery">
                             <i class="fas fa-motorcycle"></i> Repartidores
                         </a>
                     </li>
+                    
+                    <!-- Reportes - Visible para todos (o agregar permiso específico) -->
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('reportes')" data-section="reportes">
                             <i class="fas fa-chart-bar"></i> Reportes
                         </a>
                     </li>
-                    <li class="nav-item">
+                    
+                    <!-- Configuración - Solo si tiene permiso 'configuracion' -->
+                    <li class="nav-item" th:if="${permisosUsuario.contains('configuracion')}">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('configuracion')" data-section="configuracion">
                             <i class="fas fa-cog"></i> Configuración
                         </a>
@@ -142,14 +151,41 @@
 
         <!-- Contenido principal -->
         <div class="col-md-9 col-lg-10 main-content">
-            <!-- Sección Usuarios -->
-            <section id="usuarios-content" class="menu-section active">
+            <!-- Sección Usuarios/Clientes - Solo si tiene permiso -->
+            <section id="usuarios-content" class="menu-section" th:classappend="${permisosUsuario.contains('clientes') ? 'active' : ''}" th:if="${permisosUsuario.contains('clientes')}">
                 <div class="section-header">
-                    <h2><i class="fas fa-users"></i> Gestión de Usuarios</h2>
-                    <p class="text-muted">Administra los usuarios de la plataforma</p>
+                    <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
+                    <p class="text-muted">Administra los clientes de la plataforma</p>
                 </div>
 
-                <!-- Tabla de usuarios -->
+                <!-- Filtros de búsqueda en tiempo real -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3"><i class="fas fa-filter"></i> Filtros</h5>
+                        <form onsubmit="return false" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="filterClienteName" class="form-label"><i class="fas fa-search"></i> Buscar por Nombre</label>
+                                <input type="text" class="form-control" id="filterClienteName" name="clienteName" 
+                                       placeholder="Ingrese nombre o apellido...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterClienteDni" class="form-label"><i class="fas fa-id-card"></i> DNI</label>
+                                <input type="text" class="form-control" id="filterClienteDni" name="clienteDni" 
+                                       placeholder="Número de documento...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterClienteEstado" class="form-label"><i class="fas fa-toggle-on"></i> Estado</label>
+                                <select class="form-select" id="filterClienteEstado" name="clienteEstado">
+                                    <option value="">Todos</option>
+                                    <option value="true">Activos</option>
+                                    <option value="false">Inactivos</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabla de clientes -->
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
@@ -158,51 +194,66 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Nombre</th>
-                                        <th>Email</th>
-                                        <th>Rol</th>
+                                        <th>DNI</th>
+                                        <th>Teléfono</th>
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="user : ${users}">
-                                        <td th:text="${user.id}">1</td>
-                                        <td th:text="${user.name + ' ' + user.lastName}">John Doe</td>
-                                        <td th:text="${user.email}">john@example.com</td>
-                                        <td><span class="badge bg-primary" th:text="${user.role}">CUSTOMER</span></td>
+                                    <tr th:each="user : ${clientes}">
+                                        <td th:text="${user.codigo}">1</td>
+                                        <td th:text="${user.nombreCompleto}">John Doe</td>
+                                        <td th:text="${user.numeroDocumento != null ? user.numeroDocumento : 'N/A'}">12345678</td>
+                                        <td th:text="${user.telefono != null ? user.telefono : 'N/A'}">999999999</td>
                                         <td>
-                                            <span th:class="${user.enabled != null and user.enabled ? 'badge bg-success' : 'badge bg-danger'}"
-                                                  th:text="${user.enabled != null and user.enabled ? 'Activo' : 'Inactivo'}">
+                                            <span th:class="${user.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${user.estado ? 'Activo' : 'Inactivo'}">
                                                 Activo
                                             </span>
                                         </td>
                                         <td>
+                                            <!-- Botón Ver Detalles -->
+                                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#viewClientModal"
+                                                    th:data-id="${user.codigo}"
+                                                    th:data-name="${user.nombreCompleto}"
+                                                    th:data-email="${user.correoElectronico}"
+                                                    th:data-dni="${user.numeroDocumento}"
+                                                    th:data-phone="${user.telefono}"
+                                                    th:data-address="${user.direccion}"
+                                                    title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            
                                             <!-- Botón Modificar -->
                                             <button type="button" class="btn btn-sm btn-info" 
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#editUserModal"
-                                                    th:data-id="${user.id}"
-                                                    th:data-name="${user.name}"
-                                                    th:data-lastname="${user.lastName}"
-                                                    th:data-email="${user.email}"
-                                                    th:data-phone="${user.phone}"
-                                                    th:data-address="${user.address}"
+                                                    th:data-id="${user.codigo}"
+                                                    th:data-name="${user.nombre}"
+                                                    th:data-lastname="${user.apellidoPaterno + ' ' + user.apellidoMaterno}"
+                                                    th:data-email="${user.correoElectronico}"
+                                                    th:data-phone="${user.telefono}"
+                                                    th:data-address="${user.direccion}"
                                                     title="Modificar">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             
                                             <!-- Botón Cambiar Estado -->
-                                            <form th:action="@{/menuAdministrador/user/{id}/toggle-status(id=${user.id})}" 
+                                            <form th:action="@{/menuAdministrador/user/{id}/toggle-status(id=${user.codigo})}" 
                                                   method="post" style="display: inline;">
-                                                <button type="submit" class="btn btn-sm btn-warning" title="Cambiar Estado">
-                                                    <i class="fas fa-toggle-on"></i>
+                                                <button type="submit" class="btn btn-sm btn-warning" 
+                                                        th:title="${user.estado ? 'Desactivar' : 'Activar'}">
+                                                    <i th:class="${user.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
                                                 </button>
                                             </form>
                                             
                                             <!-- Botón Eliminar -->
-                                            <form th:action="@{/menuAdministrador/user/{id}/delete(id=${user.id})}" 
+                                            <form th:action="@{/menuAdministrador/user/{id}/delete(id=${user.codigo})}" 
                                                   method="post" style="display: inline;"
-                                                  onsubmit="return confirm('¿Está seguro de eliminar este usuario?');">
+                                                  onsubmit="return confirm('¿Está seguro de eliminar este cliente?');">
                                                 <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
@@ -213,14 +264,47 @@
                             </table>
                         </div>
                     </div>
+                    <div class="card-footer text-end">
+                        <a href="/api/export/usuarios" class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Exportar a Excel
+                        </a>
+                    </div>
                 </div>
             </section>
 
-            <!-- Sección Restaurantes -->
-            <section id="restaurantes-content" class="menu-section">
+            <!-- Sección Restaurantes - Solo si tiene permiso -->
+            <section id="restaurantes-content" class="menu-section" th:if="${permisosUsuario.contains('restaurantes')}">
                 <div class="section-header">
                     <h2><i class="fas fa-store"></i> Gestión de Restaurantes</h2>
                     <p class="text-muted">Administra los restaurantes asociados</p>
+                </div>
+
+                <!-- Filtros de búsqueda en tiempo real -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3"><i class="fas fa-filter"></i> Filtros</h5>
+                        <form onsubmit="return false" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="filterRestaurantName" class="form-label"><i class="fas fa-search"></i> Buscar por Nombre</label>
+                                <input type="text" class="form-control" id="filterRestaurantName" name="restaurantName" 
+                                       placeholder="Nombre comercial o razón social...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterRestaurantRuc" class="form-label"><i class="fas fa-id-card"></i> RUC</label>
+                                <input type="text" class="form-control" id="filterRestaurantRuc" name="restaurantRuc" 
+                                       placeholder="Número de RUC...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterRestaurantEstado" class="form-label"><i class="fas fa-check-circle"></i> Estado</label>
+                                <select class="form-select" id="filterRestaurantEstado" name="restaurantEstado">
+                                    <option value="">Todos</option>
+                                    <option value="PENDING">Pendientes</option>
+                                    <option value="APPROVED">Aprobados</option>
+                                    <option value="REJECTED">Rechazados</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Lista de restaurantes-->
@@ -243,14 +327,14 @@
                                     <tr th:if="${pendingRestaurants != null and !pendingRestaurants.isEmpty()}" 
                                         class="table-warning">
                                         <td colspan="6" class="text-center fw-bold py-3">
-                                            <i class="fas fa-clock fa-lg"></i> RESTAURANTES PENDIENTES DE APROBACIÓN
+                                            <i class="fas fa-clock fa-lg"></i> RESTAURANTES PENDIENTES DE APROBACIÃ“N
                                         </td>
                                     </tr>
                                     <tr th:each="restaurant : ${pendingRestaurants}">
                                         <td class="fw-bold" th:text="${restaurant.codigo}">1</td>
                                         <td>
                                             <div class="fw-bold" th:text="${restaurant.nombre}">Restaurante A</div>
-                                            <small class="text-muted" th:text="${restaurant.razonSocial}">Razón Social</small>
+                                            <small class="text-muted" th:text="${restaurant.razonSocial}">Razon Social</small>
                                         </td>
                                         <td>
                                             <span class="badge bg-secondary" th:text="${restaurant.ruc}">20131312955</span>
@@ -279,7 +363,7 @@
                                                         title="Ver Detalles y Documentos">
                                                     <i class="fas fa-eye"></i> Ver
                                                 </button>
-                                                
+
                                                 <!-- Botón Aprobar -->
                                                 <button type="button" class="btn btn-sm btn-success" 
                                                         onclick="aprobarRestaurante(this)"
@@ -313,7 +397,7 @@
                                         <td class="fw-bold" th:text="${restaurant.codigo}">1</td>
                                         <td>
                                             <div class="fw-bold" th:text="${restaurant.nombre}">Restaurante B</div>
-                                            <small class="text-muted" th:text="${restaurant.razonSocial}">Razón Social</small>
+                                            <small class="text-muted" th:text="${restaurant.razonSocial}">Razon Social</small>
                                         </td>
                                         <td>
                                             <span class="badge bg-secondary" th:text="${restaurant.ruc}">20131312955</span>
@@ -374,14 +458,47 @@
                             </table>
                         </div>
                     </div>
+                    <div class="card-footer text-end">
+                        <a href="/api/export/restaurantes" class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Exportar a Excel
+                        </a>
+                    </div>
                 </div>
             </section>
 
-            <!-- Sección Delivery -->
-            <section id="delivery-content" class="menu-section">
+            <!-- Sección Delivery - Solo si tiene permiso -->
+            <section id="delivery-content" class="menu-section" th:if="${permisosUsuario.contains('delivery')}">
                 <div class="section-header">
                     <h2><i class="fas fa-motorcycle"></i> Gestión de Repartidores</h2>
                     <p class="text-muted">Administra los repartidores de la plataforma</p>
+                </div>
+
+                <!-- Filtros de búsqueda en tiempo real -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3"><i class="fas fa-filter"></i> Filtros</h5>
+                        <form onsubmit="return false" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="filterDeliveryName" class="form-label"><i class="fas fa-search"></i> Buscar por Nombre</label>
+                                <input type="text" class="form-control" id="filterDeliveryName" name="deliveryName" 
+                                       placeholder="Ingrese nombre o apellido...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterDeliveryEmail" class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" class="form-control" id="filterDeliveryEmail" name="deliveryEmail" 
+                                       placeholder="email@ejemplo.com">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterDeliveryEstado" class="form-label"><i class="fas fa-check-circle"></i> Estado Aprobacion</label>
+                                <select class="form-select" id="filterDeliveryEstado" name="deliveryEstado">
+                                    <option value="">Todos</option>
+                                    <option value="PENDING">Pendientes</option>
+                                    <option value="APPROVED">Aprobados</option>
+                                    <option value="REJECTED">Rechazados</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Lista de repartidores (usuarios con rol DELIVERY) -->
@@ -394,41 +511,41 @@
                                         <th>ID</th>
                                         <th>Nombre</th>
                                         <th>Email</th>
-                                        <th>Rol</th>
-                                        <th>Estado Aprobación</th>
+                                        <th>Teléfono</th>
+                                        <th>Licencia</th>
+                                        <th>Estado Aprobacion</th>
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="delivery : ${deliveryUsers}">
-                                        <td th:text="${delivery.id}">1</td>
-                                        <td th:text="${delivery.name + ' ' + delivery.lastName}">Juan Pérez</td>
-                                        <td th:text="${delivery.email}">delivery@example.com</td>
-                                        <td><span class="badge bg-success" th:text="${delivery.role}">DELIVERY</span></td>
+                                    <tr th:each="delivery : ${repartidores}">
+                                        <td th:text="${delivery.codigo}">1</td>
+                                        <td th:text="${delivery.usuario != null ? delivery.usuario.nombreCompleto : 'N/A'}">Juan Pérez</td>
+                                        <td th:text="${delivery.usuario != null ? delivery.usuario.correoElectronico : 'N/A'}">delivery@example.com</td>
+                                        <td th:text="${delivery.usuario != null and delivery.usuario.telefono != null ? delivery.usuario.telefono : 'N/A'}">999999999</td>
+                                        <td th:text="${delivery.numeroLicencia}">ABC123456</td>
                                         <td>
-                                            <!-- Manejar NULL en approvalStatus -->
-                                            <span th:if="${delivery.approvalStatus == null}" class="badge bg-secondary">Sin Estado</span>
-                                            <span th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'PENDING'}" class="badge bg-warning text-dark">Pendiente</span>
-                                            <span th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'APPROVED'}" class="badge bg-success">Aprobado</span>
-                                            <span th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'REJECTED'}" class="badge bg-danger">Rechazado</span>
+                                            <span th:if="${delivery.codigoEstadoAprobacion == 7}" class="badge bg-warning text-dark">Pendiente</span>
+                                            <span th:if="${delivery.codigoEstadoAprobacion == 8}" class="badge bg-success">Aprobado</span>
+                                            <span th:if="${delivery.codigoEstadoAprobacion == 9}" class="badge bg-danger">Rechazado</span>
                                         </td>
                                         <td>
-                                            <span th:class="${delivery.enabled != null and delivery.enabled ? 'badge bg-success' : 'badge bg-danger'}"
-                                                  th:text="${delivery.enabled != null and delivery.enabled ? 'Activo' : 'Inactivo'}">
+                                            <span th:class="${delivery.estado != null and delivery.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${delivery.estado != null and delivery.estado ? 'Activo' : 'Inactivo'}">
                                                 Activo
                                             </span>
                                         </td>
                                         <td>
-                                            <!-- Botones para NULL o PENDIENTE -->
-                                            <div th:if="${delivery.approvalStatus == null or delivery.approvalStatus.name() == 'PENDING'}">
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/approve(id=${delivery.id})}" 
+                                            <!-- Botones para PENDIENTE -->
+                                            <div th:if="${delivery.codigoEstadoAprobacion == 7}">
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/approve(id=${delivery.codigo})}" 
                                                       method="post" style="display: inline;">
                                                     <button type="submit" class="btn btn-sm btn-success" title="Aprobar">
                                                         <i class="fas fa-check"></i>
                                                     </button>
                                                 </form>
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/reject(id=${delivery.id})}" 
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/reject(id=${delivery.codigo})}" 
                                                       method="post" style="display: inline;">
                                                     <button type="submit" class="btn btn-sm btn-danger" title="Rechazar">
                                                         <i class="fas fa-times"></i>
@@ -437,28 +554,29 @@
                                             </div>
                                             
                                             <!-- Botones para APROBADO -->
-                                            <div th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'APPROVED'}">
+                                            <div th:if="${delivery.codigoEstadoAprobacion == 8}">
                                                 <button type="button" class="btn btn-sm btn-info" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#editDeliveryModal"
-                                                        th:data-id="${delivery.id}"
-                                                        th:data-name="${delivery.name}"
-                                                        th:data-lastname="${delivery.lastName}"
-                                                        th:data-email="${delivery.email}"
-                                                        th:data-phone="${delivery.phone}"
-                                                        th:data-address="${delivery.address}"
+                                                        th:data-id="${delivery.codigo}"
+                                                        th:data-name="${delivery.usuario != null ? delivery.usuario.nombre : ''}"
+                                                        th:data-lastname="${delivery.usuario != null ? (delivery.usuario.apellidoPaterno + ' ' + delivery.usuario.apellidoMaterno) : ''}"
+                                                        th:data-email="${delivery.usuario != null ? delivery.usuario.correoElectronico : ''}"
+                                                        th:data-phone="${delivery.usuario != null ? delivery.usuario.telefono : ''}"
+                                                        th:data-address="${delivery.usuario != null ? delivery.usuario.direccion : ''}"
                                                         title="Modificar">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/toggle-status(id=${delivery.id})}" 
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/toggle-status(id=${delivery.codigo})}" 
                                                       method="post" style="display: inline;">
-                                                    <button type="submit" class="btn btn-sm btn-warning" title="Cambiar Estado">
-                                                        <i class="fas fa-toggle-on"></i>
+                                                    <button type="submit" class="btn btn-sm btn-warning" 
+                                                            th:title="${delivery.estado ? 'Desactivar' : 'Activar'}">
+                                                        <i th:class="${delivery.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
                                                     </button>
                                                 </form>
                                                 
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.id})}" 
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.codigo})}" 
                                                       method="post" style="display: inline;"
                                                       onsubmit="return confirm('¿Está seguro de eliminar este repartidor?');">
                                                     <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
@@ -468,8 +586,8 @@
                                             </div>
                                             
                                             <!-- Botones para RECHAZADO -->
-                                            <div th:if="${delivery.approvalStatus != null and delivery.approvalStatus.name() == 'REJECTED'}">
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.id})}" 
+                                            <div th:if="${delivery.codigoEstadoAprobacion == 9}">
+                                                <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.codigo})}" 
                                                       method="post" style="display: inline;"
                                                       onsubmit="return confirm('¿Está seguro de eliminar este repartidor rechazado?');">
                                                     <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
@@ -482,6 +600,11 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="/api/export/delivery" class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Exportar a Excel
+                        </a>
                     </div>
                 </div>
             </section>
@@ -530,8 +653,8 @@
                 </div>
             </section>
 
-            <!-- Sección Configuración -->
-            <section id="configuracion-content" class="menu-section">
+            <!-- Sección Configuración - Solo si tiene permiso -->
+            <section id="configuracion-content" class="menu-section" th:if="${permisosUsuario.contains('configuracion')}">
                 <div class="section-header">
                     <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
                     <p class="text-muted">Administra la configuración general de la plataforma</p>
@@ -564,7 +687,7 @@
                                 <h5 class="card-title">Administradores</h5>
                                 <p class="card-text text-muted">Administra los usuarios con rol de administrador</p>
                                 <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#manageAdminsModal">
-                                    <i class="fas fa-cog"></i> Gestionar Administradores
+                                    <i class="fas fa-cog"></i> Gestionar Usuarios del Sistema
                                 </button>
                             </div>
                         </div>
@@ -631,6 +754,58 @@
     </div>
 </div>
 
+<!-- Modal para ver detalles del cliente -->
+<div class="modal fade" id="viewClientModal" tabindex="-1" aria-labelledby="viewClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewClientModalLabel">
+                    <i class="fas fa-user"></i> Detalles del Cliente
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Información del Cliente -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="fas fa-info-circle text-primary"></i> Información Personal
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Nombre Completo:</dt>
+                            <dd class="col-sm-7 fw-bold" id="viewClientName">-</dd>
+                            
+                            <dt class="col-sm-5">DNI:</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge bg-secondary" id="viewClientDni">-</span>
+                            </dd>
+                            
+                            <dt class="col-sm-5">Email:</dt>
+                            <dd class="col-sm-7" id="viewClientEmail">-</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Teléfono:</dt>
+                            <dd class="col-sm-7" id="viewClientPhone">-</dd>
+                            
+                            <dt class="col-sm-5">Dirección:</dt>
+                            <dd class="col-sm-7" id="viewClientAddress">-</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal para editar repartidor -->
 <div class="modal fade" id="editDeliveryModal" tabindex="-1" aria-labelledby="editDeliveryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -687,7 +862,7 @@
                     <div class="col-12">
                         <h5 class="border-bottom pb-2 mb-3">
                             <i class="fas fa-info-circle text-primary"></i> Información General
-                        </h5>
+                        </h5>   
                     </div>
                     <div class="col-md-6">
                         <dl class="row">
@@ -798,6 +973,7 @@
             </div>
             <form id="rejectRestaurantForm" method="post">
                 <div class="modal-body">
+                    <input type="hidden" name="section" value="restaurantes">
                     <p>¿Está seguro de rechazar el restaurante <strong id="rejectRestaurantNombre"></strong>?</p>
                     <div class="mb-3">
                         <label for="motivoRechazo" class="form-label">Motivo del Rechazo <span class="text-danger">*</span></label>
@@ -950,7 +1126,7 @@
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="manageAdminsModalLabel">
-                    <i class="fas fa-users-cog"></i> Gestión de Administradores
+                    <i class="fas fa-users-cog"></i> Gestión de Usuarios del Sistema
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -958,7 +1134,7 @@
                 <div class="row">
                     <!-- Formulario para crear administrador -->
                     <div class="col-md-5">
-                        <h6 class="mb-3"><i class="fas fa-user-plus"></i> Crear Nuevo Administrador</h6>
+                        <h6 class="mb-3"><i class="fas fa-user-plus"></i> Crear Nuevo Usuario</h6>
                         <form action="/menuAdministrador/create-admin" th:action="@{/menuAdministrador/create-admin}" method="post">
                             <div class="mb-3">
                                 <label for="adminName" class="form-label">Nombre *</label>
@@ -972,24 +1148,55 @@
                                 <label for="adminEmail" class="form-label">Email *</label>
                                 <input type="email" class="form-control" id="adminEmail" name="email" required>
                             </div>
+                            
+                            <!-- Selector de Rol -->
+                            <div class="mb-3">
+                                <label for="adminRol" class="form-label"><i class="fas fa-user-tag"></i> Rol *</label>
+                                <select class="form-select" id="adminRol" name="codigoRol" required>
+                                    <option value="">-- Selecciona un rol --</option>
+                                    <option th:each="rol : ${roles}" 
+                                            th:if="${rol.estado}"
+                                            th:value="${rol.codigo}" 
+                                            th:text="${rol.nombre}"
+                                            th:selected="${rol.codigo == 1}">
+                                        Rol
+                                    </option>
+                                </select>
+                                <small class="text-muted">Define los permisos del usuario en el sistema</small>
+                            </div>
+                            
                             <div class="mb-3">
                                 <label for="adminPassword" class="form-label">Contraseña *</label>
-                                <input type="password" class="form-control" id="adminPassword" name="password" minlength="6" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="adminPassword" name="password" minlength="6" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('adminPassword', this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 <small class="text-muted">Mínimo 6 caracteres</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="adminPasswordConfirm" class="form-label">Confirmar Contraseña *</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="adminPasswordConfirm" name="passwordConfirm" minlength="6" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('adminPasswordConfirm', this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="adminPhone" class="form-label">Teléfono</label>
                                 <input type="text" class="form-control" id="adminPhone" name="phone">
                             </div>
                             <button type="submit" class="btn btn-success w-100">
-                                <i class="fas fa-user-plus"></i> Crear Administrador
+                                <i class="fas fa-user-plus"></i> Crear Usuario
                             </button>
                         </form>
                     </div>
                     
                     <!-- Lista de administradores existentes -->
                     <div class="col-md-7">
-                        <h6 class="mb-3"><i class="fas fa-list"></i> Administradores Registrados</h6>
+                        <h6 class="mb-3"><i class="fas fa-list"></i> Usuarios del Sistema Registrados</h6>
                         <div class="table-responsive">
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
@@ -1003,13 +1210,13 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="admin : ${adminUsers}">
-                                        <td th:text="${admin.id}">1</td>
-                                        <td><strong th:text="${admin.name + ' ' + admin.lastName}">Admin User</strong></td>
-                                        <td th:text="${admin.email}">admin@example.com</td>
-                                        <td th:text="${admin.phone != null ? admin.phone : 'N/A'}">999999999</td>
+                                        <td th:text="${admin.codigo}">1</td>
+                                        <td><strong th:text="${admin.nombreCompleto}">Admin User</strong></td>
+                                        <td th:text="${admin.correoElectronico}">admin@example.com</td>
+                                        <td th:text="${admin.telefono != null ? admin.telefono : 'N/A'}">999999999</td>
                                         <td>
-                                            <span th:class="${admin.enabled != null and admin.enabled ? 'badge bg-success' : 'badge bg-danger'}"
-                                                  th:text="${admin.enabled != null and admin.enabled ? 'Activo' : 'Inactivo'}">
+                                            <span th:class="${admin.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${admin.estado ? 'Activo' : 'Inactivo'}">
                                                 Activo
                                             </span>
                                         </td>
@@ -1029,103 +1236,690 @@
     </div>
 </div>
 
-<!-- Modal para visualizar roles del sistema -->
+<!-- Modal para gestionar roles del sistema -->
 <div class="modal fade" id="manageRolesModal" tabindex="-1" aria-labelledby="manageRolesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);">
                 <h5 class="modal-title" id="manageRolesModalLabel">
-                    <i class="fas fa-user-tag"></i> Roles del Sistema
+                    <i class="fas fa-user-shield me-2"></i> Gestión de Roles del Sistema
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> Los roles son definidos por el sistema y no se pueden modificar.
+            <div class="modal-body p-4" style="background-color: #f8f9fa;">
+                <div class="row g-4">
+                    <!-- Formulario para crear rol -->
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i> Crear Nuevo Rol</h6>
+                            </div>
+                            <div class="card-body">
+                                <form action="/menuAdministrador/role/create" th:action="@{/menuAdministrador/role/create}" method="post">
+                                    <div class="mb-3">
+                                        <label for="rolNombre" class="form-label fw-bold">
+                                            <i class="fas fa-tag text-primary me-1"></i> Nombre del Rol *
+                                        </label>
+                                        <input type="text" class="form-control" id="rolNombre" name="nombre" 
+                                               placeholder="Ej: Supervisor, Gerente..." required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="rolDescripcion" class="form-label fw-bold">
+                                            <i class="fas fa-align-left text-primary me-1"></i> Descripción
+                                        </label>
+                                        <textarea class="form-control" id="rolDescripcion" name="descripcion" rows="2" 
+                                                  placeholder="Describe las funciones de este rol..."></textarea>
+                                    </div>
+                                    
+                                    <!-- Permisos del rol -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-shield-alt text-success me-1"></i> Permisos de Acceso
+                                        </label>
+                                        <button type="button" class="btn btn-outline-primary w-100" onclick="abrirModalSeleccionPermisos()">
+                                            <i class="fas fa-list-check me-2"></i>
+                                            Seleccionar Permisos
+                                            <span class="badge bg-primary ms-2" id="countPermisos">0</span>
+                                        </button>
+                                        <div id="selectedPermisosDisplay" class="mt-2 p-2 border rounded bg-light" style="min-height: 60px; max-height: 150px; overflow-y: auto;">
+                                            <small class="text-muted">No hay permisos seleccionados</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Inputs ocultos para los permisos seleccionados -->
+                                    <div id="hiddenPermisosContainer"></div>
+                                    
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                                        <i class="fas fa-plus me-2"></i> Crear Rol
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal para seleccionar permisos -->
+                    <div class="modal fade" id="selectPermisosModal" tabindex="-1" aria-labelledby="selectPermisosModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title" id="selectPermisosModalLabel">
+                                        <i class="fas fa-shield-alt me-2"></i> Configurar Permisos del Rol
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" onclick="cerrarModalSeleccionPermisos()" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                                    
+                                    <!-- Usuarios -->
+                                    <div class="card mb-3 border-primary" th:if="${permisos.?[seccion == 'usuarios'].size() > 0}">
+                                        <div class="card-header bg-primary bg-opacity-10">
+                                            <div class="form-check">
+                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllUsuarios" data-section="usuarios">
+                                                <label class="form-check-label fw-bold text-primary" for="selectAllUsuarios">
+                                                    <i class="fas fa-users-cog me-2"></i> Usuarios del Sistema
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-2">
+                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'usuarios']}">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
+                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
+                                                               th:value="${permiso.codigo}"
+                                                               th:data-nombre="${permiso.nombre}"
+                                                               th:data-accion="${permiso.accion}"
+                                                               data-section="usuarios">
+                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
+                                                            <span class="badge bg-info me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                                            <small th:text="${permiso.descripcion}">Descripción</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Clientes -->
+                                    <div class="card mb-3 border-success" th:if="${permisos.?[seccion == 'clientes'].size() > 0}">
+                                        <div class="card-header bg-success bg-opacity-10">
+                                            <div class="form-check">
+                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllClientes" data-section="clientes">
+                                                <label class="form-check-label fw-bold text-success" for="selectAllClientes">
+                                                    <i class="fas fa-user-friends me-2"></i> Clientes
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-2">
+                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'clientes']}">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
+                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
+                                                               th:value="${permiso.codigo}"
+                                                               th:data-nombre="${permiso.nombre}"
+                                                               th:data-accion="${permiso.accion}"
+                                                               data-section="clientes">
+                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
+                                                            <span class="badge bg-success me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                                            <small th:text="${permiso.descripcion}">Descripción</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Restaurantes -->
+                                    <div class="card mb-3 border-warning" th:if="${permisos.?[seccion == 'restaurantes'].size() > 0}">
+                                        <div class="card-header bg-warning bg-opacity-10">
+                                            <div class="form-check">
+                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllRestaurantes" data-section="restaurantes">
+                                                <label class="form-check-label fw-bold text-warning" for="selectAllRestaurantes">
+                                                    <i class="fas fa-utensils me-2"></i> Restaurantes
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-2">
+                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'restaurantes']}">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
+                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
+                                                               th:value="${permiso.codigo}"
+                                                               th:data-nombre="${permiso.nombre}"
+                                                               th:data-accion="${permiso.accion}"
+                                                               data-section="restaurantes">
+                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
+                                                            <span class="badge bg-warning text-dark me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                                            <small th:text="${permiso.descripcion}">Descripción</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Delivery -->
+                                    <div class="card mb-3 border-danger" th:if="${permisos.?[seccion == 'delivery'].size() > 0}">
+                                        <div class="card-header bg-danger bg-opacity-10">
+                                            <div class="form-check">
+                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllDelivery" data-section="delivery">
+                                                <label class="form-check-label fw-bold text-danger" for="selectAllDelivery">
+                                                    <i class="fas fa-motorcycle me-2"></i> Repartidores
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-2">
+                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'delivery']}">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
+                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
+                                                               th:value="${permiso.codigo}"
+                                                               th:data-nombre="${permiso.nombre}"
+                                                               th:data-accion="${permiso.accion}"
+                                                               data-section="delivery">
+                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
+                                                            <span class="badge bg-danger me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                                            <small th:text="${permiso.descripcion}">Descripción</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Categorías -->
+                                    <div class="card mb-3 border-secondary" th:if="${permisos.?[seccion == 'categorias'].size() > 0}">
+                                        <div class="card-header bg-secondary bg-opacity-10">
+                                            <div class="form-check">
+                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllCategorias" data-section="categorias">
+                                                <label class="form-check-label fw-bold text-secondary" for="selectAllCategorias">
+                                                    <i class="fas fa-tags me-2"></i> Categorías
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-2">
+                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'categorias']}">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
+                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
+                                                               th:value="${permiso.codigo}"
+                                                               th:data-nombre="${permiso.nombre}"
+                                                               th:data-accion="${permiso.accion}"
+                                                               data-section="categorias">
+                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
+                                                            <span class="badge bg-secondary me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                                            <small th:text="${permiso.descripcion}">Descripción</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Configuración -->
+                                    <div class="card mb-3 border-dark" th:if="${permisos.?[seccion == 'configuracion'].size() > 0}">
+                                        <div class="card-header bg-dark bg-opacity-10">
+                                            <div class="form-check">
+                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllConfiguracion" data-section="configuracion">
+                                                <label class="form-check-label fw-bold text-dark" for="selectAllConfiguracion">
+                                                    <i class="fas fa-cogs me-2"></i> Configuración
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-2">
+                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'configuracion']}">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
+                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
+                                                               th:value="${permiso.codigo}"
+                                                               th:data-nombre="${permiso.nombre}"
+                                                               th:data-accion="${permiso.accion}"
+                                                               data-section="configuracion">
+                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
+                                                            <span class="badge bg-dark me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                                            <small th:text="${permiso.descripcion}">Descripción</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" onclick="cerrarModalSeleccionPermisos()">
+                                        <i class="fas fa-times me-2"></i> Cancelar
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="confirmPermisos" onclick="cerrarModalSeleccionPermisos()">
+                                        <i class="fas fa-check me-2"></i> Confirmar Selección
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Continuar con el resto del modal de roles -->
+                    
+                    <!-- Lista de roles existentes -->
+                    <div class="col-md-8">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="fas fa-list-ul me-2"></i> Roles Registrados</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead style="background-color: #e9ecef;">
+                                            <tr>
+                                                <th class="text-center" style="width: 80px;">Código</th>
+                                                <th>Nombre</th>
+                                                <th>Descripción</th>
+                                                <th class="text-center" style="width: 120px;">Permisos</th>
+                                                <th class="text-center" style="width: 100px;">Estado</th>
+                                                <th class="text-center" style="width: 200px;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="rol : ${roles}">
+                                                <td class="text-center">
+                                                    <span class="badge rounded-pill bg-secondary fs-6" th:text="${rol.codigo}">1</span>
+                                                </td>
+                                                <td>
+                                                    <strong class="text-primary" th:text="${rol.nombre}">ADMINISTRADOR</strong>
+                                                </td>
+                                                <td>
+                                                    <small th:text="${rol.descripcion != null ? rol.descripcion : '-'}">Descripción</small>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-primary view-permisos-btn"
+                                                            onclick="verPermisosRolManual(this)"
+                                                            th:data-rol-id="${rol.codigo}"
+                                                            th:data-rol-nombre="${rol.nombre}"
+                                                            th:if="${rol.permisos != null && !rol.permisos.isEmpty()}">
+                                                        <i class="fas fa-shield-alt me-1"></i>
+                                                        <span class="badge bg-primary rounded-pill" th:text="${rol.permisos.size()}">0</span>
+                                                    </button>
+                                                    <span th:if="${rol.permisos == null || rol.permisos.isEmpty()}" 
+                                                          class="text-muted fst-italic">
+                                                        <i class="fas fa-ban"></i>
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span th:class="${rol.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                                          th:text="${rol.estado ? 'Activo' : 'Inactivo'}">
+                                                        Activo
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="btn-group" role="group">
+                                                        <!-- Botón Editar -->
+                                                        <button type="button" class="btn btn-sm btn-outline-info" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#editRolModal"
+                                                                th:data-id="${rol.codigo}"
+                                                                th:data-nombre="${rol.nombre}"
+                                                                th:data-descripcion="${rol.descripcion}"
+                                                                th:onclick="'loadRolPermisos(' + ${rol.codigo} + ')'"
+                                                                title="Editar">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        
+                                                        <!-- Botón Cambiar Estado -->
+                                                        <form th:action="@{/menuAdministrador/role/{id}/toggle-status(id=${rol.codigo})}" 
+                                                              method="post" style="display: inline;">
+                                                            <button type="submit" class="btn btn-sm btn-outline-warning" 
+                                                                    th:title="${rol.estado ? 'Desactivar' : 'Activar'}">
+                                                                <i th:class="${rol.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
+                                                            </button>
+                                                        </form>
+                                                        
+                                                        <!-- Botón Eliminar (solo para roles personalizados) -->
+                                                        <form th:if="${rol.codigo > 4}" 
+                                                              th:action="@{/menuAdministrador/role/{id}/delete(id=${rol.codigo})}" 
+                                                              method="post" style="display: inline;"
+                                                              onsubmit="return confirm('¿Está seguro de eliminar este rol? Esta acción no se puede deshacer.');">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                    
+                                                    <!-- Indicador de rol del sistema -->
+                                                    <div th:if="${rol.codigo <= 4}" class="mt-1">
+                                                        <span class="badge bg-primary" title="Rol del sistema protegido">
+                                                            <i class="fas fa-lock me-1"></i> Sistema
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="row g-3">
-                    <!-- Rol ADMIN -->
-                    <div class="col-md-6">
-                        <div class="card border-danger">
-                            <div class="card-header bg-danger text-white">
-                                <h6 class="mb-0"><i class="fas fa-user-shield"></i> ADMINISTRADOR</h6>
+                <!-- Nota informativa -->
+                <div class="alert alert-info border-0 mt-3 mb-0" style="background-color: #d1ecf1;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle fs-4 me-3 text-info"></i>
+                        <div>
+                            <strong>Nota Importante:</strong> Los roles del sistema (códigos 1-4) están protegidos y no se pueden eliminar. 
+                            Solo puedes editar su descripción y permisos.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i> Cerrar
+                </button>       
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar rol -->
+<div class="modal fade" id="editRolModal" tabindex="-1" aria-labelledby="editRolModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <h5 class="modal-title" id="editRolModalLabel">
+                    <i class="fas fa-edit me-2"></i> Editar Rol
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editRolForm" method="post">
+                <div class="modal-body p-4" style="background-color: #f8f9fa;">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editRolNombre" class="form-label fw-bold">
+                                    <i class="fas fa-tag text-primary me-1"></i> Nombre del Rol *
+                                </label>
+                                <input type="text" class="form-control" id="editRolNombre" name="nombre" required>
                             </div>
-                            <div class="card-body">
-                                <p class="mb-2"><strong>Código:</strong> 1</p>
-                                <p class="mb-2"><strong>Permisos:</strong></p>
-                                <ul class="small">
-                                    <li>Gestión completa de usuarios</li>
-                                    <li>Aprobación de restaurantes y repartidores</li>
-                                    <li>Gestión de categorías</li>
-                                    <li>Visualización de reportes</li>
-                                    <li>Configuración del sistema</li>
-                                </ul>
+                            <div class="mb-3">
+                                <label for="editRolDescripcion" class="form-label fw-bold">
+                                    <i class="fas fa-align-left text-primary me-1"></i> Descripción
+                                </label>
+                                <textarea class="form-control" id="editRolDescripcion" name="descripcion" rows="4" 
+                                          placeholder="Actualiza la descripción del rol..."></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-shield-alt text-success me-1"></i> Permisos de Acceso
+                                </label>
+                                <button type="button" class="btn btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#editPermisosModal">
+                                    <i class="fas fa-list-check me-2"></i>
+                                    Modificar Permisos
+                                    <span class="badge bg-success ms-2" id="editCountPermisos">0</span>
+                                </button>
+                                <div id="editSelectedPermisosDisplay" class="mt-2 p-2 border rounded bg-light" style="min-height: 60px; max-height: 200px; overflow-y: auto;">
+                                    <small class="text-muted">No hay permisos seleccionados</small>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Rol RESTAURANT -->
-                    <div class="col-md-6">
-                        <div class="card border-warning">
-                            <div class="card-header bg-warning text-dark">
-                                <h6 class="mb-0"><i class="fas fa-store"></i> RESTAURANTE</h6>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-2"><strong>Código:</strong> 2</p>
-                                <p class="mb-2"><strong>Permisos:</strong></p>
-                                <ul class="small">
-                                    <li>Gestión de menú y productos</li>
-                                    <li>Administración de pedidos</li>
-                                    <li>Gestión de promociones</li>
-                                    <li>Visualización de estadísticas propias</li>
-                                </ul>
+                    <!-- Inputs ocultos para los permisos seleccionados en edición -->
+                    <div id="editHiddenPermisosContainer"></div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary fw-bold">
+                        <i class="fas fa-save me-2"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar permisos del rol -->
+<div class="modal fade" id="editPermisosModal" tabindex="-1" aria-labelledby="editPermisosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="editPermisosModalLabel">
+                    <i class="fas fa-shield-alt me-2"></i> Editar Permisos del Rol
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                
+                <!-- Usuarios -->
+                <div class="card mb-3 border-primary" th:if="${permisos.?[seccion == 'usuarios'].size() > 0}">
+                    <div class="card-header bg-primary bg-opacity-10">
+                        <div class="form-check">
+                            <input class="form-check-input edit-select-all-section" type="checkbox" id="editSelectAllUsuarios" data-section="usuarios">
+                            <label class="form-check-label fw-bold text-primary" for="editSelectAllUsuarios">
+                                <i class="fas fa-users-cog me-2"></i> Usuarios del Sistema
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'usuarios']}">
+                                <div class="form-check">
+                                    <input class="form-check-input edit-permiso-checkbox" type="checkbox" 
+                                           th:id="'edit_modal_permiso_' + ${permiso.codigo}"
+                                           th:value="${permiso.codigo}"
+                                           th:data-nombre="${permiso.nombre}"
+                                           th:data-accion="${permiso.accion}"
+                                           th:data-codigo="${permiso.codigo}"
+                                           data-section="usuarios">
+                                    <label class="form-check-label" th:for="'edit_modal_permiso_' + ${permiso.codigo}">
+                                        <span class="badge bg-info me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                        <small th:text="${permiso.descripcion}">Descripción</small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Rol DELIVERY -->
-                    <div class="col-md-6">
-                        <div class="card border-success">
-                            <div class="card-header bg-success text-white">
-                                <h6 class="mb-0"><i class="fas fa-motorcycle"></i> REPARTIDOR</h6>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-2"><strong>Código:</strong> 3</p>
-                                <p class="mb-2"><strong>Permisos:</strong></p>
-                                <ul class="small">
-                                    <li>Visualización de pedidos asignados</li>
-                                    <li>Actualización de estado de entrega</li>
-                                    <li>Gestión de ubicación en tiempo real</li>
-                                    <li>Historial de entregas</li>
-                                </ul>
+                </div>
+                
+                <!-- Clientes -->
+                <div class="card mb-3 border-success" th:if="${permisos.?[seccion == 'clientes'].size() > 0}">
+                    <div class="card-header bg-success bg-opacity-10">
+                        <div class="form-check">
+                            <input class="form-check-input edit-select-all-section" type="checkbox" id="editSelectAllClientes" data-section="clientes">
+                            <label class="form-check-label fw-bold text-success" for="editSelectAllClientes">
+                                <i class="fas fa-user-friends me-2"></i> Clientes
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'clientes']}">
+                                <div class="form-check">
+                                    <input class="form-check-input edit-permiso-checkbox" type="checkbox" 
+                                           th:id="'edit_modal_permiso_' + ${permiso.codigo}"
+                                           th:value="${permiso.codigo}"
+                                           th:data-nombre="${permiso.nombre}"
+                                           th:data-accion="${permiso.accion}"
+                                           th:data-codigo="${permiso.codigo}"
+                                           data-section="clientes">
+                                    <label class="form-check-label" th:for="'edit_modal_permiso_' + ${permiso.codigo}">
+                                        <span class="badge bg-success me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                        <small th:text="${permiso.descripcion}">Descripción</small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Rol CUSTOMER -->
-                    <div class="col-md-6">
-                        <div class="card border-primary">
-                            <div class="card-header bg-primary text-white">
-                                <h6 class="mb-0"><i class="fas fa-user"></i> CLIENTE</h6>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-2"><strong>Código:</strong> 4</p>
-                                <p class="mb-2"><strong>Permisos:</strong></p>
-                                <ul class="small">
-                                    <li>Realizar pedidos</li>
-                                    <li>Gestionar direcciones de entrega</li>
-                                    <li>Visualizar historial de pedidos</li>
-                                    <li>Calificar servicios</li>
-                                </ul>
+                </div>
+                
+                <!-- Restaurantes -->
+                <div class="card mb-3 border-warning" th:if="${permisos.?[seccion == 'restaurantes'].size() > 0}">
+                    <div class="card-header bg-warning bg-opacity-10">
+                        <div class="form-check">
+                            <input class="form-check-input edit-select-all-section" type="checkbox" id="editSelectAllRestaurantes" data-section="restaurantes">
+                            <label class="form-check-label fw-bold text-warning" for="editSelectAllRestaurantes">
+                                <i class="fas fa-utensils me-2"></i> Restaurantes
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'restaurantes']}">
+                                <div class="form-check">
+                                    <input class="form-check-input edit-permiso-checkbox" type="checkbox" 
+                                           th:id="'edit_modal_permiso_' + ${permiso.codigo}"
+                                           th:value="${permiso.codigo}"
+                                           th:data-nombre="${permiso.nombre}"
+                                           th:data-accion="${permiso.accion}"
+                                           th:data-codigo="${permiso.codigo}"
+                                           data-section="restaurantes">
+                                    <label class="form-check-label" th:for="'edit_modal_permiso_' + ${permiso.codigo}">
+                                        <span class="badge bg-warning text-dark me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                        <small th:text="${permiso.descripcion}">Descripción</small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Delivery -->
+                <div class="card mb-3 border-danger" th:if="${permisos.?[seccion == 'delivery'].size() > 0}">
+                    <div class="card-header bg-danger bg-opacity-10">
+                        <div class="form-check">
+                            <input class="form-check-input edit-select-all-section" type="checkbox" id="editSelectAllDelivery" data-section="delivery">
+                            <label class="form-check-label fw-bold text-danger" for="editSelectAllDelivery">
+                                <i class="fas fa-motorcycle me-2"></i> Repartidores
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'delivery']}">
+                                <div class="form-check">
+                                    <input class="form-check-input edit-permiso-checkbox" type="checkbox" 
+                                           th:id="'edit_modal_permiso_' + ${permiso.codigo}"
+                                           th:value="${permiso.codigo}"
+                                           th:data-nombre="${permiso.nombre}"
+                                           th:data-accion="${permiso.accion}"
+                                           th:data-codigo="${permiso.codigo}"
+                                           data-section="delivery">
+                                    <label class="form-check-label" th:for="'edit_modal_permiso_' + ${permiso.codigo}">
+                                        <span class="badge bg-danger me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                        <small th:text="${permiso.descripcion}">Descripción</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Categorías -->
+                <div class="card mb-3 border-secondary" th:if="${permisos.?[seccion == 'categorias'].size() > 0}">
+                    <div class="card-header bg-secondary bg-opacity-10">
+                        <div class="form-check">
+                            <input class="form-check-input edit-select-all-section" type="checkbox" id="editSelectAllCategorias" data-section="categorias">
+                            <label class="form-check-label fw-bold text-secondary" for="editSelectAllCategorias">
+                                <i class="fas fa-tags me-2"></i> Categorías
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'categorias']}">
+                                <div class="form-check">
+                                    <input class="form-check-input edit-permiso-checkbox" type="checkbox" 
+                                           th:id="'edit_modal_permiso_' + ${permiso.codigo}"
+                                           th:value="${permiso.codigo}"
+                                           th:data-nombre="${permiso.nombre}"
+                                           th:data-accion="${permiso.accion}"
+                                           th:data-codigo="${permiso.codigo}"
+                                           data-section="categorias">
+                                    <label class="form-check-label" th:for="'edit_modal_permiso_' + ${permiso.codigo}">
+                                        <span class="badge bg-secondary me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                        <small th:text="${permiso.descripcion}">Descripción</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Configuracion -->
+                <div class="card mb-3 border-dark" th:if="${permisos.?[seccion == 'configuracion'].size() > 0}">
+                    <div class="card-header bg-dark bg-opacity-10">
+                        <div class="form-check">
+                            <input class="form-check-input edit-select-all-section" type="checkbox" id="editSelectAllConfiguracion" data-section="configuracion">
+                            <label class="form-check-label fw-bold text-dark" for="editSelectAllConfiguracion">
+                                <i class="fas fa-cogs me-2"></i> Configuración
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'configuracion']}">
+                                <div class="form-check">
+                                    <input class="form-check-input edit-permiso-checkbox" type="checkbox" 
+                                           th:id="'edit_modal_permiso_' + ${permiso.codigo}"
+                                           th:value="${permiso.codigo}"
+                                           th:data-nombre="${permiso.nombre}"
+                                           th:data-accion="${permiso.accion}"
+                                           th:data-codigo="${permiso.codigo}"
+                                           data-section="configuracion">
+                                    <label class="form-check-label" th:for="'edit_modal_permiso_' + ${permiso.codigo}">
+                                        <span class="badge bg-dark me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
+                                        <small th:text="${permiso.descripcion}">Descripción</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-success" id="confirmEditPermisos" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i> Confirmar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Continuacion de permisos ocultos antiguos eliminada -->
+                
+<!-- Cierre de modales antiguos de edicion -->
+
+<!-- Modal para ver permisos de un rol -->
+<div class="modal fade" id="viewPermisosModal" tabindex="-1" aria-labelledby="viewPermisosModalLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background-color: white; position: relative; z-index: 1061;">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewPermisosModalLabel">
+                    <i class="fas fa-shield-alt me-2"></i> Permisos del Rol: <span id="viewRolNombre" class="fw-bold"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                <div id="permisosContent" class="row g-3">
+                    <!-- Se llenará dinámicamente con JavaScript -->
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Cerrar
+                    <i class="fas fa-times me-2"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-success" id="editPermisosFromView">
+                    <i class="fas fa-edit me-2"></i> Editar Permisos
                 </button>
             </div>
         </div>
@@ -1193,227 +1987,51 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script>
-// ========== FUNCIONES PARA GESTIÓN DE RESTAURANTES ==========
 
-// Función para aprobar restaurante
-function aprobarRestaurante(button) {
-    const id = button.dataset.id;
-    const nombre = button.dataset.nombre;
+<!-- ========================================
+     VARIABLES THYMELEAF (Solo lo necesario)
+     ======================================== -->
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+// Configuración global con variables del servidor
+window.ADMIN_CONFIG = {
+    activeSection: /*[[${activeSection}]]*/ 'usuarios',
+    permisos: /*[[${permisos}]]*/ []
+};
+
+// Mapear permisos para el sistema
+try {
+    var permisosFromServer = window.ADMIN_CONFIG.permisos;
     
-    if (confirm(`¿Está seguro de aprobar el restaurante "${nombre}"?\n\nEsto permitirá que puedan acceder al sistema.`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/menuAdministrador/restaurant/${id}/approve`;
-        
-        // Agregar token CSRF
-        const csrfToken = document.querySelector('meta[name="_csrf"]');
-        if (csrfToken) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = '_csrf';
-            input.value = csrfToken.getAttribute('content');
-            form.appendChild(input);
-        }
-        
-        document.body.appendChild(form);
-        form.submit();
+    if (permisosFromServer && Array.isArray(permisosFromServer)) {
+        window.todosLosPermisos = permisosFromServer.map(function(p) {
+            return {
+                codigo: p.codigo || 0,
+                nombre: p.nombre || p.accion || 'Permiso',
+                accion: p.accion || p.nombre || 'Permiso',
+                descripcion: p.descripcion || '',
+                seccion: p.seccion || 'general'
+            };
+        });
+        console.log('Permisos cargados:', window.todosLosPermisos.length);
+    } else {
+        console.warn('No hay permisos disponibles del servidor');
+        window.todosLosPermisos = [];
     }
+} catch(error) {
+    console.error(' Error procesando permisos:', error);
+    window.todosLosPermisos = [];
 }
 
-// Función para cambiar estado de restaurante
-function toggleEstadoRestaurante(button) {
-    const id = button.dataset.id;
-    const estadoActual = button.dataset.estado === 'true';
-    const nuevoEstado = estadoActual ? 'desactivar' : 'activar';
-    
-    if (confirm(`¿Está seguro de ${nuevoEstado} este restaurante?`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/menuAdministrador/restaurant/${id}/toggle-status`;
-        
-        // Agregar token CSRF
-        const csrfToken = document.querySelector('meta[name="_csrf"]');
-        if (csrfToken) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = '_csrf';
-            input.value = csrfToken.getAttribute('content');
-            form.appendChild(input);
-        }
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-
-// Función para eliminar restaurante
-function eliminarRestaurante(button) {
-    const id = button.dataset.id;
-    const nombre = button.dataset.nombre;
-    
-    if (confirm(`⚠️ ADVERTENCIA ⚠️\n\n¿Está seguro de ELIMINAR el restaurante "${nombre}"?\n\nEsta acción NO se puede deshacer.`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/menuAdministrador/restaurant/${id}/delete`;
-        
-        // Agregar token CSRF
-        const csrfToken = document.querySelector('meta[name="_csrf"]');
-        if (csrfToken) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = '_csrf';
-            input.value = csrfToken.getAttribute('content');
-            form.appendChild(input);
-        }
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-
-// Función para ver documentos del restaurante
-function verDocumento(tipoDocumento, restauranteId) {
-    // Construir URL del documento
-    const url = `/uploads/restaurante/${restauranteId}/${tipoDocumento}`;
-    
-    // Abrir en nueva ventana
-    window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
-}
-
-// ========== EVENT LISTENERS PARA MODALES Y CONFIRMACIONES ==========
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== MENU ADMINISTRADOR CARGADO ===');
-    console.log('showSection está definida:', typeof showSection);
-    
-    // ========== CONFIRMACIONES PARA APROBAR/RECHAZAR ==========
-    // Delegación de eventos para botones dinámicos
-    document.body.addEventListener('submit', function(e) {
-        var form = e.target;
-        
-        // Confirmar aprobación de repartidor
-        if (form.action && form.action.includes('/approve')) {
-            if (!confirm('¿Está seguro de aprobar este repartidor?')) {
-                e.preventDefault();
-                return false;
-            }
-        }
-        
-        // Confirmar rechazo de repartidor
-        if (form.action && form.action.includes('/reject')) {
-            if (!confirm('¿Está seguro de rechazar este repartidor?')) {
-                e.preventDefault();
-                return false;
-            }
-        }
-    });
-    
-    // ========== MODAL DE EDICIÓN DE USUARIO ==========
-    var editUserModal = document.getElementById('editUserModal');
-    if (editUserModal) {
-        editUserModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var id = button.getAttribute('data-id');
-            var name = button.getAttribute('data-name');
-            var lastname = button.getAttribute('data-lastname');
-            var email = button.getAttribute('data-email');
-            var phone = button.getAttribute('data-phone');
-            var address = button.getAttribute('data-address');
-            
-            document.getElementById('editUserName').value = name;
-            document.getElementById('editUserLastName').value = lastname;
-            document.getElementById('editUserEmail').value = email;
-            document.getElementById('editUserPhone').value = phone || '';
-            document.getElementById('editUserAddress').value = address || '';
-            
-            var form = document.getElementById('editUserForm');
-            form.action = '/menuAdministrador/user/' + id + '/update';
-        });
-    }
-
-    // ========== MODAL VER DETALLES RESTAURANTE ==========
-    var viewRestaurantModal = document.getElementById('viewRestaurantModal');
-    if (viewRestaurantModal) {
-        viewRestaurantModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var restaurantId = button.getAttribute('data-id');
-            
-            // Guardar ID en el modal para los botones de documentos
-            viewRestaurantModal.dataset.restaurantId = restaurantId;
-            
-            // Llenar información
-            document.getElementById('viewRestaurantNombre').textContent = button.getAttribute('data-nombre') || 'N/A';
-            document.getElementById('viewRestaurantRazon').textContent = button.getAttribute('data-razon') || 'N/A';
-            document.getElementById('viewRestaurantRuc').textContent = button.getAttribute('data-ruc') || 'N/A';
-            document.getElementById('viewRestaurantEmail').textContent = button.getAttribute('data-email') || 'N/A';
-            document.getElementById('viewRestaurantTelefono').textContent = button.getAttribute('data-telefono') || 'N/A';
-            document.getElementById('viewRestaurantDireccion').textContent = button.getAttribute('data-direccion') || 'N/A';
-        });
-    }
-
-    // ========== MODAL RECHAZAR RESTAURANTE ==========
-    var rejectRestaurantModal = document.getElementById('rejectRestaurantModal');
-    if (rejectRestaurantModal) {
-        rejectRestaurantModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var id = button.getAttribute('data-id');
-            var nombre = button.getAttribute('data-nombre');
-            
-            document.getElementById('rejectRestaurantNombre').textContent = nombre;
-            document.getElementById('motivoRechazo').value = '';
-            
-            var form = document.getElementById('rejectRestaurantForm');
-            form.action = '/menuAdministrador/restaurant/' + id + '/reject';
-        });
-    }
-
-    // ========== MODAL DE EDICIÓN DE REPARTIDOR ==========
-    var editDeliveryModal = document.getElementById('editDeliveryModal');
-    if (editDeliveryModal) {
-        editDeliveryModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var id = button.getAttribute('data-id');
-            var name = button.getAttribute('data-name');
-            var lastname = button.getAttribute('data-lastname');
-            var email = button.getAttribute('data-email');
-            var phone = button.getAttribute('data-phone');
-            var address = button.getAttribute('data-address');
-            
-            document.getElementById('editDeliveryName').value = name;
-            document.getElementById('editDeliveryLastName').value = lastname;
-            document.getElementById('editDeliveryEmail').value = email;
-            document.getElementById('editDeliveryPhone').value = phone || '';
-            document.getElementById('editDeliveryAddress').value = address || '';
-            
-            var form = document.getElementById('editDeliveryForm');
-            form.action = '/menuAdministrador/delivery/' + id + '/update';
-        });
-    }
-
-    // ========== MODAL DE EDICIÓN DE RESTAURANTE ==========
-    var editRestaurantModal = document.getElementById('editRestaurantModal');
-    if (editRestaurantModal) {
-        editRestaurantModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var id = button.getAttribute('data-id');
-            var name = button.getAttribute('data-name');
-            var lastname = button.getAttribute('data-lastname');
-            var email = button.getAttribute('data-email');
-            var phone = button.getAttribute('data-phone');
-            
-            document.getElementById('editRestaurantId').value = id;
-            document.getElementById('editRestaurantName').value = name;
-            document.getElementById('editRestaurantLastName').value = lastname;
-            document.getElementById('editRestaurantEmail').value = email;
-            document.getElementById('editRestaurantPhone').value = phone || '';
-            
-            var form = document.getElementById('editRestaurantForm');
-            form.action = '/menuAdministrador/restaurant/' + id + '/update';
-        });
-    }
-    
-    console.log('=== INICIALIZACIÓN COMPLETADA ===');
-});
+/*]]>*/
 </script>
+
+<!-- ========================================
+     SCRIPTS EXTERNOS (Funcionalidad modular)
+     ======================================== -->
+<script src="/js/admin.js"></script>
+<script src="/js/admin-permisos.js"></script>
+
 </body>
 </html>

@@ -2,13 +2,13 @@ package com.example.SistemaDePromociones.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class EmailService {
@@ -41,7 +41,7 @@ public class EmailService {
             throw new RuntimeException("No se pudo enviar el correo de verificación: " + e.getMessage());
         }
     }
-    
+
     /**
      * Enviar código de verificación con HTML para recuperación de contraseña
      */
@@ -64,6 +64,30 @@ public class EmailService {
         } catch (Exception e) {
             logger.error("❌ [EMAIL] Error al enviar código a: " + destinatario, e);
             throw e;
+        }
+    }
+    
+    /**
+     * Enviar notificación de rechazo de restaurante
+     */
+    public void sendRestaurantRejectionNotification(String email, String nombreRestaurante, String motivo) {
+        logger.info("Enviando notificación de rechazo a restaurante: {}", email);
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setFrom(fromEmail);
+            helper.setTo(email);
+            helper.setSubject("FooDIx - Solicitud de Registro Rechazada");
+            
+            String htmlContent = construirHtmlRechazoRestaurante(nombreRestaurante, motivo);
+            helper.setText(htmlContent, true);
+
+            emailSender.send(message);
+            logger.info("Notificación de rechazo enviada exitosamente a: {}", email);
+        } catch (Exception e) {
+            logger.error("Error al enviar notificación de rechazo a: " + email, e);
+            throw new RuntimeException("No se pudo enviar el correo de notificación: " + e.getMessage());
         }
     }
     
@@ -146,7 +170,7 @@ public class EmailService {
             </html>
             """;
     }
-    
+
     /**
      * Construir HTML del correo de verificación para recuperación de contraseña
      */
@@ -204,6 +228,90 @@ public class EmailService {
                                         </table>
                                         <p style="color: #6c757d; font-size: 14px; margin-top: 30px;">
                                             Si tienes problemas, contacta a nuestro equipo de soporte.
+                                        </p>
+                                    </td>
+                                </tr>
+                                <!-- Footer -->
+                                <tr>
+                                    <td style="background-color: #f8f9fa; padding: 20px; text-align: center;">
+                                        <p style="margin: 0 0 5px 0; color: #6c757d; font-size: 14px;">
+                                            © 2025 FooDIx - Sistema de Gestión de Restaurantes
+                                        </p>
+                                        <p style="margin: 0; color: #6c757d; font-size: 14px;">
+                                            Este es un correo automático, por favor no respondas a este mensaje.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+            """;
+    }
+    
+    /**
+     * Construir HTML del correo de notificación de rechazo de restaurante
+     */
+    private String construirHtmlRechazoRestaurante(String nombreRestaurante, String motivo) {
+        return """
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+                <table width="100%%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 40px 0;">
+                    <tr>
+                        <td align="center">
+                            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
+                                <!-- Header -->
+                                <tr>
+                                    <td style="background: linear-gradient(135deg, #dc3545 0%%, #c82333 100%%); color: white; padding: 30px; text-align: center;">
+                                        <h1 style="margin: 0; font-size: 28px;">🍔 FooDIx</h1>
+                                        <p style="margin: 10px 0 0 0; font-size: 16px;">Notificación de Solicitud</p>
+                                    </td>
+                                </tr>
+                                <!-- Content -->
+                                <tr>
+                                    <td style="padding: 40px 30px;">
+                                        <h2 style="color: #333; margin-top: 0;">Solicitud de Registro Rechazada</h2>
+                                        <p style="color: #666; font-size: 16px; line-height: 1.6;">
+                                            Estimado/a representante de <strong>"""
+                + nombreRestaurante
+                + """
+</strong>,
+                                        </p>
+                                        <p style="color: #666; font-size: 16px; line-height: 1.6;">
+                                            Lamentamos informarle que su solicitud de registro en la plataforma FooDIx ha sido rechazada.
+                                        </p>
+                                        
+                                        <!-- Motivo Box -->
+                                        <table width="100%%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                                            <tr>
+                                                <td style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 4px;">
+                                                    <p style="margin: 0 0 10px 0; color: #856404; font-weight: bold;">Motivo del rechazo:</p>
+                                                    <p style="margin: 0; color: #856404; font-size: 15px;">"""
+                + motivo
+                + """
+</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        
+                                        <p style="color: #666; font-size: 16px; line-height: 1.6;">
+                                            Si considera que esto es un error o desea realizar correcciones, puede:
+                                        </p>
+                                        <ul style="color: #666; font-size: 16px; line-height: 1.8;">
+                                            <li>Revisar los requisitos de registro</li>
+                                            <li>Corregir la información solicitada</li>
+                                            <li>Volver a enviar su solicitud</li>
+                                        </ul>
+                                        
+                                        <p style="color: #6c757d; font-size: 14px; margin-top: 30px;">
+                                            Si tiene alguna duda, no dude en contactar a nuestro equipo de soporte.
                                         </p>
                                     </td>
                                 </tr>

@@ -4,6 +4,7 @@ import com.example.SistemaDePromociones.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -31,4 +32,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      * Verificar si existe un número de documento
      */
     boolean existsByNumeroDocumento(String numeroDocumento);
+    
+    /**
+     * Buscar usuarios por código de rol
+     */
+    List<Usuario> findByCodigoRol(Long codigoRol);
 }
