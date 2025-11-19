@@ -8,6 +8,147 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Estilos personalizados para login */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .login-header h2 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 28px;
+        }
+        
+        .login-header .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: #a0002a;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .login-body {
+            padding: 40px 30px;
+            background: white;
+        }
+        
+        .form-control:focus {
+            border-color: #a0002a;
+            box-shadow: 0 0 0 0.2rem rgba(160, 0, 42, 0.25);
+        }
+        
+        .input-group-text {
+            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
+            border: none;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(160, 0, 42, 0.3);
+            color: white;
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .divider span {
+            padding: 0 10px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .link-primary-custom {
+            color: #a0002a;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        
+        .link-primary-custom:hover {
+            color: #FFD700;
+            text-decoration: underline;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .form-check-input:checked {
+            background-color: #a0002a;
+            border-color: #a0002a;
+        }
+        
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(160, 0, 42, 0.25);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
 </head>
 <body>
 
@@ -43,102 +184,132 @@
 </nav>
 
 <!-- Contenido Principal -->
-<main style="padding-top: 80px; min-height: 100vh; background: linear-gradient(360deg, #FFD700 0%, #a0002a 100%);">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5 col-lg-4">
-                <div class="card shadow-lg mt-5">
-                    <div class="card-body p-4">
-                        <div class="text-center mb-4">
-                            <h2 class="fw-bold">Iniciar Sesión</h2>
-                            <p class="text-muted">Ingresa a tu cuenta</p>
+<main style="background: linear-gradient(360deg, #FFD700 0%, #a0002a 100%);">
+    <div class="login-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card login-card border-0">
+                        <!-- Header del Login -->
+                        <div class="login-header">
+                            <div class="logo-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <h2>Bienvenido a FoodIx</h2>
+                            <p class="mb-0 mt-2" style="opacity: 0.9;">Inicia sesión para continuar</p>
                         </div>
 
-                        <!-- Mensajes de notificación -->
-                        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-circle"></i> 
-                            Correo electrónico o contraseña incorrectos
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle"></i> 
-                            Has cerrado sesión correctamente
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        <div th:if="${param.passwordChanged}" class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle"></i> 
-                            Tu contraseña ha sido actualizada correctamente. Por favor, inicia sesión con tu nueva contraseña.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
-                            <span th:text="${message}"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                        <!-- Body del Login -->
+                        <div class="login-body">
+                            <!-- Mensajes de notificación -->
+                            <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i> 
+                                <strong>Error:</strong> Correo electrónico o contraseña incorrectos
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i> 
+                                <strong>Éxito:</strong> Has cerrado sesión correctamente
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <div th:if="${param.passwordChanged}" class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i> 
+                                <strong>Contraseña actualizada:</strong> Por favor, inicia sesión con tu nueva contraseña
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <span th:text="${message}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
 
-                        <form th:action="@{/login}" method="post" id="loginForm">
-                            <!-- CSRF Token -->
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                            
-                            <!-- Email -->
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Correo Electrónico</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-envelope"></i>
-                                    </span>
-                                    <input type="email" class="form-control" id="email" 
-                                           name="email" required maxlength="50"
-                                           placeholder="correo@ejemplo.com">
+                            <form th:action="@{/login}" method="post" id="loginForm">
+                                <!-- CSRF Token -->
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                
+                                <!-- Email -->
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-semibold">
+                                        <i class="fas fa-envelope me-1"></i>Correo Electrónico
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                        <input type="email" class="form-control form-control-lg" id="email" 
+                                               name="email" required maxlength="50"
+                                               placeholder="correo@ejemplo.com"
+                                               autocomplete="email">
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Por favor, ingresa un correo electrónico válido
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Contraseña -->
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-lock"></i>
-                                    </span>
-                                    <input type="password" class="form-control" id="password" 
-                                           name="password" required minlength="6"
-                                           placeholder="Tu contraseña">
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                <!-- Contraseña -->
+                                <div class="mb-3">
+                                    <label for="password" class="form-label fw-semibold">
+                                        <i class="fas fa-lock me-1"></i>Contraseña
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-key"></i>
+                                        </span>
+                                        <input type="password" class="form-control form-control-lg" id="password" 
+                                               name="password" required minlength="6"
+                                               placeholder="Tu contraseña"
+                                               autocomplete="current-password">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        La contraseña debe tener al menos 6 caracteres
+                                    </div>
                                 </div>
+
+                                <!-- Recordar sesión y olvidé contraseña -->
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                                        <label class="form-check-label" for="remember-me">
+                                            Recordarme
+                                        </label>
+                                    </div>
+                                    <a href="/recuperar-password" th:href="@{/recuperar-password}" 
+                                       class="link-primary-custom">
+                                        <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+                                    </a>
+                                </div>
+
+                                <!-- Botón de Login -->
+                                <button type="submit" class="btn btn-login w-100 mb-3">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                                </button>
+                            </form>
+
+                            <!-- Divisor -->
+                            <div class="divider">
+                                <span>O</span>
                             </div>
 
-                            <!-- Recordar sesión -->
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
-                                <label class="form-check-label" for="remember-me">
-                                    Recordar mi sesión
-                                </label>
+                            <!-- Opciones adicionales -->
+                            <div class="text-center">
+                                <p class="mb-0">
+                                    ¿No tienes cuenta? 
+                                    <a href="/verificacion" th:href="@{/verificacion}" class="link-primary-custom">
+                                        Regístrate aquí
+                                    </a>
+                                </p>
                             </div>
-
-                            <!-- Botón de Login -->
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                            </button>
-                        </form>
-
-                        <!-- Divisor -->
-                        <div class="text-center my-3">
-                            <span class="text-muted">o</span>
                         </div>
-
-                        <!-- Opciones adicionales -->
-                        <div class="text-center">
-                            <p class="mb-2">¿No tienes cuenta? 
-                                <a href="/registro" th:href="@{/verificacion}" class="text-decoration-none fw-bold">
-                                    Regístrate aquí
-                                </a>
-                            </p>
-                            <a href="/recuperar-password" th:href="@{/recuperar-password}" 
-                               class="text-decoration-none text-muted">
-                                <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
-                            </a>
-                        </div>
+                    </div>
+                    
+                    <!-- Enlace de retorno -->
+                    <div class="text-center mt-3">
+                        <a href="/" th:href="@{/}" class="text-white text-decoration-none">
+                            <i class="fas fa-arrow-left me-2"></i>Volver al inicio
+                        </a>
                     </div>
                 </div>
             </div>
