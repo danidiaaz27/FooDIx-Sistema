@@ -1168,21 +1168,22 @@
                             <div class="mb-3">
                                 <label for="adminPassword" class="form-label">Contraseña *</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="adminPassword" name="password" minlength="6" required>
+                                    <input type="password" class="form-control" id="adminPassword" name="password" minlength="8" required>
                                     <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('adminPassword', this)">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                <small class="text-muted">Mínimo 6 caracteres</small>
+                                <!-- El mensaje de requisitos se generará dinámicamente por JavaScript -->
                             </div>
                             <div class="mb-3">
                                 <label for="adminPasswordConfirm" class="form-label">Confirmar Contraseña *</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="adminPasswordConfirm" name="passwordConfirm" minlength="6" required>
+                                    <input type="password" class="form-control" id="adminPasswordConfirm" name="passwordConfirm" minlength="8" required>
                                     <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('adminPasswordConfirm', this)">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
+                                <!-- El mensaje de coincidencia se generará dinámicamente por JavaScript -->
                             </div>
                             <div class="mb-3">
                                 <label for="adminPhone" class="form-label">Teléfono</label>
@@ -2032,6 +2033,7 @@ try {
      ======================================== -->
 <script src="/js/admin.js"></script>
 <script src="/js/admin-permisos.js"></script>
+<script src="/js/admin-form-validation.js"></script>
 
 </body>
 </html>
