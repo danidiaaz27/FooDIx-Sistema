@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(360deg, #FFD700 0%, #a0002a 100%);
+            background: #FFFFFF;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -27,7 +27,7 @@
         .verification-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -53,13 +53,13 @@
             transition: all 0.3s;
         }
         .code-input:focus {
-            border-color: #a0002a;
-            box-shadow: 0 0 0 0.2rem rgba(160, 0, 42, 0.25);
+            border-color: #C62828;
+            box-shadow: 0 0 0 0.2rem rgba(198, 40, 40, 0.25);
             outline: none;
         }
         .code-input.filled {
-            border-color: #a0002a;
-            background-color: #fff8dc;
+            border-color: #C62828;
+            background-color: #FFF5E1;
         }
         .code-input.error {
             border-color: #dc3545;
@@ -71,7 +71,7 @@
             75% { transform: translateX(10px); }
         }
         .btn-verify {
-            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
             border: none;
             color: white;
             padding: 15px;
@@ -81,9 +81,9 @@
             width: 100%;
             transition: transform 0.2s;
         }
-        .btn-verify:hover {
+        .btn-verify:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(160, 0, 42, 0.3);
+            box-shadow: 0 10px 20px rgba(198, 40, 40, 0.3);
         }
         .btn-verify:disabled {
             opacity: 0.6;
@@ -91,13 +91,13 @@
             transform: none;
         }
         .resend-link {
-            color: #a0002a;
+            color: #C62828;
             text-decoration: none;
             font-weight: 500;
         }
         .resend-link:hover {
             text-decoration: underline;
-            color: #8b0024;
+            color: #8B1F1F;
         }
         .timer {
             color: #6c757d;

@@ -14,8 +14,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminPasswordInput = document.getElementById('adminPassword');
     const adminPasswordConfirmInput = document.getElementById('adminPasswordConfirm');
     const adminPhoneInput = document.getElementById('adminPhone');
+    const adminRolSelect = document.getElementById('adminRol');
+    const rolHelpText = document.getElementById('rolHelp');
     
     if (!adminForm) return; // Si no existe el formulario, salir
+    
+    // =============================================
+    // VALIDACIÓN DE SELECTOR DE ROL
+    // Códigos de rol según datos_iniciales.sql:
+    // 1 = ADMINISTRADOR (Administrador del sistema FooDix)
+    // 2 = RESTAURANTE (Propietario de restaurante)
+    // 3 = REPARTIDOR (Repartidor de pedidos)
+    // 4 = USUARIO (Usuario cliente del sistema)
+    // =============================================
+    if (adminRolSelect) {
+        adminRolSelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            const selectedOption = this.options[this.selectedIndex];
+            
+            // Validación visual
+            if (selectedValue === '') {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                if (rolHelpText) {
+                    rolHelpText.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-circle"></i> Debe seleccionar un rol</span>';
+                }
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                
+                // Validar que el código del rol sea válido (1, 2, 3 o 4)
+                const validRoles = ['1', '2', '3', '4'];
+                if (!validRoles.includes(selectedValue)) {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                    if (rolHelpText) {
+                        rolHelpText.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-circle"></i> Rol no válido</span>';
+                    }
+                } else {
+                    // Mostrar información del rol seleccionado
+                    const rolNombre = selectedOption.dataset.rolNombre || selectedOption.text;
+                    let infoRol = '';
+                    
+                    switch(selectedValue) {
+                        case '1':
+                            infoRol = '<i class="fas fa-check-circle text-success"></i> <strong>ADMINISTRADOR</strong>: Acceso total al sistema';
+                            break;
+                        case '2':
+                            infoRol = '<i class="fas fa-check-circle text-success"></i> <strong>RESTAURANTE</strong>: Gestión de restaurante y menús';
+                            break;
+                        case '3':
+                            infoRol = '<i class="fas fa-check-circle text-success"></i> <strong>REPARTIDOR</strong>: Gestión de entregas';
+                            break;
+                        case '4':
+                            infoRol = '<i class="fas fa-check-circle text-success"></i> <strong>USUARIO</strong>: Cliente del sistema';
+                            break;
+                    }
+                    
+                    if (rolHelpText && infoRol) {
+                        rolHelpText.innerHTML = infoRol;
+                    }
+                }
+            }
+        });
+    }
     
     // =============================================
     // VALIDACIÓN DE SOLO LETRAS (NOMBRE Y APELLIDO)
@@ -237,6 +299,16 @@ document.addEventListener('DOMContentLoaded', function() {
         let isValid = true;
         const errors = [];
         
+        // Validar rol
+        const validRoles = ['1', '2', '3', '4'];
+        if (!adminRolSelect || adminRolSelect.value === '' || !validRoles.includes(adminRolSelect.value)) {
+            if (adminRolSelect) {
+                adminRolSelect.classList.add('is-invalid');
+            }
+            errors.push('Debe seleccionar un rol válido del sistema');
+            isValid = false;
+        }
+        
         // Validar nombre
         if (adminNameInput && adminNameInput.value.trim().length < 2) {
             adminNameInput.classList.add('is-invalid');
@@ -303,12 +375,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Limpiar clases de validación
             const inputs = [adminNameInput, adminLastNameInput, adminEmailInput, 
-                          adminPasswordInput, adminPasswordConfirmInput, adminPhoneInput];
+                          adminPasswordInput, adminPasswordConfirmInput, adminPhoneInput, adminRolSelect];
             inputs.forEach(input => {
                 if (input) {
                     input.classList.remove('is-valid', 'is-invalid', 'password-mismatch');
                 }
             });
+            
+            // Limpiar mensaje de ayuda del rol
+            if (rolHelpText) {
+                rolHelpText.innerHTML = '';
+            }
             
             // Limpiar mensajes de ayuda de contraseña
             const passwordHelp = document.getElementById('adminPasswordHelp');
