@@ -6,8 +6,8 @@
     <title>Mi Menú - FoodIx</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
 </head>
 <body>
 
@@ -22,6 +22,13 @@
         </button>
         <div class="collapse navbar-collapse" id="menuNav">
             <ul class="navbar-nav ms-auto">
+                <!-- Botón de Tema Claro/Oscuro -->
+                <li class="nav-item d-flex align-items-center">
+                    <button class="theme-toggle" type="button" aria-label="Cambiar tema">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </li>
                 <li class="nav-item"><a class="nav-link" href="/" th:href="@{/}">Inicio</a></li>
                 
                 <!-- Nuevo: Trabaja con Nosotros -->
@@ -471,6 +478,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/theme-toggle.js}"></script>
 <script th:src="@{/js/main.js}"></script>
 </body>
 </html>

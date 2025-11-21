@@ -8,8 +8,8 @@
     <title>Panel de Administrador - FoodIx</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
     <style>
         .hover-card {
             transition: all 0.3s ease;
@@ -72,6 +72,13 @@
         </button>
         <div class="collapse navbar-collapse" id="menuNav">
             <ul class="navbar-nav ms-auto">
+                <!-- Botón de Tema Claro/Oscuro -->
+                <li class="nav-item d-flex align-items-center">
+                    <button class="theme-toggle" type="button" aria-label="Cambiar tema">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </li>
                 <li class="nav-item">
                     <div class="dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -1157,12 +1164,14 @@
                                     <option th:each="rol : ${roles}" 
                                             th:if="${rol.estado}"
                                             th:value="${rol.codigo}" 
-                                            th:text="${rol.nombre}"
-                                            th:selected="${rol.codigo == 1}">
+                                            th:text="${rol.nombre + ' - ' + rol.descripcion}"
+                                            th:data-rol-codigo="${rol.codigo}"
+                                            th:data-rol-nombre="${rol.nombre}">
                                         Rol
                                     </option>
                                 </select>
                                 <small class="text-muted">Define los permisos del usuario en el sistema</small>
+                                <div id="rolHelp" class="form-text mt-1"></div>
                             </div>
                             
                             <div class="mb-3">
@@ -1241,13 +1250,13 @@
 <div class="modal fade" id="manageRolesModal" tabindex="-1" aria-labelledby="manageRolesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content shadow-lg border-0">
-            <div class="modal-header text-white" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);">
+            <div class="modal-header">
                 <h5 class="modal-title" id="manageRolesModalLabel">
                     <i class="fas fa-user-shield me-2"></i> Gestión de Roles del Sistema
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4" style="background-color: #f8f9fa;">
+            <div class="modal-body p-4">
                 <div class="row g-4">
                     <!-- Formulario para crear rol -->
                     <div class="col-md-4">
@@ -1628,14 +1637,14 @@
 <div class="modal fade" id="editRolModal" tabindex="-1" aria-labelledby="editRolModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content shadow-lg border-0">
-            <div class="modal-header text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="modal-header">
                 <h5 class="modal-title" id="editRolModalLabel">
                     <i class="fas fa-edit me-2"></i> Editar Rol
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editRolForm" method="post">
-                <div class="modal-body p-4" style="background-color: #f8f9fa;">
+                <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -1988,6 +1997,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/theme-toggle.js}"></script>
 
 <!-- ========================================
      VARIABLES THYMELEAF (Solo lo necesario)
