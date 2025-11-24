@@ -82,7 +82,6 @@
 
 <!-- Contenido Principal -->
 <main class="container-fluid" style="padding-top: 90px;">
-
     <div class="row">
         <!-- Sidebar de navegación -->
         <div class="col-md-3 col-lg-2 sidebar">
@@ -158,25 +157,68 @@
                     </form>
                 </div>
 
-                <!-- Grid de productos -->
+                <!-- Grid de Promociones -->
                 <div class="products-grid" id="productsGrid">
-                    <div class="product-card" th:each="product : ${products}">
-                        <img th:src="${product.image}" th:alt="${product.name}" class="product-image">
+                    <!-- Mensaje si no hay promociones -->
+                    <div th:if="${promociones == null or promociones.isEmpty()}" class="text-center py-5">
+                        <i class="fas fa-tags fa-4x text-muted mb-3"></i>
+                        <h4>No hay promociones disponibles</h4>
+                        <p class="text-muted">Pronto tendremos nuevas ofertas para ti</p>
+                    </div>
+
+                    <!-- Promociones -->
+                    <div class="product-card" th:each="promocion : ${promociones}">
+                        <img th:src="${promocion.imagenPrincipal}" th:alt="${promocion.titulo}" 
+                             class="product-image" onerror="this.src='/img/default-food.jpg'">
                         <div class="product-info">
-                            <span class="product-category" th:text="${categories.get(product.category)}">Categoría</span>
-                            <h3 class="product-name" th:text="${product.name}">Nombre del producto</h3>
+                            <span class="product-category" th:text="${promocion.categoriaPromocion}">Categoría</span>
+                            <h3 class="product-name" th:text="${promocion.titulo}">Nombre de la promoción</h3>
                             <p class="product-restaurant">
-                                <i class="fas fa-store"></i> <span th:text="${product.restaurant}">Restaurante</span>
+                                <i class="fas fa-store"></i> 
+                                <span th:text="${promocion.restaurante.nombre}">Restaurante</span>
+                                <small class="text-muted ms-2" th:text="'• ' + ${promocion.restaurante.distrito.nombre}">• Distrito</small>
                             </p>
-                            <p class="product-description" th:text="${product.description}">Descripción</p>
-                            <div class="product-prices">
-                                <span class="original-price" th:text="'S/ ' + ${#numbers.formatDecimal(product.originalPrice, 1, 2)}">S/ 0.00</span>
-                                <span class="sale-price" th:text="'S/ ' + ${#numbers.formatDecimal(product.salePrice, 1, 2)}">S/ 0.00</span>
-                                <span class="discount-badge" th:text="'-' + ${product.discount} + '%'">-0%</span>
+                            <p class="product-description" th:text="${promocion.descripcion}">Descripción</p>
+                            
+                            <!-- Tiempo restante -->
+                            <div class="time-remaining mb-2" th:if="${promocion.estado == 'activa'}">
+                                <small class="text-warning">
+                                    <i class="fas fa-clock"></i> 
+                                    <span th:text="'Válido hasta ' + ${#temporals.format(promocion.fechaFin, 'dd/MM/yyyy')}"></span>
+                                </small>
                             </div>
-                            <form method="post" th:action="@{/cart/add/{id}(id=${product.id})}">
-                                <button type="submit" class="add-to-cart-btn">
-                                    <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                            
+                            <div class="product-prices">
+                                <span class="original-price" th:if="${promocion.precioOriginal > promocion.precioPromocional}"
+                                      th:text="'S/ ' + ${#numbers.formatDecimal(promocion.precioOriginal, 1, 2)}">
+                                    S/ 0.00
+                                </span>
+                                <span class="sale-price" th:text="'S/ ' + ${#numbers.formatDecimal(promocion.precioPromocional, 1, 2)}">
+                                    S/ 0.00
+                                </span>
+                                <span class="discount-badge" 
+                                      th:if="${promocion.precioOriginal > promocion.precioPromocional}"
+                                      th:text="'-' + ${#numbers.formatDecimal(((promocion.precioOriginal - promocion.precioPromocional) / promocion.precioOriginal * 100), 0, 0)} + '%'">
+                                    -0%
+                                </span>
+                            </div>
+                            
+                            <!-- Métricas de popularidad -->
+                            <div class="product-metrics">
+                                <small class="text-muted">
+                                    <i class="fas fa-eye"></i> <span th:text="${promocion.contadorVistas}">0</span> vistas • 
+                                    <i class="fas fa-shopping-bag"></i> <span th:text="${promocion.contadorPedidos}">0</span> pedidos
+                                </small>
+                            </div>
+                            
+                            <form method="post" th:action="@{/cart/add/{id}(id=${promocion.codigo})}">
+                                <input type="hidden" name="tipo" value="promocion">
+                                <button type="submit" class="add-to-cart-btn" 
+                                        th:disabled="${promocion.estado != 'activa'}">
+                                    <i class="fas fa-cart-plus"></i> 
+                                    <span th:text="${promocion.estado == 'activa' ? 'Agregar al Carrito' : 'No Disponible'}">
+                                        Agregar al Carrito
+                                    </span>
                                 </button>
                             </form>
                         </div>
@@ -191,40 +233,52 @@
                     <p class="text-muted">Revisa tus productos antes de realizar el pedido</p>
                 </div>
 
-                <!-- Indicador de carga del carrito -->
-                <div id="cart-loading" class="text-center py-5" style="display: block;">
-                    <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
-                    <h5>Cargando carrito...</h5>
-                    <p class="text-muted">Obteniendo tus productos...</p>
-                </div>
-
                 <!-- Carrito vacío -->
-                <div class="empty-cart-message" style="display: none;" th:if="${cartItems == null or cartItems.isEmpty()}">
-                    <div class="text-center py-5">
-                        <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
-                        <h4>Tu carrito está vacío</h4>
-                        <p class="text-muted mb-4">¡Agrega algunos productos deliciosos desde nuestro menú!</p>
-                        <button type="button" class="btn btn-primary" onclick="showMenuSection('promociones')">
-                            <i class="fas fa-utensils"></i> Ver Promociones
-                        </button>
-                    </div>
+                <div th:if="${cartItems == null or cartItems.isEmpty()}" class="empty-cart text-center py-5">
+                    <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+                    <h4>Tu carrito está vacío</h4>
+                    <p class="text-muted mb-4">¡Agrega algunas promociones deliciosas desde nuestro menú!</p>
+                    <button type="button" class="btn btn-primary" onclick="showMenuSection('promociones')">
+                        <i class="fas fa-utensils"></i> Ver Promociones
+                    </button>
                 </div>
 
                 <!-- Carrito con productos -->
                 <div class="cart-content" th:if="${cartItems != null and !cartItems.isEmpty()}">
                     <div class="cart-items">
                         <div class="cart-item" th:each="item : ${cartItems}">
-                            <img th:src="${item.image}" th:alt="${item.productName}" class="cart-item-image">
+                            <img th:src="${item.promocion.imagenPrincipal}" th:alt="${item.promocion.titulo}" 
+                                 class="cart-item-image" onerror="this.src='/img/default-food.jpg'">
                             <div class="cart-item-info">
-                                <h5 th:text="${item.productName}">Producto</h5>
-                                <p th:text="${item.restaurant}">Restaurante</p>
+                                <h5 th:text="${item.promocion.titulo}">Promoción</h5>
+                                <p th:text="${item.promocion.restaurante.nombre}">Restaurante</p>
+                                
+                                <!-- Opciones de entrega -->
+                                <div class="delivery-options mb-2">
+                                    <small class="text-muted">Tipo de entrega:</small>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <input type="radio" class="btn-check" name="tipoEntrega_${item.promocion.codigo}" 
+                                               th:id="delivery_${item.promocion.codigo}" value="DELIVERY" checked>
+                                        <label class="btn btn-outline-primary" th:for="delivery_${item.promocion.codigo}">
+                                            <i class="fas fa-motorcycle"></i> Delivery
+                                        </label>
+                                        
+                                        <input type="radio" class="btn-check" name="tipoEntrega_${item.promocion.codigo}" 
+                                               th:id="pickup_${item.promocion.codigo}" value="RECOGO_TIENDA">
+                                        <label class="btn btn-outline-success" th:for="pickup_${item.promocion.codigo}">
+                                            <i class="fas fa-store"></i> Recoger
+                                        </label>
+                                    </div>
+                                </div>
+                                
                                 <div class="quantity-controls">
-                                    <form method="post" th:action="@{/cart/update/{id}(id=${item.productId})}" style="display: inline;">
+                                    <form method="post" th:action="@{/cart/update/{id}(id=${item.promocion.codigo})}" style="display: inline;">
                                         <input type="hidden" name="quantity" th:value="${item.quantity - 1}">
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                                th:disabled="${item.quantity <= 1}">-</button>
                                     </form>
                                     <span class="quantity" th:text="${item.quantity}">1</span>
-                                    <form method="post" th:action="@{/cart/update/{id}(id=${item.productId})}" style="display: inline;">
+                                    <form method="post" th:action="@{/cart/update/{id}(id=${item.promocion.codigo})}" style="display: inline;">
                                         <input type="hidden" name="quantity" th:value="${item.quantity + 1}">
                                         <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
                                     </form>
@@ -232,9 +286,12 @@
                             </div>
                             <div class="cart-item-price">
                                 <p th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">S/ 0.00</p>
-                                <form method="post" th:action="@{/cart/remove/{id}(id=${item.productId})}">
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i>
+                                <small class="text-muted" th:text="'S/ ' + ${#numbers.formatDecimal(item.promocion.precioPromocional, 1, 2)} + ' c/u'">
+                                    S/ 0.00 c/u
+                                </small>
+                                <form method="post" th:action="@{/cart/remove/{id}(id=${item.promocion.codigo})}">
+                                    <button type="submit" class="btn btn-sm btn-danger mt-1">
+                                        <i class="fas fa-trash"></i> Eliminar
                                     </button>
                                 </form>
                             </div>
@@ -242,38 +299,82 @@
                     </div>
 
                     <div class="cart-summary">
-                        <div class="cart-total">
-                            <h4>Total: <span th:text="'S/ ' + ${#numbers.formatDecimal(cartTotal, 1, 2)}">S/ 0.00</span></h4>
+                        <!-- Información de entrega -->
+                        <div class="delivery-info mb-3">
+                            <h6><i class="fas fa-map-marker-alt"></i> Dirección de entrega</h6>
+                            <div class="mb-2">
+                                <input type="text" class="form-control" name="direccionEntrega" 
+                                       th:value="${currentUser.direccion}" 
+                                       placeholder="Ingresa tu dirección para delivery">
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle"></i> Solo para pedidos con delivery
+                                </small>
+                            </div>
+                            <div class="mb-2">
+                                <textarea class="form-control" name="referenciaEntrega" rows="2" 
+                                          placeholder="Referencias adicionales (opcional)"></textarea>
+                            </div>
                         </div>
+
+                        <div class="cart-total">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span th:text="'S/ ' + ${#numbers.formatDecimal(cartSubtotal, 1, 2)}">S/ 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Costo de delivery:</span>
+                                <span th:text="'S/ ' + ${#numbers.formatDecimal(deliveryCost, 1, 2)}">S/ 0.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <h4>Total:</h4>
+                                <h4 class="text-primary" th:text="'S/ ' + ${#numbers.formatDecimal(cartTotal, 1, 2)}">S/ 0.00</h4>
+                            </div>
+                        </div>
+                        
                         <div class="payment-methods">
-                            <form method="post" action="/cart/checkout" th:action="@{/cart/checkout}">
+                            <form method="post" action="/cart/checkout" th:action="@{/cart/checkout}" id="checkoutForm">
                                 <div class="mb-3">
                                     <label class="form-label">Método de pago:</label>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" value="efectivo" id="efectivo" checked>
-                                        <label class="form-check-label" for="efectivo">Efectivo</label>
+                                        <input class="form-check-input" type="radio" name="metodoPago" value="efectivo" id="efectivo" checked>
+                                        <label class="form-check-label" for="efectivo">
+                                            <i class="fas fa-money-bill-wave"></i> Efectivo
+                                        </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" value="tarjeta" id="tarjeta">
-                                        <label class="form-check-label" for="tarjeta">Tarjeta</label>
+                                        <input class="form-check-input" type="radio" name="metodoPago" value="tarjeta" id="tarjeta">
+                                        <label class="form-check-label" for="tarjeta">
+                                            <i class="fas fa-credit-card"></i> Tarjeta
+                                        </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" value="yape" id="yape">
-                                        <label class="form-check-label" for="yape">Yape</label>
+                                        <input class="form-check-input" type="radio" name="metodoPago" value="yape" id="yape">
+                                        <label class="form-check-label" for="yape">
+                                            <i class="fas fa-mobile-alt"></i> Yape
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="metodoPago" value="plin" id="plin">
+                                        <label class="form-check-label" for="plin">
+                                            <i class="fas fa-mobile-alt"></i> Plin
+                                        </label>
                                     </div>
                                 </div>
+                                
+                                <!-- Notas especiales -->
+                                <div class="mb-3">
+                                    <label for="notasEspeciales" class="form-label">Notas especiales (opcional)</label>
+                                    <textarea class="form-control" id="notasEspeciales" name="notasEspeciales" 
+                                              rows="2" placeholder="Instrucciones especiales para tu pedido..."></textarea>
+                                </div>
+                                
                                 <button type="submit" class="btn btn-success btn-lg w-100">
                                     <i class="fas fa-credit-card"></i> Realizar Pedido
                                 </button>
                             </form>
                         </div>
                     </div>
-                </div>
-
-                <div th:if="${cartItems == null or cartItems.isEmpty()}" class="empty-cart">
-                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                    <h4>Tu carrito está vacío</h4>
-                    <p class="text-muted">Agrega algunos productos para comenzar</p>
                 </div>
             </section>
 
@@ -284,23 +385,47 @@
                     <p class="text-muted">Revisa tus pedidos anteriores</p>
                 </div>
 
-                <div class="orders-list" th:if="${orders != null and !orders.isEmpty()}">
-                    <div class="order-card" th:each="order : ${orders}">
+                <div class="orders-list" th:if="${pedidos != null and !pedidos.isEmpty()}">
+                    <div class="order-card" th:each="pedido : ${pedidos}">
                         <div class="order-header">
-                            <h5 th:text="${order.orderNumber}">Número de orden</h5>
+                            <h5 th:text="${pedido.numeroPedido}">Número de pedido</h5>
                             <span class="badge" 
-                                  th:classappend="${order.status.name() == 'COMPLETADO'} ? 'bg-success' : (${order.status.name() == 'EN_PROCESO'} ? 'bg-warning' : 'bg-danger')"
-                                  th:text="${order.status}">Estado</span>
+                                  th:classappend="${pedido.estadoPedido.nombre == 'ENTREGADO'} ? 'bg-success' : 
+                                                 (${pedido.estadoPedido.nombre == 'EN_CAMINO'} ? 'bg-primary' :
+                                                 (${pedido.estadoPedido.nombre == 'EN_PREPARACION'} ? 'bg-warning' :
+                                                 (${pedido.estadoPedido.nombre == 'PENDIENTE'} ? 'bg-secondary' : 'bg-danger')))"
+                                  th:text="${pedido.estadoPedido.nombre}">Estado</span>
                         </div>
                         <div class="order-details">
-                            <p><strong>Fecha:</strong> <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Fecha</span></p>
-                            <p><strong>Total:</strong> <span th:text="'S/ ' + ${#numbers.formatDecimal(order.total, 1, 2)}">S/ 0.00</span></p>
-                            <p><strong>Método de pago:</strong> <span th:text="${order.paymentMethod}">Método</span></p>
+                            <p><strong>Fecha:</strong> <span th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">Fecha</span></p>
+                            <p><strong>Restaurante:</strong> <span th:text="${pedido.restaurante.nombre}">Restaurante</span></p>
+                            <p><strong>Total:</strong> <span th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 0.00</span></p>
+                            <p><strong>Método de pago:</strong> <span th:text="${pedido.metodoPago}">Método</span></p>
+                            <p><strong>Tipo de entrega:</strong> 
+                                <span th:text="${pedido.tipoEntrega.nombre}">Tipo</span>
+                                <span th:if="${pedido.tipoEntrega.nombre == 'DELIVERY' && pedido.repartidor}" 
+                                      class="text-muted">• Repartidor: <span th:text="${pedido.repartidor.usuario.nombre}"></span></span>
+                            </p>
+                            
+                            <!-- Detalles de los productos -->
+                            <div class="order-products mt-2">
+                                <h6>Productos:</h6>
+                                <div th:each="detalle : ${pedido.detalles}">
+                                    <small th:text="${detalle.cantidad} + 'x ' + ${detalle.promocion.titulo} + ' - S/ ' + ${#numbers.formatDecimal(detalle.subtotal, 1, 2)}"></small>
+                                </div>
+                            </div>
+                            
+                            <!-- Acciones según estado -->
+                            <div class="order-actions mt-2" th:if="${pedido.estadoPedido.nombre == 'ENTREGADO'}">
+                                <button class="btn btn-sm btn-outline-primary" th:onclick="|calificarPedido(${pedido.codigo})|">
+                                    <i class="fas fa-star"></i> Calificar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div th:if="${orders == null or orders.isEmpty()}" class="empty-history">
+                <div th:if="${pedidos == null or pedidos.isEmpty()}" class="empty-history text-center py-5">
                     <i class="fas fa-history fa-3x text-muted mb-3"></i>
                     <h4>No tienes pedidos anteriores</h4>
                     <p class="text-muted">Tus pedidos aparecerán aquí una vez que realices tu primera compra</p>
@@ -328,9 +453,13 @@
                         <div class="col-md-6">
                             <div class="stats-card">
                                 <h5>Estadísticas</h5>
-                                <p><strong>Pedidos realizados:</strong> <span th:text="${orders != null ? orders.size() : 0}">0</span></p>
+                                <p><strong>Pedidos realizados:</strong> <span th:text="${pedidos != null ? pedidos.size() : 0}">0</span></p>
                                 <p><strong>Productos en carrito:</strong> <span th:text="${cartItemCount ?: 0}">0</span></p>
-                                <p><strong>Total gastado:</strong> S/ 0.00</p>
+                                <p><strong>Total gastado:</strong> 
+                                    <span th:if="${pedidos != null and !pedidos.isEmpty()}" 
+                                          th:text="'S/ ' + ${#numbers.formatDecimal(pedidos.![total].sum(), 1, 2)}">S/ 0.00</span>
+                                    <span th:if="${pedidos == null or pedidos.isEmpty()}">S/ 0.00</span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -339,9 +468,6 @@
         </div>
     </div>
 </main>
-
-    </div>
-</div>
 
 <!-- Botón Flotante del Carrito -->
 <div class="floating-cart-btn" id="floatingCartBtn" style="display: none;">
@@ -480,5 +606,119 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/theme-toggle.js}"></script>
 <script th:src="@{/js/main.js}"></script>
+<script>
+// JavaScript para funcionalidades específicas del menú
+document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar botón flotante del carrito
+    updateFloatingCart();
+    
+    // Manejar cambios en tipo de entrega
+    document.querySelectorAll('input[name^="tipoEntrega_"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateCartSummary();
+        });
+    });
+
+    // Navegación entre secciones
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const section = this.getAttribute('href').substring(1);
+            showMenuSection(section);
+        });
+    });
+});
+
+function showMenuSection(sectionName) {
+    // Ocultar todas las secciones
+    document.querySelectorAll('.menu-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Remover active de todos los links
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Mostrar sección seleccionada
+    document.getElementById(sectionName + '-content').classList.add('active');
+    
+    // Activar link correspondiente
+    document.querySelector(`.sidebar .nav-link[href="#${sectionName}"]`).classList.add('active');
+}
+
+function updateFloatingCart() {
+    fetch('/cart/summary')
+        .then(response => response.json())
+        .then(data => {
+            const floatingBtn = document.getElementById('floatingCartBtn');
+            const cartCount = document.getElementById('floatingCartCount');
+            const cartTotal = document.getElementById('floatingCartTotal');
+            
+            if (data.itemCount > 0) {
+                floatingBtn.style.display = 'block';
+                cartCount.textContent = data.itemCount;
+                cartTotal.textContent = 'S/ ' + data.total.toFixed(2);
+            } else {
+                floatingBtn.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.log('Error al cargar resumen del carrito:', error);
+        });
+}
+
+function updateCartSummary() {
+    // Recalcular costos basado en tipo de entrega seleccionado
+    const deliveryItems = document.querySelectorAll('input[name^="tipoEntrega_"]:checked[value="DELIVERY"]').length;
+    const deliveryCost = deliveryItems > 0 ? 5.90 : 0;
+    
+    // Actualizar el elemento que muestra el costo de delivery
+    const deliveryCostElement = document.querySelector('[th\\:text*="deliveryCost"]');
+    if (deliveryCostElement) {
+        deliveryCostElement.textContent = 'S/ ' + deliveryCost.toFixed(2);
+    }
+    
+    // Actualizar total
+    const cartTotalElement = document.querySelector('[th\\:text*="cartTotal"]');
+    const cartSubtotalElement = document.querySelector('[th\\:text*="cartSubtotal"]');
+    
+    if (cartTotalElement && cartSubtotalElement) {
+        const subtotalText = cartSubtotalElement.textContent.replace('S/ ', '');
+        const subtotal = parseFloat(subtotalText) || 0;
+        const newTotal = subtotal + deliveryCost;
+        cartTotalElement.textContent = 'S/ ' + newTotal.toFixed(2);
+    }
+}
+
+function calificarPedido(pedidoId) {
+    const rating = prompt('Califica este pedido (1-5 estrellas):');
+    if (rating && rating >= 1 && rating <= 5) {
+        const comentario = prompt('Comentario adicional (opcional):') || '';
+        
+        fetch(`/pedidos/${pedidoId}/calificar`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('[name="_csrf"]').value
+            },
+            body: JSON.stringify({
+                calificacion: parseInt(rating),
+                comentario: comentario
+            })
+        }).then(response => {
+            if (response.ok) {
+                alert('¡Gracias por tu calificación!');
+                location.reload();
+            } else {
+                alert('Error al enviar la calificación');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('Error al enviar la calificación');
+        });
+    }
+}
+</script>
 </body>
 </html>

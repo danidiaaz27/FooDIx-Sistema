@@ -414,4 +414,233 @@ INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) V
 INSERT INTO `rol_permiso` (`rol_codigo`, `permiso_codigo`)
 SELECT 1, codigo FROM permiso WHERE estado = TRUE;
 
+-- =====================================================
+-- TABLAS NUEVAS PARA EL SISTEMA DE PROMOCIONES Y PEDIDOS
+-- =====================================================
+
+-- =====================================================
+-- TABLA: promocion
+-- =====================================================
+DROP TABLE IF EXISTS `promocion`;
+CREATE TABLE `promocion` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_restaurante` bigint NOT NULL,
+  `titulo` varchar(200) NOT NULL,
+  `descripcion` text,
+  `precio_original` decimal(10,2) NOT NULL,
+  `precio_promocional` decimal(10,2) NOT NULL,
+  `tipo_descuento` enum('porcentaje','monto_fijo') NOT NULL,
+  `valor_descuento` decimal(5,2) DEFAULT NULL,
+  `categoria_promocion` varchar(50) DEFAULT NULL,
+  `fecha_inicio` datetime NOT NULL,
+  `fecha_fin` datetime NOT NULL,
+  `estado` enum('borrador','activa','inactiva','expirada') NOT NULL DEFAULT 'borrador',
+  `contador_vistas` int DEFAULT 0,
+  `contador_pedidos` int DEFAULT 0,
+  `ingresos_totales` decimal(10,2) DEFAULT 0,
+  `fecha_creacion` datetime(6) NOT NULL,
+  `fecha_modificacion` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `FK_promocion_restaurante` (`codigo_restaurante`),
+  CONSTRAINT `FK_promocion_restaurante` FOREIGN KEY (`codigo_restaurante`) REFERENCES `restaurante` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- TABLA: imagen_promocion
+-- =====================================================
+DROP TABLE IF EXISTS `imagen_promocion`;
+CREATE TABLE `imagen_promocion` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_promocion` bigint NOT NULL,
+  `ruta_imagen` varchar(255) NOT NULL,
+  `orden` int DEFAULT 1,
+  `tipo_imagen` enum('principal','galeria') NOT NULL DEFAULT 'principal',
+  `fecha_subida` datetime(6) NOT NULL,
+  `estado` BOOLEAN NOT NULL DEFAULT TRUE,
+  PRIMARY KEY (`codigo`),
+  KEY `FK_imagen_promocion_promocion` (`codigo_promocion`),
+  CONSTRAINT `FK_imagen_promocion_promocion` FOREIGN KEY (`codigo_promocion`) REFERENCES `promocion` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- TABLA: estado_pedido
+-- =====================================================
+DROP TABLE IF EXISTS `estado_pedido`;
+CREATE TABLE `estado_pedido` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` varchar(100) DEFAULT NULL,
+  `orden` int NOT NULL,
+  `estado` BOOLEAN NOT NULL DEFAULT TRUE,
+  PRIMARY KEY (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `estado_pedido` VALUES 
+(1, 'PENDIENTE', 'Pedido recibido, esperando confirmación', 1, TRUE),
+(2, 'CONFIRMADO', 'Restaurante confirmó el pedido', 2, TRUE),
+(3, 'EN_PREPARACION', 'Restaurante preparando el pedido', 3, TRUE),
+(4, 'LISTO', 'Pedido listo para recoger/delivery', 4, TRUE),
+(5, 'EN_CAMINO', 'Repartidor en camino con el pedido', 5, TRUE),
+(6, 'ENTREGADO', 'Pedido entregado al cliente', 6, TRUE),
+(7, 'CANCELADO', 'Pedido cancelado', 7, TRUE),
+(8, 'RECHAZADO', 'Pedido rechazado por el restaurante', 8, TRUE);
+
+-- =====================================================
+-- TABLA: tipo_entrega
+-- =====================================================
+DROP TABLE IF EXISTS `tipo_entrega`;
+CREATE TABLE `tipo_entrega` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` varchar(100) DEFAULT NULL,
+  `estado` BOOLEAN NOT NULL DEFAULT TRUE,
+  PRIMARY KEY (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `tipo_entrega` VALUES 
+(1, 'DELIVERY', 'Entrega a domicilio', TRUE),
+(2, 'RECOGO_TIENDA', 'Recogo en el local', TRUE);
+
+-- =====================================================
+-- TABLA: pedido
+-- =====================================================
+DROP TABLE IF EXISTS `pedido`;
+CREATE TABLE `pedido` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_usuario` bigint NOT NULL,
+  `codigo_restaurante` bigint NOT NULL,
+  `codigo_repartidor` bigint DEFAULT NULL,
+  `codigo_estado_pedido` bigint NOT NULL,
+  `codigo_tipo_entrega` bigint NOT NULL,
+  `numero_pedido` varchar(20) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL,
+  `costo_delivery` decimal(10,2) DEFAULT 0,
+  `descuento` decimal(10,2) DEFAULT 0,
+  `total` decimal(10,2) NOT NULL,
+  `metodo_pago` enum('efectivo','tarjeta','yape','plin') NOT NULL,
+  `direccion_entrega` varchar(255) DEFAULT NULL,
+  `referencia_entrega` text,
+  `telefono_contacto` varchar(20) DEFAULT NULL,
+  `notas_especiales` text,
+  `fecha_pedido` datetime(6) NOT NULL,
+  `fecha_confirmacion` datetime(6) DEFAULT NULL,
+  `fecha_entrega_estimada` datetime(6) DEFAULT NULL,
+  `fecha_entrega_real` datetime(6) DEFAULT NULL,
+  `calificacion_restaurante` int DEFAULT NULL,
+  `calificacion_repartidor` int DEFAULT NULL,
+  `comentario_cliente` text,
+  `ganancia_repartidor` decimal(10,2) DEFAULT 0,
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `UK_numero_pedido` (`numero_pedido`),
+  KEY `FK_pedido_usuario` (`codigo_usuario`),
+  KEY `FK_pedido_restaurante` (`codigo_restaurante`),
+  KEY `FK_pedido_repartidor` (`codigo_repartidor`),
+  KEY `FK_pedido_estado_pedido` (`codigo_estado_pedido`),
+  KEY `FK_pedido_tipo_entrega` (`codigo_tipo_entrega`),
+  CONSTRAINT `FK_pedido_usuario` FOREIGN KEY (`codigo_usuario`) REFERENCES `usuario` (`codigo`),
+  CONSTRAINT `FK_pedido_restaurante` FOREIGN KEY (`codigo_restaurante`) REFERENCES `restaurante` (`codigo`),
+  CONSTRAINT `FK_pedido_repartidor` FOREIGN KEY (`codigo_repartidor`) REFERENCES `repartidor` (`codigo`),
+  CONSTRAINT `FK_pedido_estado_pedido` FOREIGN KEY (`codigo_estado_pedido`) REFERENCES `estado_pedido` (`codigo`),
+  CONSTRAINT `FK_pedido_tipo_entrega` FOREIGN KEY (`codigo_tipo_entrega`) REFERENCES `tipo_entrega` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- TABLA: detalle_pedido
+-- =====================================================
+DROP TABLE IF EXISTS `detalle_pedido`;
+CREATE TABLE `detalle_pedido` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_pedido` bigint NOT NULL,
+  `codigo_promocion` bigint NOT NULL,
+  `cantidad` int NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `FK_detalle_pedido_pedido` (`codigo_pedido`),
+  KEY `FK_detalle_pedido_promocion` (`codigo_promocion`),
+  CONSTRAINT `FK_detalle_pedido_pedido` FOREIGN KEY (`codigo_pedido`) REFERENCES `pedido` (`codigo`),
+  CONSTRAINT `FK_detalle_pedido_promocion` FOREIGN KEY (`codigo_promocion`) REFERENCES `promocion` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- TABLA: historial_estado_pedido
+-- =====================================================
+DROP TABLE IF EXISTS `historial_estado_pedido`;
+CREATE TABLE `historial_estado_pedido` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_pedido` bigint NOT NULL,
+  `codigo_estado_pedido` bigint NOT NULL,
+  `observaciones` text,
+  `fecha_cambio` datetime(6) NOT NULL,
+  `codigo_usuario` bigint DEFAULT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `FK_historial_pedido` (`codigo_pedido`),
+  KEY `FK_historial_estado_pedido` (`codigo_estado_pedido`),
+  KEY `FK_historial_usuario` (`codigo_usuario`),
+  CONSTRAINT `FK_historial_pedido` FOREIGN KEY (`codigo_pedido`) REFERENCES `pedido` (`codigo`),
+  CONSTRAINT `FK_historial_estado_pedido` FOREIGN KEY (`codigo_estado_pedido`) REFERENCES `estado_pedido` (`codigo`),
+  CONSTRAINT `FK_historial_usuario` FOREIGN KEY (`codigo_usuario`) REFERENCES `usuario` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- TABLA: pedido_disponible_repartidor
+-- =====================================================
+DROP TABLE IF EXISTS `pedido_disponible_repartidor`;
+CREATE TABLE `pedido_disponible_repartidor` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_pedido` bigint NOT NULL,
+  `codigo_repartidor` bigint NOT NULL,
+  `fecha_asignacion` datetime(6) NOT NULL,
+  `fecha_respuesta` datetime(6) DEFAULT NULL,
+  `estado` enum('pendiente','aceptado','rechazado','expirado') NOT NULL DEFAULT 'pendiente',
+  `motivo_rechazo` text,
+  PRIMARY KEY (`codigo`),
+  KEY `FK_pedido_disponible_pedido` (`codigo_pedido`),
+  KEY `FK_pedido_disponible_repartidor` (`codigo_repartidor`),
+  CONSTRAINT `FK_pedido_disponible_pedido` FOREIGN KEY (`codigo_pedido`) REFERENCES `pedido` (`codigo`),
+  CONSTRAINT `FK_pedido_disponible_repartidor` FOREIGN KEY (`codigo_repartidor`) REFERENCES `repartidor` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- ACTUALIZACIÓN DE PERMISOS PARA LAS NUEVAS FUNCIONALIDADES
+-- =====================================================
+
+INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) VALUES
+('PROMOCIONES_VER', 'Ver promociones del restaurante', 'promociones', 'Ver', TRUE),
+('PROMOCIONES_CREAR', 'Crear nuevas promociones', 'promociones', 'Crear', TRUE),
+('PROMOCIONES_EDITAR', 'Editar promociones existentes', 'promociones', 'Editar', TRUE),
+('PROMOCIONES_ELIMINAR', 'Eliminar promociones', 'promociones', 'Eliminar', TRUE),
+('PROMOCIONES_PUBLICAR', 'Publicar/ocultar promociones', 'promociones', 'Gestionar', TRUE),
+('PEDIDOS_VER', 'Ver pedidos del restaurante', 'pedidos', 'Ver', TRUE),
+('PEDIDOS_GESTIONAR', 'Gestionar estado de pedidos', 'pedidos', 'Gestionar', TRUE),
+('ESTADISTICAS_VER', 'Ver estadísticas del restaurante', 'estadisticas', 'Ver', TRUE),
+('DELIVERY_PEDIDOS_VER', 'Ver pedidos disponibles para delivery', 'delivery', 'Ver', TRUE),
+('DELIVERY_PEDIDOS_ACEPTAR', 'Aceptar pedidos de delivery', 'delivery', 'Aceptar', TRUE),
+('DELIVERY_PEDIDOS_RECHAZAR', 'Rechazar pedidos de delivery', 'delivery', 'Rechazar', TRUE),
+('DELIVERY_ESTADO_ACTUALIZAR', 'Actualizar estado de entrega', 'delivery', 'Gestionar', TRUE),
+('DELIVERY_ESTADISTICAS_VER', 'Ver estadísticas de delivery', 'delivery', 'Ver', TRUE);
+
+-- Asignar permisos nuevos al rol ADMINISTRADOR
+INSERT INTO `rol_permiso` (`rol_codigo`, `permiso_codigo`)
+SELECT 1, codigo FROM permiso WHERE nombre IN (
+    'PROMOCIONES_VER', 'PROMOCIONES_CREAR', 'PROMOCIONES_EDITAR', 'PROMOCIONES_ELIMINAR', 'PROMOCIONES_PUBLICAR',
+    'PEDIDOS_VER', 'PEDIDOS_GESTIONAR', 'ESTADISTICAS_VER',
+    'DELIVERY_PEDIDOS_VER', 'DELIVERY_PEDIDOS_ACEPTAR', 'DELIVERY_PEDIDOS_RECHAZAR', 
+    'DELIVERY_ESTADO_ACTUALIZAR', 'DELIVERY_ESTADISTICAS_VER'
+);
+
+-- Asignar permisos al rol RESTAURANTE
+INSERT INTO `rol_permiso` (`rol_codigo`, `permiso_codigo`)
+SELECT 2, codigo FROM permiso WHERE nombre IN (
+    'PROMOCIONES_VER', 'PROMOCIONES_CREAR', 'PROMOCIONES_EDITAR', 'PROMOCIONES_ELIMINAR', 'PROMOCIONES_PUBLICAR',
+    'PEDIDOS_VER', 'PEDIDOS_GESTIONAR', 'ESTADISTICAS_VER'
+);
+
+-- Asignar permisos al rol REPARTIDOR
+INSERT INTO `rol_permiso` (`rol_codigo`, `permiso_codigo`)
+SELECT 3, codigo FROM permiso WHERE nombre IN (
+    'DELIVERY_PEDIDOS_VER', 'DELIVERY_PEDIDOS_ACEPTAR', 'DELIVERY_PEDIDOS_RECHAZAR', 
+    'DELIVERY_ESTADO_ACTUALIZAR', 'DELIVERY_ESTADISTICAS_VER'
+);
+
 SET FOREIGN_KEY_CHECKS = 1;
