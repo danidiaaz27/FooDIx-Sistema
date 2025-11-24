@@ -9,120 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
     <style>
-        /* Estilos personalizados para login */
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .login-card {
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        .login-header {
-            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
-            padding: 40px 30px;
-            text-align: center;
-            color: white;
-        }
-        
-        .login-header h2 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 28px;
-        }
-        
-        .login-header .logo-icon {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 40px;
-            color: #a0002a;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        
-        .login-body {
-            padding: 40px 30px;
-            background: white;
-        }
-        
         .form-control:focus {
             border-color: #a0002a;
             box-shadow: 0 0 0 0.2rem rgba(160, 0, 42, 0.25);
-        }
-        
-        .input-group-text {
-            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
-            border: none;
-            color: white;
-        }
-        
-        .btn-login {
-            background: linear-gradient(135deg, #a0002a 0%, #FFD700 100%);
-            border: none;
-            color: white;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(160, 0, 42, 0.3);
-            color: white;
-        }
-        
-        .btn-login:active {
-            transform: translateY(0);
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 25px 0;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .divider span {
-            padding: 0 10px;
-            color: #6c757d;
-            font-size: 14px;
-        }
-        
-        .link-primary-custom {
-            color: #a0002a;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-        
-        .link-primary-custom:hover {
-            color: #FFD700;
-            text-decoration: underline;
-        }
-        
-        .alert {
-            border-radius: 10px;
-            border: none;
         }
         
         .form-check-input:checked {
@@ -132,21 +21,6 @@
         
         .form-check-input:focus {
             box-shadow: 0 0 0 0.2rem rgba(160, 0, 42, 0.25);
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .login-card {
-            animation: fadeInUp 0.6s ease-out;
         }
     </style>
 </head>
@@ -163,13 +37,6 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <!-- Botón de Tema Claro/Oscuro -->
-                <li class="nav-item d-flex align-items-center">
-                    <button class="theme-toggle" type="button" aria-label="Cambiar tema">
-                        <i class="fas fa-sun"></i>
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
                         <i class="fas fa-question-circle"></i> Tutorial
@@ -184,6 +51,13 @@
                     <a class="nav-link" href="/contacto" th:href="@{/contacto}">
                         <i class="fas fa-envelope"></i> Contacto
                     </a>
+                </li>
+                <!-- Botón de Tema Claro/Oscuro -->
+                <li class="nav-item d-flex align-items-center">
+                    <button class="theme-toggle" type="button" aria-label="Cambiar tema">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </button>
                 </li>             
             </ul>
         </div>
@@ -191,23 +65,16 @@
 </nav>
 
 <!-- Contenido Principal -->
-<main style="background: linear-gradient(360deg, #FFD700 0%, #a0002a 100%);">
-    <div class="login-container">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-6 col-lg-5">
-                    <div class="card login-card border-0">
-                        <!-- Header del Login -->
-                        <div class="login-header">
-                            <div class="logo-icon">
-                                <i class="fas fa-utensils"></i>
-                            </div>
-                            <h2>Bienvenido a FoodIx</h2>
-                            <p class="mb-0 mt-2" style="opacity: 0.9;">Inicia sesión para continuar</p>
+<main style="padding-top: 80px; padding-bottom: 40px; min-height: 100vh; background: var(--bg-primary); transition: background-color 0.3s ease;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg mt-4">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">Iniciar Sesión</h2>
+                            <p class="text-muted">Ingresa tus credenciales para continuar</p>
                         </div>
-
-                        <!-- Body del Login -->
-                        <div class="login-body">
                             <!-- Mensajes de notificación -->
                             <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <i class="fas fa-exclamation-circle me-2"></i> 
@@ -239,15 +106,10 @@
                                     <label for="email" class="form-label fw-semibold">
                                         <i class="fas fa-envelope me-1"></i>Correo Electrónico
                                     </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-user"></i>
-                                        </span>
-                                        <input type="email" class="form-control form-control-lg" id="email" 
-                                               name="email" required maxlength="50"
-                                               placeholder="correo@ejemplo.com"
-                                               autocomplete="email">
-                                    </div>
+                                    <input type="email" class="form-control form-control-lg" id="email" 
+                                           name="email" required maxlength="50"
+                                           placeholder="correo@ejemplo.com"
+                                           autocomplete="email">
                                     <div class="invalid-feedback">
                                         Por favor, ingresa un correo electrónico válido
                                     </div>
@@ -259,9 +121,6 @@
                                         <i class="fas fa-lock me-1"></i>Contraseña
                                     </label>
                                     <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-key"></i>
-                                        </span>
                                         <input type="password" class="form-control form-control-lg" id="password" 
                                                name="password" required minlength="6"
                                                placeholder="Tu contraseña"
@@ -284,27 +143,27 @@
                                         </label>
                                     </div>
                                     <a href="/recuperar-password" th:href="@{/recuperar-password}" 
-                                       class="link-primary-custom">
+                                       class="text-decoration-none">
                                         <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
                                     </a>
                                 </div>
 
                                 <!-- Botón de Login -->
-                                <button type="submit" class="btn btn-login w-100 mb-3">
+                                <button type="submit" class="btn btn-danger w-100 mb-3">
                                     <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
                                 </button>
                             </form>
 
                             <!-- Divisor -->
-                            <div class="divider">
-                                <span>O</span>
+                            <div class="text-center my-3">
+                                <span class="text-muted">O</span>
                             </div>
 
                             <!-- Opciones adicionales -->
                             <div class="text-center">
                                 <p class="mb-0">
                                     ¿No tienes cuenta? 
-                                    <a href="/verificacion" th:href="@{/verificacion}" class="link-primary-custom">
+                                    <a href="/verificacion" th:href="@{/verificacion}" class="text-decoration-none">
                                         Regístrate aquí
                                     </a>
                                 </p>
@@ -314,7 +173,7 @@
                     
                     <!-- Enlace de retorno -->
                     <div class="text-center mt-3">
-                        <a href="/" th:href="@{/}" class="text-white text-decoration-none">
+                        <a href="/" th:href="@{/}" class="text-decoration-none">
                             <i class="fas fa-arrow-left me-2"></i>Volver al inicio
                         </a>
                     </div>
