@@ -26,13 +26,7 @@
         </button>
         <div class="collapse navbar-collapse" id="menuNav">
             <ul class="navbar-nav ms-auto">
-                <!-- Botón de Tema Claro/Oscuro -->
-                <li class="nav-item d-flex align-items-center">
-                    <button class="theme-toggle" type="button" aria-label="Cambiar tema">
-                        <i class="fas fa-sun"></i>
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </li>
+                
                 <!-- Opciones solo para usuarios NO autenticados -->
                 <li class="nav-item" th:if="${session.usuario == null}">
                     <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
@@ -48,6 +42,13 @@
                     <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#negocioModal">
                         <i class="fas fa-briefcase"></i> ¿Tienes un negocio?
                     </a>
+                </li>
+                <!-- Botón de Tema Claro/Oscuro -->
+                <li class="nav-item d-flex align-items-center">
+                    <button class="theme-toggle" type="button" aria-label="Cambiar tema">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </button>
                 </li>
 
                 <!-- Opciones para usuarios autenticados -->

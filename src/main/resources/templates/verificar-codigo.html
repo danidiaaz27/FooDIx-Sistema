@@ -6,23 +6,26 @@
     <title>Verificar Código - FooDIx</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
     <style>
         body {
-            background: #FFFFFF;
+            background: var(--bg-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            transition: background-color 0.3s ease;
         }
         .verification-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: var(--box-shadow-lg);
             padding: 40px;
             max-width: 500px;
             width: 100%;
             margin: auto;
+            transition: background-color 0.3s ease;
         }
         .verification-icon {
             width: 80px;
@@ -48,14 +51,17 @@
             font-size: 32px;
             font-weight: bold;
             text-align: center;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             transition: all 0.3s;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
         }
         .code-input:focus {
             border-color: #C62828;
             box-shadow: 0 0 0 0.2rem rgba(198, 40, 40, 0.25);
             outline: none;
+            background: var(--card-bg);
         }
         .code-input.filled {
             border-color: #C62828;
@@ -100,7 +106,7 @@
             color: #8B1F1F;
         }
         .timer {
-            color: #6c757d;
+            color: var(--text-secondary);
             font-weight: 500;
         }
         
@@ -445,6 +451,13 @@
                 showAlert('Error al reenviar el código. Intenta nuevamente.');
             }
         });
+    </script>
+    <script>
+        // Aplicar tema guardado sin botón
+        (function() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
     </script>
 </body>
 </html>

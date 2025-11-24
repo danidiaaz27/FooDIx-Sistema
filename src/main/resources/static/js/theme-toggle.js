@@ -14,17 +14,13 @@
     const applyTheme = (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
         
-        // Actualizar el ícono del botón
-        const sunIcon = document.querySelector('.theme-toggle .fa-sun');
-        const moonIcon = document.querySelector('.theme-toggle .fa-moon');
-        
-        if (sunIcon && moonIcon) {
+        // Actualizar el estado visual del toggle (los iconos ya se manejan con CSS)
+        const toggleBtn = document.querySelector('.theme-toggle');
+        if (toggleBtn) {
             if (theme === 'dark') {
-                sunIcon.style.display = 'none';
-                moonIcon.style.display = 'inline-block';
+                toggleBtn.setAttribute('aria-label', 'Cambiar a modo claro');
             } else {
-                sunIcon.style.display = 'inline-block';
-                moonIcon.style.display = 'none';
+                toggleBtn.setAttribute('aria-label', 'Cambiar a modo oscuro');
             }
         }
     };
@@ -36,15 +32,6 @@
         
         setStoredTheme(newTheme);
         applyTheme(newTheme);
-        
-        // Animación suave del botón
-        const toggleBtn = document.querySelector('.theme-toggle');
-        if (toggleBtn) {
-            toggleBtn.style.transform = 'scale(1.2) rotate(360deg)';
-            setTimeout(() => {
-                toggleBtn.style.transform = '';
-            }, 300);
-        }
     };
 
     // Aplicar tema guardado al cargar la página
