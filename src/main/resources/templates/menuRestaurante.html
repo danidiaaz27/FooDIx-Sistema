@@ -185,39 +185,30 @@
             <div class="container-fluid py-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4>Mi Menú</h4>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Agregar Producto
-                    </button>
                 </div>
-                <div class="row">
-                    <!-- Productos del restaurante -->
-                    <div class="col-md-4 mb-4" th:each="producto : ${productos}">
-                        <div class="card product-card">
-                            <img th:src="${producto.imagen}" th:alt="${producto.nombre}" class="card-img-top">
+                <!-- Mostrar solo promociones activas en el menú -->
+                <div class="row" th:if="${promocionesActivas != null and !promocionesActivas.isEmpty()}">
+                    <div class="col-md-6 mb-4" th:each="promocion : ${promocionesActivas}">
+                        <div class="card promo-card">
+                            <!-- Imagen deshabilitada temporalmente -->
                             <div class="card-body">
-                                <h5 class="card-title" th:text="${producto.nombre}">Nombre del producto</h5>
-                                <p class="card-text" th:text="${producto.descripcion}">Descripción del producto</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 2)}">S/ 0.00</span>
-                                    <div>
-                                        <button class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </button>
-                                    </div>
-                                </div>
+                                <h5 class="card-title" th:text="${promocion.titulo}">Título promoción</h5>
+                                <p class="card-text" th:text="${promocion.descripcion}">Descripción promoción</p>
+                                <ul class="list-unstyled mb-2">
+                                    <li><strong>Vistas:</strong> <span th:text="${promocion.contadorVistas}">0</span></li>
+                                    <li><strong>Pedidos:</strong> <span th:text="${promocion.contadorPedidos}">0</span></li>
+                                    <li><strong>Ingresos:</strong> S/ <span th:text="${#numbers.formatDecimal(promocion.ingresosTotales, 1, 2)}">0.00</span></li>
+                                </ul>
+                                <span class="badge bg-success">Activa</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Mensaje si no hay productos -->
-                    <div th:if="${productos == null or productos.isEmpty()}" class="col-12 text-center py-5">
-                        <i class="fas fa-utensils fa-4x text-muted mb-3"></i>
-                        <h4>No hay productos en tu menú</h4>
-                        <p class="text-muted">Agrega algunos productos para comenzar</p>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Agregar Primer Producto
-                        </button>
-                    </div>
+                </div>
+                <!-- Mensaje si no hay promociones activas -->
+                <div th:if="${promocionesActivas == null or promocionesActivas.isEmpty()}" class="text-center py-4">
+                    <i class="fas fa-tags fa-4x text-warning mb-3"></i>
+                    <h4>¡Publica tus promociones para que los clientes las vean aquí!</h4>
+                    <p class="text-muted">Solo se mostrarán promociones activas en tu menú.</p>
                 </div>
             </div>
         </div>
@@ -234,29 +225,29 @@
                 
                 <!-- Promociones Activas -->
                 <div class="row" th:if="${promocionesActivas != null and !promocionesActivas.isEmpty()}">
-                    <div class="col-md-6 mb-4" th:each="promocion : ${promocionesActivas}">
-                        <div class="card promo-card">
-                            <img th:src="${promocion.imagenPrincipal}" th:alt="${promocion.titulo}" class="card-img-top">
-                            <div class="card-body">
-                                <h5 class="card-title" th:text="${promocion.titulo}">Título promoción</h5>
-                                <p class="card-text" th:text="${promocion.descripcion}">Descripción promoción</p>
-                                <ul class="list-unstyled mb-2">
-                                    <li><strong>Vistas:</strong> <span th:text="${promocion.contadorVistas}">0</span></li>
-                                    <li><strong>Pedidos:</strong> <span th:text="${promocion.contadorPedidos}">0</span></li>
-                                    <li><strong>Ingresos:</strong> S/ <span th:text="${#numbers.formatDecimal(promocion.ingresosTotales, 1, 2)}">0.00</span></li>
-                                </ul>
-                                <span class="badge bg-success">Activa</span>
-                                <div class="mt-2">
-                                    <button class="btn btn-outline-primary btn-sm" th:onclick="|editarPromocion(${promocion.codigo})|">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-sm" th:onclick="|eliminarPromocion(${promocion.codigo})|">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                        <div class="col-md-6 mb-4" th:each="promocion : ${promocionesActivas}">
+                            <div class="card promo-card">
+                                <!-- Imagen deshabilitada temporalmente -->
+                                <div class="card-body">
+                                    <h5 class="card-title" th:text="${promocion.titulo}">Título promoción</h5>
+                                    <p class="card-text" th:text="${promocion.descripcion}">Descripción promoción</p>
+                                    <ul class="list-unstyled mb-2">
+                                        <li><strong>Vistas:</strong> <span th:text="${promocion.contadorVistas}">0</span></li>
+                                        <li><strong>Pedidos:</strong> <span th:text="${promocion.contadorPedidos}">0</span></li>
+                                        <li><strong>Ingresos:</strong> S/ <span th:text="${#numbers.formatDecimal(promocion.ingresosTotales, 1, 2)}">0.00</span></li>
+                                    </ul>
+                                    <span class="badge bg-success">Activa</span>
+                                    <div class="mt-2">
+                                        <button class="btn btn-outline-primary btn-sm" th:onclick="|editarPromocion(${promocion.codigo})|">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" th:onclick="|eliminarPromocion(${promocion.codigo})|">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
                 
                 <!-- Mensaje si no hay promociones activas -->
@@ -268,7 +259,7 @@
                 <div class="row" th:if="${promocionesBorrador != null and !promocionesBorrador.isEmpty()}">
                     <div class="col-md-6 mb-4" th:each="promocion : ${promocionesBorrador}">
                         <div class="card promo-card">
-                            <img th:src="${promocion.imagenPrincipal}" th:alt="${promocion.titulo}" class="card-img-top">
+                            <!-- Imagen deshabilitada temporalmente -->
                             <div class="card-body">
                                 <h5 class="card-title" th:text="${promocion.titulo}">Título promoción</h5>
                                 <p class="card-text" th:text="${promocion.descripcion}">Descripción promoción</p>

@@ -12,27 +12,26 @@ import java.util.Optional;
  */
 @Repository
 public interface RestauranteRepository extends JpaRepository<Restaurante, Long> {
-    
     /**
-     * Buscar restaurante por código de usuario
+     * Buscar restaurante por correo electrónico
      */
-    Optional<Restaurante> findByCodigoUsuario(Long codigoUsuario);
-    
+    Optional<Restaurante> findByCorreoElectronico(String correoElectronico);
+
     /**
      * Buscar restaurante por RUC
      */
     Optional<Restaurante> findByRuc(String ruc);
-    
+
     /**
      * Verificar si existe un RUC
      */
     boolean existsByRuc(String ruc);
-    
+
     /**
      * Buscar restaurantes por estado de aprobación
      */
     List<Restaurante> findByCodigoEstadoAprobacion(Long codigoEstadoAprobacion);
-    
+
     /**
      * Buscar restaurantes por estado ordenados por fecha de creación
      */

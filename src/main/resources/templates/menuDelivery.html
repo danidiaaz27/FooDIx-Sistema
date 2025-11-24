@@ -433,16 +433,16 @@
                         <div class="location-time">
                             <div class="location">
                                 <i class="fas fa-map-marker-alt text-danger"></i>
-                                <span th:text="${pedido.restaurante.distrito.nombre} + ' • ' + ${pedido.distancia} + ' km'">Distrito • 0 km</span>
+                                <span th:text="${pedido.restaurante.distrito.nombre}">Distrito</span>
                             </div>
                             <div class="estimated-time">
                                 <i class="fas fa-clock text-warning"></i>
-                                <span th:text="${pedido.tiempoEstimado} + ' min'">0 min</span>
+                                <span>0 min</span>
                             </div>
                         </div>
                         <div class="order-value">
                             <i class="fas fa-shopping-bag"></i>
-                            <span th:text="${pedido.cantidadProductos} + ' productos'">0 productos</span>
+                            <span>1 producto</span>
                             <span class="total-value" th:text="${pedido.metodoPago} + ' (S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)} + ')'">
                                 Efectivo (S/ 0.00)
                             </span>
@@ -493,7 +493,7 @@
                         </div>
                         <div class="order-earnings">
                             <div class="earning-amount" th:text="'+S/ ' + ${#numbers.formatDecimal(pedido.gananciaRepartidor, 1, 2)}">+S/ 0.00</div>
-                            <div class="distance" th:text="${pedido.distancia} + ' km'">0 km</div>
+                            <!-- distancia eliminada -->
                         </div>
                     </div>
                     
@@ -774,9 +774,9 @@
                         <div class="delivery-earnings-info mt-3 p-3 bg-light rounded">
                             <div class="d-flex justify-content-between">
                                 <span class="text-success fw-bold">Tu ganancia: S/ ${pedido.gananciaRepartidor.toFixed(2)}</span>
-                                <span class="text-muted">Tiempo: ${pedido.tiempoEstimado} min</span>
+                                <span class="text-muted">Tiempo: 0 min</span>
                             </div>
-                            <div class="distance">Distancia: ${pedido.distancia} km</div>
+                            <!-- distancia eliminada -->
                         </div>
                     `;
                     

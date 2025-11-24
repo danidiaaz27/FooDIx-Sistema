@@ -18,12 +18,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/menuDelivery")
 public class MenuDeliveryController {
+        @Autowired
+        private com.example.SistemaDePromociones.service.EstadisticasRepartidorService estadisticasRepartidorService;
     
     @Autowired
     private RepartidorRepository repartidorRepository;
     
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+        @Autowired
+        private com.example.SistemaDePromociones.repository.PedidoRepository pedidoRepository;
     
     /**
      * Mostrar menú principal del repartidor
@@ -54,14 +59,21 @@ public class MenuDeliveryController {
                 model.addAttribute("estado", "desactivado");
             }
             
+
+
             // Agregar datos al modelo
             model.addAttribute("repartidor", repartidor);
             model.addAttribute("usuario", usuario);
-            model.addAttribute("nombreCompleto", 
-                usuario.getNombre() + " " + usuario.getApellidoPaterno());
-            
+            model.addAttribute("currentUser", usuario);
+            model.addAttribute("nombreCompleto", usuario.getNombre() + " " + usuario.getApellidoPaterno());
+            model.addAttribute("estadisticas", estadisticasRepartidorService.calcularEstadisticas(repartidor.getCodigo()));
+
+            // Pedidos disponibles: estado pendiente (1) y sin repartidor asignado
+            java.util.List<com.example.SistemaDePromociones.model.Pedido> pedidosDisponibles = pedidoRepository.findByCodigoEstadoPedidoAndCodigoRepartidorIsNull(1L);
+            model.addAttribute("pedidosDisponibles", pedidosDisponibles);
+            System.out.println("📦 [MENU DELIVERY] Pedidos disponibles: " + (pedidosDisponibles != null ? pedidosDisponibles.size() : 0));
+
             System.out.println("✅ [MENU DELIVERY] Repartidor cargado: " + usuario.getNombre());
-            
             return "menuDelivery";
             
         } catch (Exception e) {
