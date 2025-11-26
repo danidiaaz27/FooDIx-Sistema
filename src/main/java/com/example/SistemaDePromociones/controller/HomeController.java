@@ -48,11 +48,11 @@ public class HomeController {
     }
     
     /**
-     * Página de selección de tipo de registro
+     * Página de selección de tipo de registro (LEGACY - mantener compatibilidad)
      */
     @GetMapping("/registro")
     public String registro(Model model, HttpSession session) {
-        System.out.println("👤 [REGISTRO USUARIO] Cargando formulario de registro");
+        System.out.println("👤 [REGISTRO] Cargando formulario de registro (legacy)");
         
         // Obtener email verificado de la sesión
         String verifiedEmail = (String) session.getAttribute("verifiedEmail");
@@ -62,10 +62,62 @@ public class HomeController {
         }
         
         List<Departamento> departamentos = departamentoRepository.findAllActivos();
-        System.out.println("👤 [REGISTRO USUARIO] Departamentos cargados: " + departamentos.size());
+        System.out.println("👤 [REGISTRO] Departamentos cargados: " + departamentos.size());
         departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
         model.addAttribute("departamentos", departamentos);
         return "registro";
+    }
+    
+    /**
+     * Página de registro de usuario (cliente)
+     * Requiere verificación de email previa
+     */
+    @GetMapping("/registroUsuario")
+    public String registroUsuario(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        System.out.println("👤 [REGISTRO USUARIO] Cargando formulario de registro de usuario");
+        
+        // Verificar que el email esté verificado
+        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
+        if (verifiedEmail == null) {
+            System.out.println("⚠️ [REGISTRO USUARIO] Email no verificado, redirigiendo a /verificacion");
+            redirectAttributes.addFlashAttribute("error", "Debes verificar tu correo electrónico primero");
+            return "redirect:/verificacion?tipo=usuario";
+        }
+        
+        model.addAttribute("verifiedEmail", verifiedEmail);
+        System.out.println("📧 [REGISTRO USUARIO] Email verificado: " + verifiedEmail);
+        
+        List<Departamento> departamentos = departamentoRepository.findAllActivos();
+        System.out.println("👤 [REGISTRO USUARIO] Departamentos cargados: " + departamentos.size());
+        departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
+        model.addAttribute("departamentos", departamentos);
+        return "registroUsuario";
+    }
+    
+    /**
+     * Página de registro de negocio (restaurante/repartidor)
+     * Requiere verificación de email previa
+     */
+    @GetMapping("/registroNegocio")
+    public String registroNegocio(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        System.out.println("🏪 [REGISTRO NEGOCIO] Cargando formulario de registro de negocio");
+        
+        // Verificar que el email esté verificado
+        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
+        if (verifiedEmail == null) {
+            System.out.println("⚠️ [REGISTRO NEGOCIO] Email no verificado, redirigiendo a /verificacion");
+            redirectAttributes.addFlashAttribute("error", "Debes verificar tu correo electrónico primero");
+            return "redirect:/verificacion?tipo=negocio";
+        }
+        
+        model.addAttribute("verifiedEmail", verifiedEmail);
+        System.out.println("📧 [REGISTRO NEGOCIO] Email verificado: " + verifiedEmail);
+        
+        List<Departamento> departamentos = departamentoRepository.findAllActivos();
+        System.out.println("🏪 [REGISTRO NEGOCIO] Departamentos cargados: " + departamentos.size());
+        departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
+        model.addAttribute("departamentos", departamentos);
+        return "registroNegocio";
     }
     
     /**

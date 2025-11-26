@@ -23,17 +23,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /**
  * Selecciona el tipo de negocio (restaurante o repartidor)
- * y redirige a verificacion.html
+ * y redirige a verificacion.html con tipo=negocio
  */
 function selectBusinessType(type) {
     console.log('📌 Tipo de negocio seleccionado:', type);
     
-    // Guardar en localStorage para uso posterior si es necesario
+    // Guardar en localStorage para uso posterior
     localStorage.setItem('selectedBusinessType', type);
     console.log('💾 Guardado en localStorage:', type);
     
-    // Redirigir directamente a verificacion (sin parámetros)
-    window.location.href = '/verificacion';
+    // Redirigir a verificación con tipo=negocio
+    window.location.href = '/verificacion?tipo=negocio';
 }
 
 /**
@@ -45,11 +45,11 @@ function redirectToVerification() {
     // Obtener el tipo seleccionado
     const businessType = localStorage.getItem('selectedBusinessType');
     
-    // Redirigir con parámetro query (opcional para backend)
+    // Siempre redirigir con tipo=negocio si hay un tipo guardado
     if (businessType) {
-        window.location.href = `/verificacion?tipo=${businessType}`;
+        window.location.href = '/verificacion?tipo=negocio';
     } else {
-        window.location.href = '/verificacion';
+        window.location.href = '/verificacion?tipo=usuario';
     }
 }
 
