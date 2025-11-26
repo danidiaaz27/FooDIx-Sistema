@@ -211,7 +211,7 @@
                             <span class="online-status">
                                 <i class="fas fa-circle text-success"></i> En línea
                             </span>
-                            <div class="restaurante-name" th:text="'¡Hola ' + ${restaurante.nombre} + '!'">¡Hola Restaurante!</div>
+                            <div class="restaurante-name" th:text="'¡Hola ' + ${restaurante != null ? restaurante.nombre : 'Restaurante'} + '!'">¡Hola Restaurante!</div>
                         </div>
                     </div>
                 </div>
@@ -232,27 +232,27 @@
         <div class="container-fluid">
             <ul class="nav nav-tabs restaurante-tabs" id="restauranteTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="menu-tab" data-bs-toggle="tab" data-bs-target="#menu" type="button" role="tab">
+                    <button class="nav-link active" id="menu-tab" data-bs-toggle="tab" data-bs-target="#menu" type="button" role="tab" aria-controls="menu" aria-selected="true">
                         <i class="fas fa-pizza-slice"></i> Menú
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="promociones-tab" data-bs-toggle="tab" data-bs-target="#promociones" type="button" role="tab">
+                    <button class="nav-link" id="promociones-tab" data-bs-toggle="tab" data-bs-target="#promociones" type="button" role="tab" aria-controls="promociones" aria-selected="false">
                         <i class="fas fa-tags"></i> Promociones
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="estadisticas-tab" data-bs-toggle="tab" data-bs-target="#estadisticas" type="button" role="tab">
+                    <button class="nav-link" id="estadisticas-tab" data-bs-toggle="tab" data-bs-target="#estadisticas" type="button" role="tab" aria-controls="estadisticas" aria-selected="false">
                         <i class="fas fa-chart-bar"></i> Analíticas
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="ajustes-tab" data-bs-toggle="tab" data-bs-target="#ajustes" type="button" role="tab">
+                    <button class="nav-link" id="ajustes-tab" data-bs-toggle="tab" data-bs-target="#ajustes" type="button" role="tab" aria-controls="ajustes" aria-selected="false">
                         <i class="fas fa-cog"></i> Ajustes
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="soporte-tab" data-bs-toggle="tab" data-bs-target="#soporte" type="button" role="tab">
+                    <button class="nav-link" id="soporte-tab" data-bs-toggle="tab" data-bs-target="#soporte" type="button" role="tab" aria-controls="soporte" aria-selected="false">
                         <i class="fas fa-life-ring"></i> Soporte
                     </button>
                 </li>
@@ -263,7 +263,7 @@
     <!-- Tab Content -->
     <div class="tab-content restaurante-content" id="restauranteTabsContent">
         <!-- MENÚ TAB -->
-        <div class="tab-pane fade show active" id="menu" role="tabpanel">
+        <div class="tab-pane fade show active" id="menu" role="tabpanel" aria-labelledby="menu-tab">
             <div class="container-fluid py-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4>Mi Menú</h4>
@@ -296,7 +296,7 @@
         </div>
 
         <!-- PROMOCIONES TAB -->
-        <div class="tab-pane fade" id="promociones" role="tabpanel">
+        <div class="tab-pane fade" id="promociones" role="tabpanel" aria-labelledby="promociones-tab">
             <div class="container-fluid py-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4>Promociones Activas</h4>
@@ -368,7 +368,7 @@
         </div>
 
         <!-- ANALÍTICAS TAB -->
-        <div class="tab-pane fade" id="estadisticas" role="tabpanel">
+        <div class="tab-pane fade" id="estadisticas" role="tabpanel" aria-labelledby="estadisticas-tab">
             <div class="container-fluid py-4">
                 <div class="row mb-4">
                     <div class="col-md-4">
@@ -429,7 +429,7 @@
         </div>
 
         <!-- AJUSTES TAB -->
-        <div class="tab-pane fade" id="ajustes" role="tabpanel">
+        <div class="tab-pane fade" id="ajustes" role="tabpanel" aria-labelledby="ajustes-tab">
             <div class="container-fluid py-4">
                 
                 <!-- Alerta de estado de cuenta -->
@@ -487,27 +487,24 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">Nombre del Restaurante</label>
-                                <p class="form-control-plaintext" th:text="${restaurante.nombre}">ChiclaYapa Restaurante</p>
+                                <p class="form-control-plaintext" th:text="${restaurante != null ? restaurante.nombre : 'ChiclaYapa Restaurante'}">ChiclaYapa Restaurante</p>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">Correo Electrónico</label>
-                                <p class="form-control-plaintext" th:text="${restaurante.correo}">contacto@chiclayapa.com</p>
+                                <p class="form-control-plaintext" th:text="${restaurante != null ? restaurante.correoElectronico : 'contacto@chiclayapa.com'}">contacto@chiclayapa.com</p>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">Teléfono</label>
-                                <p class="form-control-plaintext" th:text="${restaurante.telefono}">+51 987 654 321</p>
+                                <p class="form-control-plaintext" th:text="${restaurante != null ? restaurante.telefono : '+51 987 654 321'}">+51 987 654 321</p>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">Dirección</label>
-                                <p class="form-control-plaintext" th:text="${restaurante.direccion}">Av. Principal 123, Lima</p>
+                                <p class="form-control-plaintext" th:text="${restaurante != null ? restaurante.direccion : 'Av. Principal 123, Lima'}">Av. Principal 123, Lima</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold text-muted">Horario de Atención</label>
-                                <p class="form-control-plaintext" th:text="${restaurante.horario}">Lun - Dom: 10:00 AM - 10:00 PM</p>
-                            </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">RUC</label>
-                                <p class="form-control-plaintext" th:text="${restaurante.ruc}">20123456789</p>
+                                <p class="form-control-plaintext" th:text="${restaurante != null ? restaurante.ruc : '20123456789'}">20123456789</p>
                             </div>
                         </div>
                     </div>
@@ -593,7 +590,7 @@
         </div>
 
         <!-- SOPORTE TAB -->
-        <div class="tab-pane fade" id="soporte" role="tabpanel">
+        <div class="tab-pane fade" id="soporte" role="tabpanel" aria-labelledby="soporte-tab">
             <div class="container-fluid py-4">
                 
                 <div class="row">
@@ -681,13 +678,13 @@
                                         <h6 class="mb-2"><i class="fas fa-user-circle me-2"></i>Tus datos de contacto</h6>
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <strong>Restaurante:</strong> <span th:text="${restaurante.nombre}">Nombre</span>
+                                                <strong>Restaurante:</strong> <span th:text="${restaurante != null ? restaurante.nombre : 'Nombre'}">Nombre</span>
                                             </div>
                                             <div class="col-md-6">
-                                                <strong>Correo:</strong> <span th:text="${restaurante.correo}">correo@example.com</span>
+                                                <strong>Correo:</strong> <span th:text="${restaurante != null ? restaurante.correoElectronico : 'correo@example.com'}">correo@example.com</span>
                                             </div>
                                             <div class="col-md-6">
-                                                <strong>Teléfono:</strong> <span th:text="${restaurante.telefono}">999999999</span>
+                                                <strong>Teléfono:</strong> <span th:text="${restaurante != null ? restaurante.telefono : '999999999'}">999999999</span>
                                             </div>
                                             <div class="col-md-6">
                                                 <strong>ID:</strong> <span>rest-001</span>
@@ -798,34 +795,26 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nombre del Restaurante</label>
-                                <input type="text" class="form-control" name="nombre" th:value="${restaurante.nombre}" required>
+                                <input type="text" class="form-control" name="nombre" th:value="${restaurante != null ? restaurante.nombre : ''}" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Correo Electrónico</label>
-                                <input type="email" class="form-control" name="correo" th:value="${restaurante.correo}" required>
+                                <input type="email" class="form-control" name="correo" th:value="${restaurante != null ? restaurante.correoElectronico : ''}" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Teléfono</label>
-                                <input type="tel" class="form-control" name="telefono" th:value="${restaurante.telefono}" required>
+                                <input type="tel" class="form-control" name="telefono" th:value="${restaurante != null ? restaurante.telefono : ''}" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">RUC</label>
-                                <input type="text" class="form-control" name="ruc" th:value="${restaurante.ruc}" required>
+                                <input type="text" class="form-control" name="ruc" th:value="${restaurante != null ? restaurante.ruc : ''}" required>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Dirección</label>
-                                <input type="text" class="form-control" name="direccion" th:value="${restaurante.direccion}" required>
+                                <input type="text" class="form-control" name="direccion" th:value="${restaurante != null ? restaurante.direccion : ''}" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Horario de Atención</label>
-                                <input type="text" class="form-control" name="horario" th:value="${restaurante.horario}" 
-                                       placeholder="Ej: Lun - Dom: 10:00 AM - 10:00 PM">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Sitio Web (Opcional)</label>
-                                <input type="url" class="form-control" name="sitioWeb" th:value="${restaurante.sitioWeb}" 
-                                       placeholder="https://www.ejemplo.com">
-                            </div>
+
+
                         </div>
                     </form>
                 </div>
@@ -1025,18 +1014,37 @@
 
         // Inicializar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
-            // Botón nueva promoción
-            document.getElementById('btnNuevaPromo').addEventListener('click', function() {
-                const modal = new bootstrap.Modal(document.getElementById('nuevaPromoModal'));
-                modal.show();
+            // ===== INICIALIZAR TABS DE BOOTSTRAP =====
+            // Inicializar manualmente todos los tabs
+            const triggerTabList = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            triggerTabList.forEach(function (triggerEl) {
+                const tabTrigger = new bootstrap.Tab(triggerEl);
+                
+                triggerEl.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    tabTrigger.show();
+                });
             });
+            
+            // Botón nueva promoción (verificar si existe)
+            const btnNuevaPromo = document.getElementById('btnNuevaPromo');
+            if (btnNuevaPromo) {
+                btnNuevaPromo.addEventListener('click', function() {
+                    const modal = new bootstrap.Modal(document.getElementById('nuevaPromoModal'));
+                    modal.show();
+                });
+            }
 
-            // Upload de imagen
-            document.getElementById('uploadArea').addEventListener('click', function() {
-                document.getElementById('imagenInput').click();
-            });
+            // Upload de imagen (verificar si existe)
+            const uploadArea = document.getElementById('uploadArea');
+            const imagenInput = document.getElementById('imagenInput');
+            
+            if (uploadArea && imagenInput) {
+                uploadArea.addEventListener('click', function() {
+                    imagenInput.click();
+                });
 
-            document.getElementById('imagenInput').addEventListener('change', function(e) {
+                imagenInput.addEventListener('change', function(e) {
                 if (e.target.files && e.target.files[0]) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -1053,10 +1061,13 @@
                     }
                     reader.readAsDataURL(e.target.files[0]);
                 }
-            });
+                });
+            }
 
-            // Cambio en tipo de descuento
-            document.getElementById('tipoDescuento').addEventListener('change', function() {
+            // Cambio en tipo de descuento (verificar si existe)
+            const tipoDescuento = document.getElementById('tipoDescuento');
+            if (tipoDescuento) {
+                tipoDescuento.addEventListener('change', function() {
                 const label = document.getElementById('labelValorDescuento');
                 const input = document.getElementById('valorDescuento');
                 
@@ -1068,11 +1079,15 @@
                     input.removeAttribute('max');
                 }
                 actualizarResumen();
-            });
+                });
+            }
 
             // Eventos para actualizar en tiempo real
             ['titulo', 'descripcion', 'precioOriginal', 'precioPromocional', 'valorDescuento'].forEach(field => {
-                document.querySelector(`[name="${field}"]`).addEventListener('input', actualizarVistaPrevia);
+                const element = document.querySelector(`[name="${field}"]`);
+                if (element) {
+                    element.addEventListener('input', actualizarVistaPrevia);
+                }
             });
 
             // Inicializar vista previa
@@ -1092,22 +1107,37 @@
 
         // Función para actualizar vista previa
         function actualizarVistaPrevia() {
-            const titulo = document.querySelector('[name="titulo"]').value || 'Título de la promoción';
-            const descripcion = document.querySelector('[name="descripcion"]').value || 'Descripción de la promoción';
-            const precioOriginal = parseFloat(document.querySelector('[name="precioOriginal"]').value) || 0;
-            const precioPromocional = parseFloat(document.querySelector('[name="precioPromocional"]').value) || 0;
+            const tituloEl = document.querySelector('[name="titulo"]');
+            const descripcionEl = document.querySelector('[name="descripcion"]');
+            const precioOriginalEl = document.querySelector('[name="precioOriginal"]');
+            const precioPromocionalEl = document.querySelector('[name="precioPromocional"]');
             
-            document.getElementById('previewTitulo').textContent = titulo;
-            document.getElementById('previewDescripcion').textContent = descripcion;
-            document.getElementById('previewPrecioOriginal').textContent = `S/ ${precioOriginal.toFixed(2)}`;
-            document.getElementById('previewPrecioPromocional').textContent = `S/ ${precioPromocional.toFixed(2)}`;
+            if (!tituloEl || !descripcionEl || !precioOriginalEl || !precioPromocionalEl) return;
+            
+            const titulo = tituloEl.value || 'Título de la promoción';
+            const descripcion = descripcionEl.value || 'Descripción de la promoción';
+            const precioOriginal = parseFloat(precioOriginalEl.value) || 0;
+            const precioPromocional = parseFloat(precioPromocionalEl.value) || 0;
+            
+            const previewTitulo = document.getElementById('previewTitulo');
+            const previewDescripcion = document.getElementById('previewDescripcion');
+            const previewPrecioOriginal = document.getElementById('previewPrecioOriginal');
+            const previewPrecioPromocional = document.getElementById('previewPrecioPromocional');
+            const previewDescuento = document.getElementById('previewDescuento');
+            
+            if (previewTitulo) previewTitulo.textContent = titulo;
+            if (previewDescripcion) previewDescripcion.textContent = descripcion;
+            if (previewPrecioOriginal) previewPrecioOriginal.textContent = `S/ ${precioOriginal.toFixed(2)}`;
+            if (previewPrecioPromocional) previewPrecioPromocional.textContent = `S/ ${precioPromocional.toFixed(2)}`;
             
             // Calcular y mostrar descuento
-            if (precioOriginal > 0 && precioPromocional < precioOriginal) {
-                const descuentoPorcentaje = ((precioOriginal - precioPromocional) / precioOriginal * 100).toFixed(0);
-                document.getElementById('previewDescuento').textContent = `🔥 ${descuentoPorcentaje}% DE DESCUENTO`;
-            } else {
-                document.getElementById('previewDescuento').textContent = '';
+            if (previewDescuento) {
+                if (precioOriginal > 0 && precioPromocional < precioOriginal) {
+                    const descuentoPorcentaje = ((precioOriginal - precioPromocional) / precioOriginal * 100).toFixed(0);
+                    previewDescuento.textContent = `🔥 ${descuentoPorcentaje}% DE DESCUENTO`;
+                } else {
+                    previewDescuento.textContent = '';
+                }
             }
             
             actualizarResumen();
@@ -1115,18 +1145,29 @@
 
         // Función para actualizar resumen de precios
         function actualizarResumen() {
-            const precioOriginal = parseFloat(document.querySelector('[name="precioOriginal"]').value) || 0;
-            const precioPromocional = parseFloat(document.querySelector('[name="precioPromocional"]').value) || 0;
+            const precioOriginalEl = document.querySelector('[name="precioOriginal"]');
+            const precioPromocionalEl = document.querySelector('[name="precioPromocional"]');
             
-            document.getElementById('resumenOriginal').textContent = `S/ ${precioOriginal.toFixed(2)}`;
-            document.getElementById('resumenFinal').textContent = `S/ ${precioPromocional.toFixed(2)}`;
+            if (!precioOriginalEl || !precioPromocionalEl) return;
             
-            if (precioOriginal > 0 && precioPromocional < precioOriginal) {
-                const ahorro = precioOriginal - precioPromocional;
-                const porcentaje = (ahorro / precioOriginal * 100).toFixed(0);
-                document.getElementById('resumenDescuento').textContent = `S/ ${ahorro.toFixed(2)} (${porcentaje}%)`;
-            } else {
-                document.getElementById('resumenDescuento').textContent = 'S/ 0.00 (0%)';
+            const precioOriginal = parseFloat(precioOriginalEl.value) || 0;
+            const precioPromocional = parseFloat(precioPromocionalEl.value) || 0;
+            
+            const resumenOriginal = document.getElementById('resumenOriginal');
+            const resumenFinal = document.getElementById('resumenFinal');
+            const resumenDescuento = document.getElementById('resumenDescuento');
+            
+            if (resumenOriginal) resumenOriginal.textContent = `S/ ${precioOriginal.toFixed(2)}`;
+            if (resumenFinal) resumenFinal.textContent = `S/ ${precioPromocional.toFixed(2)}`;
+            
+            if (resumenDescuento) {
+                if (precioOriginal > 0 && precioPromocional < precioOriginal) {
+                    const ahorro = precioOriginal - precioPromocional;
+                    const porcentaje = (ahorro / precioOriginal * 100).toFixed(0);
+                    resumenDescuento.textContent = `S/ ${ahorro.toFixed(2)} (${porcentaje}%)`;
+                } else {
+                    resumenDescuento.textContent = 'S/ 0.00 (0%)';
+                }
             }
         }
 
