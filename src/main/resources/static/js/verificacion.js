@@ -272,6 +272,8 @@ document.getElementById('verificationForm').addEventListener('submit', async fun
         const formData = new URLSearchParams();
         formData.append('code', code);
         
+        console.log('🔐 Verificando código:', code);
+        
         const response = await fetch('/auth/verify-code', {
             method: 'POST',
             headers: {
@@ -280,19 +282,27 @@ document.getElementById('verificationForm').addEventListener('submit', async fun
             body: formData
         });
         
+        console.log('📬 Respuesta status:', response.status);
+        console.log('📬 Respuesta headers:', response.headers.get('content-type'));
+        
         const result = await response.text();
+        console.log('📄 Respuesta raw:', result);
+        
         const data = JSON.parse(result);
+        console.log('📦 Datos parseados:', data);
         
         // Ocultar modal
         loadingModal.classList.remove('show');
         
         if (data.success) {
+            console.log('✅ Verificación exitosa, redirigiendo a:', data.redirectUrl);
             showAlert('¡Código verificado correctamente!', 'success');
             // Redirigir después de 1 segundo
             setTimeout(() => {
-                window.location.href = data.redirectUrl || '/registro';
+                window.location.href = data.redirectUrl || '/registroUsuario';
             }, 1000);
         } else {
+            console.log('❌ Verificación fallida:', data.error);
             showAlert(data.error || 'Código inválido. Intenta nuevamente.', 'danger');
             clearCodeInputs();
         }

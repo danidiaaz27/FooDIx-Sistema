@@ -63,9 +63,8 @@ public class VerificationController {
             
             // Redirigir según el tipo de registro
             String redirectUrl = switch (tipo) {
-                case "restaurante" -> "/registro-restaurante";
-                case "repartidor" -> "/registro-repartidor";
-                default -> "/registro";
+                case "negocio", "restaurante", "repartidor" -> "/registroNegocio";
+                default -> "/registroUsuario";
             };
             
             return "{\"success\": true, \"redirectUrl\": \"" + redirectUrl + "\"}";

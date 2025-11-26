@@ -30,7 +30,9 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/",                        // Página principal
                     "/login",                   // Login
-                    "/registro",                // Registro de usuarios
+                    "/registro",                // Registro de usuarios (legacy)
+                    "/registroUsuario",         // Registro de usuario/cliente
+                    "/registroNegocio",         // Registro de negocio (restaurante/repartidor)
                     "/registro-repartidor",     // Registro de repartidores
                     "/registro-restaurante",    // Registro de restaurantes
                     "/verificacion",            // Verificación de email
@@ -42,12 +44,7 @@ public class SecurityConfig {
                     "/auth/recovery/**",        // Endpoints de recuperación de contraseña
                     "/contacto",                // Página de contacto
                     "/tutorial",                // Tutorial
-                    "/api/roles",               // API de roles (para formularios)
-                    "/api/roles/**",            // API de roles (específicos)
-                    "/api/provincias/**",       // API de provincias
-                    "/api/distritos/**",        // API de distritos
-                    "/api/tipos-vehiculo",      // API de tipos de vehículo
-                    "/api/validation/**",       // API de validación
+                    "/api/**",                  // ✅ TODAS las APIs públicas (roles, provincias, distritos, validación, etc.)
                     "/menuAdministrador/test-password",  // Test de passwords
                     "/css/**",                  // Recursos estáticos CSS
                     "/js/**",                   // Recursos estáticos JS

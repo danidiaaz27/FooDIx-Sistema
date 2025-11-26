@@ -6,8 +6,8 @@
     <title>Registro - FoodIx</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
     <style>
         .password-mismatch {
             border-color: #dc3545 !important;
@@ -71,6 +71,19 @@
             justify-content: space-between;
             margin-top: 20px;
         }
+        
+        /* Estilos para modal de selección de tipo de cuenta */
+        .hover-card {
+            transition: all 0.3s ease;
+            border: 2px solid #dee2e6;
+        }
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+        }
+        .bg-gradient {
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -84,8 +97,9 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="menuNav">
+        <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+                
                 <li class="nav-item">
                     <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
                         <i class="fas fa-question-circle"></i> Tutorial
@@ -97,7 +111,16 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">Contacto</a>
+                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">
+                        <i class="fas fa-envelope"></i> Contacto
+                    </a>
+                </li>
+                <!-- Botón de Tema Claro/Oscuro -->
+                <li class="nav-item d-flex align-items-center">
+                    <button class="theme-toggle" type="button" aria-label="Cambiar tema">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </button>
                 </li>             
             </ul>
         </div>
@@ -113,7 +136,23 @@
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
                             <h2 class="fw-bold">Regístrate</h2>
-                            <p class="text-muted">Llena los datos para crear tu cuenta</p>
+                            <p class="text-muted">Selecciona tu tipo de cuenta y completa tus datos</p>
+                        </div>
+
+                        <!-- Selector de Tipo de Usuario -->
+                        <div class="user-type-selector">
+                            <button type="button" class="type-btn active" data-type="cliente">
+                                <i class="fas fa-user"></i>
+                                <div>Cliente</div>
+                            </button>
+                            <button type="button" class="type-btn" data-type="restaurante">
+                                <i class="fas fa-store"></i>
+                                <div>Restaurante</div>
+                            </button>
+                            <button type="button" class="type-btn" data-type="repartidor">
+                                <i class="fas fa-motorcycle"></i>
+                                <div>Repartidor</div>
+                            </button>
                         </div>
 
                         <!-- Mensajes de notificación -->
@@ -305,9 +344,158 @@
                             </div>
                             
                             <!-- Botón de Registro -->
-                            <button type="submit" class="btn btn-success w-100 mb-3">
+                            <button type="submit" class="btn btn-success w-100 mb-3" id="btnRegistrarCliente">
                                 <i class="fas fa-user-plus"></i> Registrarme como Cliente
                             </button>
+                            <button type="button" class="btn btn-primary w-100 mb-3" id="btnSiguiente" style="display:none;">
+                                Siguiente <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+
+                        <!-- Formulario para Restaurante (Paso 2) -->
+                        <form action="/registro-restaurante" method="post" id="restaurantForm" class="form-step" enctype="multipart/form-data">
+                            <h5 class="mb-3">Datos del Restaurante</h5>
+                            
+                            <!-- RUC - PRIMERO para auto-completar -->
+                            <div class="mb-3">
+                                <label for="RUC" class="form-label">RUC</label>
+                                <input type="text" class="form-control" id="RUC" name="RUC" 
+                                       required maxlength="11" pattern="[0-9]{11}"
+                                       placeholder="Ingrese 11 dígitos"
+                                       title="Debe contener exactamente 11 dígitos numéricos">
+                                <div class="form-text text-muted">
+                                    <i class="fas fa-info-circle"></i> Se validará automáticamente al completar 11 dígitos
+                                </div>
+                            </div>
+                            
+                            <!-- Razón Social - Auto-completado (solo lectura) -->
+                            <div class="mb-3">
+                                <label for="RazonSocial" class="form-label">Razón Social</label>
+                                <input type="text" class="form-control" id="RazonSocial" name="RazonSocial" 
+                                       required readonly
+                                       placeholder="Se completará automáticamente">
+                                <div class="form-text text-muted">
+                                    <i class="fas fa-lock"></i> Este campo se completa automáticamente al validar el RUC
+                                </div>
+                            </div>
+                            
+                            <!-- Domicilio Fiscal - Auto-completado (solo lectura) -->
+                            <div class="mb-3">
+                                <label for="DomicilioFiscal" class="form-label">Domicilio Fiscal</label>
+                                <textarea class="form-control" id="DomicilioFiscal" name="DomicilioFiscal" 
+                                          rows="2" required readonly
+                                          placeholder="Se completará automáticamente"></textarea>
+                                <div class="form-text text-muted">
+                                    <i class="fas fa-lock"></i> Este campo se completa automáticamente al validar el RUC
+                                </div>
+                            </div>
+                            
+                            <!-- Teléfono - Validación en tiempo real -->
+                            <div class="mb-3">
+                                <label for="TelefonoRestaurante" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="TelefonoRestaurante" name="Telefono" 
+                                       required maxlength="9" pattern="[0-9]{9}"
+                                       placeholder="9 dígitos"
+                                       title="Debe contener exactamente 9 dígitos numéricos">
+                                <div class="form-text text-muted">Debe contener exactamente 9 dígitos</div>
+                            </div>
+                            
+                            <!-- Sección de Documentos -->
+                            <div class="alert alert-info mb-3">
+                                <h6 class="alert-heading mb-2">
+                                    <i class="fas fa-info-circle me-2"></i>Documentos de Verificación
+                                </h6>
+                                <p class="mb-1 small">
+                                    Los siguientes documentos son <strong>opcionales</strong> pero <strong>altamente recomendados</strong>.
+                                </p>
+                                <p class="mb-0 small">
+                                    <i class="fas fa-check-circle text-success me-1"></i>
+                                    Con todos los documentos cargados, activarás la función de <strong>publicar promociones</strong> tras nuestra verificación.
+                                </p>
+                            </div>
+                            
+                            <!-- Carta/Menú -->
+                            <div class="mb-3">
+                                <label for="Carta" class="form-label">
+                                    <i class="fas fa-file-pdf me-1"></i>Carta/Menú <span class="text-muted small">(Opcional)</span>
+                                </label>
+                                <input type="file" class="form-control" id="Carta" name="Carta" 
+                                       accept=".pdf,.jpg,.jpeg,.png">
+                                <div class="form-text text-muted">
+                                    Formatos aceptados: PDF, JPG, PNG (Máx. 5MB) - Recomendado para verificación
+                                </div>
+                            </div>
+                            
+                            <!-- Carnet de Sanidad -->
+                            <div class="mb-3">
+                                <label for="CarnetSanidad" class="form-label">
+                                    <i class="fas fa-file-medical me-1"></i>Carnet de Sanidad <span class="text-muted small">(Opcional)</span>
+                                </label>
+                                <input type="file" class="form-control" id="CarnetSanidad" name="CarnetSanidad" 
+                                       accept=".pdf,.jpg,.jpeg,.png">
+                                <div class="form-text text-muted">
+                                    Formatos aceptados: PDF, JPG, PNG (Máx. 5MB) - Recomendado para verificación
+                                </div>
+                            </div>
+                            
+                            <!-- Licencia de Funcionamiento -->
+                            <div class="mb-3">
+                                <label for="LicenciaFuncionamiento" class="form-label">
+                                    <i class="fas fa-file-contract me-1"></i>Licencia de Funcionamiento <span class="text-muted small">(Opcional)</span>
+                                </label>
+                                <input type="file" class="form-control" id="LicenciaFuncionamiento" name="LicenciaFuncionamiento" 
+                                       accept=".pdf,.jpg,.jpeg,.png">
+                                <div class="form-text text-muted">
+                                    Formatos aceptados: PDF, JPG, PNG (Máx. 5MB) - Recomendado para verificación
+                                </div>
+                            </div>
+                            
+                            <!-- Botones de Navegación -->
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="button" class="btn btn-secondary" id="btnVolverRestaurante">
+                                    <i class="fas fa-arrow-left"></i> Volver
+                                </button>
+                                <button type="submit" class="btn btn-success flex-grow-1">
+                                    <i class="fas fa-store"></i> Registrar Restaurante
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Formulario para Repartidor (Paso 2) -->
+                        <form action="/registro-repartidor" method="post" id="deliveryForm" class="form-step" enctype="multipart/form-data">
+                            <h5 class="mb-3">Datos de Repartidor</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="TipoVehiculo" class="form-label">Tipo de Vehículo *</label>
+                                    <select class="form-select" id="TipoVehiculo" name="TipoVehiculo" required>
+                                        <option value="">Seleccionar</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="NumeroLicencia" class="form-label">Número de Licencia *</label>
+                                    <input type="text" class="form-control" id="NumeroLicencia" name="NumeroLicencia" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="NumeroPlaca" class="form-label">Número de Placa *</label>
+                                <input type="text" class="form-control" id="NumeroPlaca" name="NumeroPlaca" required maxlength="7">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Antecedentes" class="form-label">Antecedentes Policiales/Penales (opcional)</label>
+                                <input type="file" class="form-control" id="Antecedentes" name="Antecedentes" accept=".pdf">
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" id="btnVolverRepartidor">
+                                    <i class="fas fa-arrow-left"></i> Volver
+                                </button>
+                                <button type="submit" class="btn btn-success flex-grow-1">
+                                    <i class="fas fa-motorcycle"></i> Registrar Repartidor
+                                </button>
+                            </div>
                         </form>
 
                         <div class="text-center">
@@ -324,339 +512,63 @@
     </div>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/registro.js}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const docTypeSelect = document.getElementById('CodigoTipoDocumento');
-        const docNumberInput = document.getElementById('NumeroDocumento');
-        const docNumberHelp = document.getElementById('docNumberHelp');
-        const passwordInput = document.getElementById('Contrasena');
-        const confirmPasswordInput = document.getElementById('ConfirmarContrasena');
-        const passwordMatchText = document.getElementById('passwordMatchText');
-        const nameInput = document.getElementById('Nombre');
-        const paternalInput = document.getElementById('ApellidoPaterno');
-        const maternalInput = document.getElementById('ApellidoMaterno');
-        const phoneInput = document.getElementById('Telefono');
-        const birthDateInput = document.getElementById('FechaNacimiento');
-        const deptSelect = document.getElementById('CodigoDepartamento');
-        const provSelect = document.getElementById('CodigoProvincia');
-        const distSelect = document.getElementById('CodigoDistrito');
-        
-        // Validación de edad mínima (18 años)
-        const today = new Date();
-        const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-        birthDateInput.max = maxDate.toISOString().split('T')[0];
-        
-        // Validación de tipo de documento y número
-        docTypeSelect.addEventListener('change', function() {
-            const selectedType = this.value;
-            const btnVerificar = document.getElementById('btnVerificarDNI');
-            
-            if (selectedType === '1') { // DNI
-                docNumberInput.setAttribute('maxlength', '8');
-                docNumberInput.setAttribute('pattern', '[0-9]{8}');
-                docNumberInput.setAttribute('title', 'Debe contener exactamente 8 dígitos');
-                docNumberHelp.textContent = '8 dígitos numéricos - Se autocompletará al escribir';
-                btnVerificar.style.display = 'block'; // Mostrar botón de verificar
-            } else if (selectedType === '2' || selectedType === '3') { // CE o Pasaporte
-                docNumberInput.setAttribute('maxlength', '15');
-                docNumberInput.setAttribute('pattern', '[A-Za-z0-9]{1,15}');
-                docNumberInput.setAttribute('title', 'Máximo 15 caracteres alfanuméricos');
-                docNumberHelp.textContent = 'Máximo 15 caracteres alfanuméricos';
-                btnVerificar.style.display = 'none'; // Ocultar botón
-            } else {
-                docNumberInput.removeAttribute('maxlength');
-                docNumberInput.removeAttribute('pattern');
-                docNumberInput.removeAttribute('title');
-                docNumberHelp.textContent = 'Ingrese el número de documento';
-                btnVerificar.style.display = 'none';
-            }
-            
-            docNumberInput.value = '';
-            // Limpiar campos auto-completados
-            nameInput.value = '';
-            paternalInput.value = '';
-            maternalInput.value = '';
-            nameInput.readOnly = false;
-            paternalInput.readOnly = false;
-            maternalInput.readOnly = false;
-            nameInput.style.backgroundColor = '';
-            paternalInput.style.backgroundColor = '';
-            maternalInput.style.backgroundColor = '';
-        });
-        
-        // ========================================
-        // AUTO-COMPLETADO DE DNI
-        // ========================================
-        async function consultarDNI(dni) {
-            const spinner = document.getElementById('dniSpinner');
-            const btnVerificar = document.getElementById('btnVerificarDNI');
-            
-            try {
-                spinner.style.display = 'inline-block';
-                btnVerificar.disabled = true;
-                docNumberHelp.textContent = '🔍 Consultando DNI...';
-                docNumberHelp.className = 'form-text text-primary';
-                
-                const response = await fetch(`/api/validation/dni/${dni}`);
-                
-                if (!response.ok) {
-                    throw new Error('DNI no encontrado o error en la consulta');
-                }
-                
-                const data = await response.json();
-                
-                // Auto-completar los campos
-                nameInput.value = data.nombres || '';
-                paternalInput.value = data.apellidoPaterno || '';
-                maternalInput.value = data.apellidoMaterno || '';
-                
-                // Hacer los campos de solo lectura y cambiar color
-                nameInput.readOnly = true;
-                paternalInput.readOnly = true;
-                maternalInput.readOnly = true;
-                nameInput.style.backgroundColor = '#e7f5e7';
-                paternalInput.style.backgroundColor = '#e7f5e7';
-                maternalInput.style.backgroundColor = '#e7f5e7';
-                
-                // Mensaje de éxito
-                docNumberHelp.textContent = '✓ DNI verificado correctamente';
-                docNumberHelp.className = 'form-text text-success';
-                
-                // Animación de éxito
-                docNumberInput.classList.add('is-valid');
-                
-            } catch (error) {
-                console.error('Error consultando DNI:', error);
-                
-                // Limpiar campos
-                nameInput.value = '';
-                paternalInput.value = '';
-                maternalInput.value = '';
-                nameInput.readOnly = false;
-                paternalInput.readOnly = false;
-                maternalInput.readOnly = false;
-                nameInput.style.backgroundColor = '';
-                paternalInput.style.backgroundColor = '';
-                maternalInput.style.backgroundColor = '';
-                
-                // Mensaje de error
-                docNumberHelp.textContent = '✗ DNI no encontrado. Ingrese los datos manualmente';
-                docNumberHelp.className = 'form-text text-danger';
-                
-                docNumberInput.classList.remove('is-valid');
-                docNumberInput.classList.add('is-invalid');
-                
-            } finally {
-                spinner.style.display = 'none';
-                btnVerificar.disabled = false;
-            }
-        }
-        
-        // Auto-consultar cuando se complete el DNI (8 dígitos)
-        docNumberInput.addEventListener('input', function() {
-            if (docTypeSelect.value === '1') { // Solo para DNI
-                this.value = this.value.replace(/[^0-9]/g, '');
-                
-                // Limpiar clases de validación
-                this.classList.remove('is-valid', 'is-invalid');
-                
-                if (this.value.length === 8) {
-                    // Auto-consultar cuando tenga 8 dígitos
-                    consultarDNI(this.value);
-                } else if (this.value.length > 0) {
-                    docNumberHelp.textContent = `Ingresa ${8 - this.value.length} dígitos más`;
-                    docNumberHelp.className = 'form-text text-muted';
-                }
-            }
-        });
-        
-        // Botón manual de verificación
-        document.getElementById('btnVerificarDNI').addEventListener('click', function() {
-            const dni = docNumberInput.value;
-            if (dni.length === 8) {
-                consultarDNI(dni);
-            } else {
-                alert('Por favor ingrese un DNI válido de 8 dígitos');
-            }
-        });
-        
-        // Permitir edición manual de campos si se limpia el DNI
-        docNumberInput.addEventListener('blur', function() {
-            if (this.value.length === 0) {
-                // Si se borra el DNI, permitir edición manual
-                nameInput.readOnly = false;
-                paternalInput.readOnly = false;
-                maternalInput.readOnly = false;
-                nameInput.style.backgroundColor = '';
-                paternalInput.style.backgroundColor = '';
-                maternalInput.style.backgroundColor = '';
-                this.classList.remove('is-valid', 'is-invalid');
-                docNumberHelp.textContent = '8 dígitos numéricos - Se autocompletará al escribir';
-                docNumberHelp.className = 'form-text text-muted';
-            }
-        });
-        
-        // ========================================
-        // FIN AUTO-COMPLETADO DE DNI
-        // ========================================
-        
-        // Validación de coincidencia de contraseñas
-        function validatePasswordMatch() {
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
-            
-            if (confirmPassword === '') {
-                confirmPasswordInput.classList.remove('password-mismatch');
-                passwordMatchText.textContent = 'Las contraseñas deben coincidir';
-                passwordMatchText.className = 'form-text text-muted';
-                return;
-            }
-            
-            if (password === confirmPassword) {
-                confirmPasswordInput.classList.remove('password-mismatch');
-                passwordMatchText.textContent = '✓ Las contraseñas coinciden';
-                passwordMatchText.className = 'form-text text-success';
-            } else {
-                confirmPasswordInput.classList.add('password-mismatch');
-                passwordMatchText.textContent = '✗ Las contraseñas no coinciden';
-                passwordMatchText.className = 'form-text text-danger';
-            }
-        }
-        
-        passwordInput.addEventListener('input', validatePasswordMatch);
-        confirmPasswordInput.addEventListener('input', validatePasswordMatch);
-        
-        // Validación de solo letras para nombres y apellidos
-        function validateLettersOnly(input) {
-            input.addEventListener('input', function() {
-                this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑ\s]/g, '');
-            });
-        }
-        
-        validateLettersOnly(nameInput);
-        validateLettersOnly(paternalInput);
-        validateLettersOnly(maternalInput);
-        
-        // Validación de solo números para teléfono
-        phoneInput.addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
-        });
-        
-        // Cascada Departamento -> Provincia -> Distrito
-        deptSelect.addEventListener('change', async function() {
-            const deptId = this.value;
-            provSelect.disabled = true;
-            distSelect.disabled = true;
-            provSelect.innerHTML = '<option value="">Cargando...</option>';
-            distSelect.innerHTML = '<option value="">Seleccione provincia primero</option>';
-            
-            if (deptId) {
-                try {
-                    // Llamada AJAX para cargar provincias
-                    const response = await fetch(`/api/provincias/${deptId}`);
-                    const provincias = await response.json();
-                    
-                    provSelect.innerHTML = '<option value="">Seleccionar</option>';
-                    provincias.forEach(prov => {
-                        provSelect.innerHTML += `<option value="${prov.codigo}">${prov.nombre}</option>`;
-                    });
-                    provSelect.disabled = false;
-                } catch (error) {
-                    console.error('Error cargando provincias:', error);
-                    provSelect.innerHTML = '<option value="">Error al cargar</option>';
-                }
-            } else {
-                provSelect.innerHTML = '<option value="">Seleccione departamento primero</option>';
-            }
-        });
-        
-        provSelect.addEventListener('change', async function() {
-            const provId = this.value;
-            distSelect.disabled = true;
-            distSelect.innerHTML = '<option value="">Cargando...</option>';
-            
-            if (provId) {
-                try {
-                    // Llamada AJAX para cargar distritos
-                    const response = await fetch(`/api/distritos/${provId}`);
-                    const distritos = await response.json();
-                    
-                    distSelect.innerHTML = '<option value="">Seleccionar</option>';
-                    distritos.forEach(dist => {
-                        distSelect.innerHTML += `<option value="${dist.codigo}">${dist.nombre}</option>`;
-                    });
-                    distSelect.disabled = false;
-                } catch (error) {
-                    console.error('Error cargando distritos:', error);
-                    distSelect.innerHTML = '<option value="">Error al cargar</option>';
-                }
-            } else {
-                distSelect.innerHTML = '<option value="">Seleccione provincia primero</option>';
-            }
-        });
-        
-        // Validación del formulario antes de enviar
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            let isValid = true;
-            const errors = [];
-            
-            // Validar coincidencia de contraseñas
-            if (passwordInput.value !== confirmPasswordInput.value) {
-                confirmPasswordInput.classList.add('password-mismatch');
-                errors.push('Las contraseñas no coinciden');
-                isValid = false;
-            }
-            
-            // Validar edad mínima
-            const birthDate = new Date(birthDateInput.value);
-            const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
-            if (age < 18) {
-                birthDateInput.classList.add('invalid-input');
-                errors.push('Debes ser mayor de 18 años');
-                isValid = false;
-            }
-            
-            // Validar documento según tipo
-            const docType = docTypeSelect.value;
-            const docNumber = docNumberInput.value;
-            
-            if (docType === '1' && !/^[0-9]{8}$/.test(docNumber)) {
-                docNumberInput.classList.add('invalid-input');
-                errors.push('El DNI debe tener exactamente 8 dígitos');
-                isValid = false;
-            }
-            
-            if ((docType === '2' || docType === '3') && !/^[A-Za-z0-9]{1,15}$/.test(docNumber)) {
-                docNumberInput.classList.add('invalid-input');
-                errors.push('Número de documento inválido');
-                isValid = false;
-            }
-            
-            // Validar teléfono si se ingresó
-            if (phoneInput.value && !/^[0-9]{9}$/.test(phoneInput.value)) {
-                phoneInput.classList.add('invalid-input');
-                errors.push('El teléfono debe tener exactamente 9 dígitos');
-                isValid = false;
-            }
-            
-            if (!isValid) {
-                event.preventDefault();
-                alert('Errores en el formulario:\n- ' + errors.join('\n- '));
-            }
-        });
+<!-- Modal Información Restaurante -->
+<div class="modal fade" id="modalInfoRestaurante" tabindex="-1" aria-labelledby="modalInfoRestauranteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalInfoRestauranteLabel">
+                    <i class="fas fa-store me-2"></i>Registro de Restaurante
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Para registrarte como <strong>restaurante</strong>, el proceso consta de 2 pasos:</p>
+                <ol class="mb-0">
+                    <li class="mb-2"><strong>Paso 1:</strong> Completa los datos de la persona responsable del restaurante</li>
+                    <li><strong>Paso 2:</strong> Ingresa la información del restaurante (nombre, RUC, dirección, etc.)</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-1"></i>Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Autocompletar email desde URL (para verificación)
-        const urlParams = new URLSearchParams(window.location.search);
-        const verifiedEmail = urlParams.get('email');
-        if (verifiedEmail) {
-            const emailInput = document.getElementById('CorreoElectronico');
-            emailInput.value = verifiedEmail;
-            emailInput.readOnly = true;
-            emailInput.style.backgroundColor = '#e9ecef';
-        }
-    });
-</script>
+<!-- Modal Información Repartidor -->
+<div class="modal fade" id="modalInfoRepartidor" tabindex="-1" aria-labelledby="modalInfoRepartidorLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalInfoRepartidorLabel">
+                    <i class="fas fa-motorcycle me-2"></i>Registro de Repartidor
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Para registrarte como <strong>repartidor</strong>, el proceso consta de 2 pasos:</p>
+                <ol class="mb-0">
+                    <li class="mb-2"><strong>Paso 1:</strong> Completa tus datos personales</li>
+                    <li><strong>Paso 2:</strong> Ingresa los datos de tu unidad de transporte (tipo de vehículo, licencia, placa, etc.)</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-1"></i>Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/theme-toggle.js}"></script>
+<script th:src="@{/js/registro.js}"></script>
+<script th:src="@{/js/registro-restaurante.js}"></script>
+<script th:src="@{/js/modales-registro-restaurante.js}"></script>
 </body>
 </html>
+       

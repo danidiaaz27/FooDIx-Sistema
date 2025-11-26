@@ -119,21 +119,21 @@
 
                 <ul class="nav nav-pills flex-column">
                     <!-- Gestion de Clientes - Solo si tiene permiso 'clientes' -->
-                    <li class="nav-item" th:if="${permisosUsuario.contains('clientes')}">
+                    <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('usuarios')" data-section="usuarios">
                             <i class="fas fa-users"></i> Gestión de Clientes
                         </a>
                     </li>
                     
                     <!-- Restaurantes - Solo si tiene permiso 'restaurantes' -->
-                    <li class="nav-item" th:if="${permisosUsuario.contains('restaurantes')}">
+                    <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('restaurantes')" data-section="restaurantes">
                             <i class="fas fa-store"></i> Restaurantes
                         </a>
                     </li>
                     
                     <!-- Repartidores - Solo si tiene permiso 'delivery' -->
-                    <li class="nav-item" th:if="${permisosUsuario.contains('delivery')}">
+                    <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('delivery')" data-section="delivery">
                             <i class="fas fa-motorcycle"></i> Repartidores
                         </a>
@@ -159,7 +159,7 @@
         <!-- Contenido principal -->
         <div class="col-md-9 col-lg-10 main-content">
             <!-- Sección Usuarios/Clientes - Solo si tiene permiso -->
-            <section id="usuarios-content" class="menu-section" th:classappend="${permisosUsuario.contains('clientes') ? 'active' : ''}" th:if="${permisosUsuario.contains('clientes')}">
+            <section id="usuarios-content" class="menu-section">
                 <div class="section-header">
                     <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
                     <p class="text-muted">Administra los clientes de la plataforma</p>
@@ -280,7 +280,7 @@
             </section>
 
             <!-- Sección Restaurantes - Solo si tiene permiso -->
-            <section id="restaurantes-content" class="menu-section" th:if="${permisosUsuario.contains('restaurantes')}">
+            <section id="restaurantes-content" class="menu-section">
                 <div class="section-header">
                     <h2><i class="fas fa-store"></i> Gestión de Restaurantes</h2>
                     <p class="text-muted">Administra los restaurantes asociados</p>
@@ -474,7 +474,7 @@
             </section>
 
             <!-- Sección Delivery - Solo si tiene permiso -->
-            <section id="delivery-content" class="menu-section" th:if="${permisosUsuario.contains('delivery')}">
+            <section id="delivery-content" class="menu-section">
                 <div class="section-header">
                     <h2><i class="fas fa-motorcycle"></i> Gestión de Repartidores</h2>
                     <p class="text-muted">Administra los repartidores de la plataforma</p>
@@ -661,7 +661,7 @@
             </section>
 
             <!-- Sección Configuración - Solo si tiene permiso -->
-            <section id="configuracion-content" class="menu-section" th:if="${permisosUsuario.contains('configuracion')}">
+            <section id="configuracion-content" class="menu-section">
                 <div class="section-header">
                     <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
                     <p class="text-muted">Administra la configuración general de la plataforma</p>
