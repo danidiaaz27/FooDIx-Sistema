@@ -10,63 +10,63 @@ import java.time.LocalDateTime;
  * Almacena información básica de todos los usuarios del sistema
  */
 @Entity
-@Table(name = "Usuario")
+@Table(name = "usuario")
 @Data
 public class Usuario {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Codigo")
+    @Column(name = "codigo")
     private Long codigo;
     
-    @Column(name = "Nombre", nullable = false, length = 50)
+    @Column(name = "nombre", nullable = false, length = 50)
     private String nombre;
     
-    @Column(name = "ApellidoPaterno", nullable = false, length = 50)
+    @Column(name = "apellido_paterno", nullable = false, length = 50)
     private String apellidoPaterno;
     
-    @Column(name = "ApellidoMaterno", nullable = false, length = 50)
+    @Column(name = "apellido_materno", nullable = false, length = 50)
     private String apellidoMaterno;
     
-    @Column(name = "NumeroDocumento", nullable = false, unique = true, length = 15)
+    @Column(name = "numero_documento", nullable = false, unique = true, length = 15)
     private String numeroDocumento;
     
-    @Column(name = "FechaNacimiento", nullable = false)
+    @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
     
-    @Column(name = "CorreoElectronico", nullable = false, unique = true, length = 50)
+    @Column(name = "correo_electronico", nullable = false, unique = true, length = 50)
     private String correoElectronico;
     
-    @Column(name = "Contrasena", nullable = false, length = 255)
+    @Column(name = "contrasena", nullable = false, length = 255)
     private String contrasena;
     
-    @Column(name = "Telefono", length = 20)
+    @Column(name = "telefono", length = 20)
     private String telefono;
     
-    @Column(name = "Direccion", length = 100)
+    @Column(name = "direccion", length = 100)
     private String direccion;
     
-    @Column(name = "CodigoTipoDocumento", nullable = false)
+    @Column(name = "codigo_tipo_documento", nullable = false)
     private Long codigoTipoDocumento;
     
-    @Column(name = "CodigoRol", nullable = false, insertable = false, updatable = false)
+    @Column(name = "codigo_rol", nullable = false)
     private Long codigoRol;
     
     // Relación con Rol
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "CodigoRol", referencedColumnName = "codigo")
+    @JoinColumn(name = "codigo_rol", referencedColumnName = "codigo", insertable = false, updatable = false)
     private Rol rol;
     
-    @Column(name = "CodigoDistrito", nullable = false)
+    @Column(name = "codigo_distrito", nullable = false)
     private Long codigoDistrito;
     
-    @Column(name = "FechaCreacion", nullable = false, updatable = false)
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
     
-    @Column(name = "FechaModificacion")
+    @Column(name = "fecha_modificacion")
     private LocalDateTime fechaModificacion;
     
-    @Column(name = "Estado", nullable = false)
+    @Column(name = "estado", nullable = false)
     private Boolean estado = true;
     
     @PrePersist

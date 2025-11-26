@@ -201,13 +201,13 @@ INSERT INTO `usuario` (
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
   `numero_documento`, `fecha_creacion`
 ) VALUES 
-('System', 'Admin', 1, '$2a$10$vwhw6tkh2mBmKRhEhmS8Te/8G/0PunlG620NQwkFMvF56kBrZp/9G', 
+('System', 'Admin', 1, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'admin@local.dev', NULL, TRUE, 'Admin', NULL, '99999999', NOW()),
 
-('Diaz', 'Jesus', 1, '$2a$10$YvbeD4FkunCAGIRIYvYtrucGQMyrSv50n7meEJxzN4RjtsqRnhov.', 
+('Diaz', 'Jesus', 1, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'JesusDiaz@gmail.com', NULL, TRUE, 'Jesus', '975184139', '99999998', NOW()),
 
-('Herrera', 'Tania', 1, '$2a$10$u6Tu6f6Bkm4vdGbtow0HRutgF61be2eyYj3Sm67KCSPDXXWzz7X6S', 
+('Herrera', 'Tania', 1, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'Tania@gmail.com', NULL, TRUE, 'Tania', '994518225', '99999997', NOW());
 
 -- Usuario restaurante (Daniela)
@@ -216,7 +216,7 @@ INSERT INTO `usuario` (
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
   `numero_documento`, `fecha_nacimiento`, `genero`, `avatar`, `fecha_creacion`
 ) VALUES 
-('Chaname', 'Díaz', 2, '$2a$10$i/mlTAmBmvb3oHE.5FqDHuf2gf4bQT5U1Is.x.3KbI5/kbbU2rd/u', 
+('Chaname', 'Díaz', 2, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'daniela@test.com', 'Av. Balta 123, Chiclayo', TRUE, 'Daniela', '+51 987654321', 
  '12345678', '1995-05-15', 'femenino', 'Imagen', NOW());
 
@@ -226,11 +226,11 @@ INSERT INTO `usuario` (
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
   `numero_documento`, `fecha_nacimiento`, `genero`, `avatar`, `fecha_creacion`
 ) VALUES 
-('', 'Diaz', 3, '$2a$10$k0rudhwf6O/gRQ0g20tuLu1sJzDpSyeZQEXrfLnRo8R2h154dx.HC', 
+('', 'Diaz', 3, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'dann27@gmail.com', 'Faustino Sanchez Carrion 258', TRUE, 'Daniela', '975184139', 
  '87654321', '2003-02-27', 'femenino', 'Daniela', NOW()),
 
-('', 'Diaz', 3, '$2a$10$Pre2pLOcsvX.RWVOsJIdI.jMyC6TpB1ChA2jzyFpFkpUt3ULE8nE6', 
+('', 'Diaz', 3, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'CarlosDiaz@gmail.com', 'Avenida Saleverry', TRUE, 'Carlos', '975184139', 
  '76543210', NULL, NULL, NULL, NOW());
 
@@ -240,11 +240,11 @@ INSERT INTO `usuario` (
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
   `numero_documento`, `fecha_nacimiento`, `genero`, `avatar`, `fecha_creacion`
 ) VALUES 
-('Herrera', 'Diaz', 4, '$2a$10$C6h02qm3pUHzH9M9xkRXLeGbjvk0P5bpbe88lb0QUtvKqxOInwgW.', 
+('Herrera', 'Diaz', 4, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'nanisss27@gmail.com', 'Avenida zarumilla', TRUE, 'Daniela Andreina', '975184139', 
  '11223344', '2003-02-27', 'femenino', 'jecha', NOW()),
 
-('Herrera', 'Diaz', 4, '$2a$10$oXYvg6NiX4qtrtTaT7BFXu6iMLUmHzsxdpZ48u4VGBCqk38mQxcqi', 
+('Herrera', 'Diaz', 4, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'DanielAnteroJunior@gmail.com', 'Avenida Salaverry', TRUE, 'Daniel Antero', '975184139', 
  '44332211', '2003-02-27', 'femenino', 'jecha', NOW());
 
@@ -425,3 +425,7 @@ CREATE TABLE `rol_permiso` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+model.addAttribute("clientes", clienteService.findAll());
+model.addAttribute("restaurantes", restauranteService.findAll());
+model.addAttribute("repartidores", repartidorService.findAll());
