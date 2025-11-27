@@ -4,6 +4,7 @@ import com.example.SistemaDePromociones.model.Repartidor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -26,4 +27,14 @@ public interface RepartidorRepository extends JpaRepository<Repartidor, Long> {
      * Verificar si existe un número de licencia
      */
     boolean existsByNumeroLicencia(String numeroLicencia);
+    
+    /**
+     * Buscar repartidores por estado de aprobación
+     */
+    List<Repartidor> findByCodigoEstadoAprobacion(Long codigoEstadoAprobacion);
+    
+    /**
+     * Buscar repartidores por estado de aprobación ordenados por fecha de creación
+     */
+    List<Repartidor> findByCodigoEstadoAprobacionOrderByFechaCreacionAsc(Long codigoEstadoAprobacion);
 }

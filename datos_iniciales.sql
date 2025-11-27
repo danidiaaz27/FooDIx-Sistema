@@ -466,6 +466,34 @@ CREATE TABLE `permiso` (
   UNIQUE KEY `UK_nombre_permiso` (`nombre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Insertar permisos predefinidos
+INSERT INTO `permiso` (`nombre`, `descripcion`, `seccion`, `accion`, `estado`) VALUES
+('DASHBOARD_VIEW', 'Ver dashboard principal', 'dashboard', 'view', TRUE),
+('CATEGORIAS_VIEW', 'Ver gestión de categorías', 'categorias', 'view', TRUE),
+('CATEGORIAS_CREATE', 'Crear categorías', 'categorias', 'create', TRUE),
+('CATEGORIAS_EDIT', 'Editar categorías', 'categorias', 'edit', TRUE),
+('CATEGORIAS_DELETE', 'Eliminar categorías', 'categorias', 'delete', TRUE),
+('RESTAURANTES_VIEW', 'Ver gestión de restaurantes', 'restaurantes', 'view', TRUE),
+('RESTAURANTES_APPROVE', 'Aprobar/rechazar restaurantes', 'restaurantes', 'approve', TRUE),
+('RESTAURANTES_EDIT', 'Editar restaurantes', 'restaurantes', 'edit', TRUE),
+('RESTAURANTES_DELETE', 'Eliminar restaurantes', 'restaurantes', 'delete', TRUE),
+('CLIENTES_VIEW', 'Ver gestión de clientes', 'clientes', 'view', TRUE),
+('CLIENTES_EDIT', 'Editar clientes', 'clientes', 'edit', TRUE),
+('CLIENTES_DELETE', 'Eliminar clientes', 'clientes', 'delete', TRUE),
+('DELIVERY_VIEW', 'Ver gestión de repartidores', 'delivery', 'view', TRUE),
+('DELIVERY_APPROVE', 'Aprobar/rechazar repartidores', 'delivery', 'approve', TRUE),
+('DELIVERY_EDIT', 'Editar repartidores', 'delivery', 'edit', TRUE),
+('DELIVERY_DELETE', 'Eliminar repartidores', 'delivery', 'delete', TRUE),
+('ROLES_VIEW', 'Ver gestión de roles', 'roles', 'view', TRUE),
+('ROLES_CREATE', 'Crear roles', 'roles', 'create', TRUE),
+('ROLES_EDIT', 'Editar roles', 'roles', 'edit', TRUE),
+('ROLES_DELETE', 'Eliminar roles', 'roles', 'delete', TRUE),
+('CONFIGURACION_VIEW', 'Ver configuración del sistema', 'configuracion', 'view', TRUE),
+('CONFIGURACION_EDIT', 'Editar configuración', 'configuracion', 'edit', TRUE),
+('REPORTES_VIEW', 'Ver reportes y estadísticas', 'reportes', 'view', TRUE),
+('PEDIDOS_VIEW', 'Ver gestión de pedidos', 'pedidos', 'view', TRUE),
+('PEDIDOS_MANAGE', 'Gestionar pedidos', 'pedidos', 'manage', TRUE);
+
 DROP TABLE IF EXISTS `rol_permiso`;
 CREATE TABLE `rol_permiso` (
   `rol_codigo` bigint NOT NULL,
@@ -474,6 +502,125 @@ CREATE TABLE `rol_permiso` (
   KEY `FK_rol_permiso_permiso` (`permiso_codigo`),
   CONSTRAINT `FK_rol_permiso_permiso` FOREIGN KEY (`permiso_codigo`) REFERENCES `permiso` (`codigo`) ON DELETE CASCADE,
   CONSTRAINT `FK_rol_permiso_rol` FOREIGN KEY (`rol_codigo`) REFERENCES `rol` (`codigo`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Asignar TODOS los permisos al rol ADMINISTRADOR (codigo 1)
+INSERT INTO `rol_permiso` (`rol_codigo`, `permiso_codigo`) 
+SELECT 1, codigo FROM permiso WHERE estado = TRUE;
+
+-- =====================================================
+-- TABLA: estado_pedido
+-- =====================================================
+DROP TABLE IF EXISTS `estado_pedido`;
+CREATE TABLE `estado_pedido` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` varchar(200) DEFAULT NULL,
+  `color` varchar(20) DEFAULT NULL,
+  `estado` BOOLEAN NOT NULL DEFAULT TRUE,
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `UK_nombre_estado_pedido` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `estado_pedido` (`nombre`, `descripcion`, `color`, `estado`) VALUES
+('Pendiente', 'Pedido creado, esperando confirmación', '#ffc107', TRUE),
+('Confirmado', 'Pedido confirmado por el restaurante', '#17a2b8', TRUE),
+('Preparando', 'El restaurante está preparando el pedido', '#fd7e14', TRUE),
+('Listo', 'Pedido listo para recoger/entregar', '#6f42c1', TRUE),
+('En camino', 'Repartidor en camino a entregar', '#007bff', TRUE),
+('Entregado', 'Pedido entregado exitosamente', '#28a745', TRUE),
+('Cancelado', 'Pedido cancelado', '#dc3545', TRUE),
+('Rechazado', 'Pedido rechazado por el restaurante', '#6c757d', TRUE);
+
+-- =====================================================
+-- TABLA: metodo_pago
+-- =====================================================
+DROP TABLE IF EXISTS `metodo_pago`;
+CREATE TABLE `metodo_pago` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` varchar(200) DEFAULT NULL,
+  `activo` BOOLEAN NOT NULL DEFAULT TRUE,
+  `requiere_cambio` BOOLEAN NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `UK_nombre_metodo_pago` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `metodo_pago` (`nombre`, `descripcion`, `activo`, `requiere_cambio`) VALUES
+('Efectivo', 'Pago en efectivo al recibir', TRUE, TRUE),
+('Yape', 'Transferencia por Yape', TRUE, FALSE),
+('Plin', 'Transferencia por Plin', TRUE, FALSE),
+('Tarjeta', 'Pago con tarjeta de crédito/débito', TRUE, FALSE),
+('Transferencia', 'Transferencia bancaria', TRUE, FALSE);
+
+-- =====================================================
+-- TABLA: pedido
+-- =====================================================
+DROP TABLE IF EXISTS `pedido`;
+CREATE TABLE `pedido` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_usuario` bigint NOT NULL,
+  `codigo_restaurante` bigint NOT NULL,
+  `codigo_promocion` bigint DEFAULT NULL,
+  `codigo_repartidor` bigint DEFAULT NULL,
+  `codigo_estado_pedido` bigint NOT NULL DEFAULT 1,
+  `codigo_metodo_pago` bigint NOT NULL,
+  `direccion_entrega` varchar(200) NOT NULL,
+  `referencia_direccion` varchar(200) DEFAULT NULL,
+  `latitud` decimal(10,8) DEFAULT NULL,
+  `longitud` decimal(11,8) DEFAULT NULL,
+  `telefono_contacto` varchar(20) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `descuento` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `costo_delivery` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `total` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `monto_efectivo` decimal(10,2) DEFAULT NULL,
+  `vuelto` decimal(10,2) DEFAULT NULL,
+  `notas` text,
+  `fecha_pedido` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `fecha_confirmacion` datetime(6) DEFAULT NULL,
+  `fecha_listo` datetime(6) DEFAULT NULL,
+  `fecha_asignacion_repartidor` datetime(6) DEFAULT NULL,
+  `fecha_en_camino` datetime(6) DEFAULT NULL,
+  `fecha_entrega` datetime(6) DEFAULT NULL,
+  `fecha_cancelacion` datetime(6) DEFAULT NULL,
+  `motivo_cancelacion` text,
+  `calificacion_restaurante` int DEFAULT NULL,
+  `calificacion_repartidor` int DEFAULT NULL,
+  `comentario_calificacion` text,
+  `estado` BOOLEAN NOT NULL DEFAULT TRUE,
+  PRIMARY KEY (`codigo`),
+  KEY `FK_pedido_usuario` (`codigo_usuario`),
+  KEY `FK_pedido_restaurante` (`codigo_restaurante`),
+  KEY `FK_pedido_promocion` (`codigo_promocion`),
+  KEY `FK_pedido_repartidor` (`codigo_repartidor`),
+  KEY `FK_pedido_estado_pedido` (`codigo_estado_pedido`),
+  KEY `FK_pedido_metodo_pago` (`codigo_metodo_pago`),
+  CONSTRAINT `FK_pedido_usuario` FOREIGN KEY (`codigo_usuario`) REFERENCES `usuario` (`codigo`),
+  CONSTRAINT `FK_pedido_restaurante` FOREIGN KEY (`codigo_restaurante`) REFERENCES `restaurante` (`codigo`),
+  CONSTRAINT `FK_pedido_promocion` FOREIGN KEY (`codigo_promocion`) REFERENCES `promocion` (`codigo`),
+  CONSTRAINT `FK_pedido_repartidor` FOREIGN KEY (`codigo_repartidor`) REFERENCES `repartidor` (`codigo`),
+  CONSTRAINT `FK_pedido_estado_pedido` FOREIGN KEY (`codigo_estado_pedido`) REFERENCES `estado_pedido` (`codigo`),
+  CONSTRAINT `FK_pedido_metodo_pago` FOREIGN KEY (`codigo_metodo_pago`) REFERENCES `metodo_pago` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- TABLA: detalle_pedido
+-- =====================================================
+DROP TABLE IF EXISTS `detalle_pedido`;
+CREATE TABLE `detalle_pedido` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_pedido` bigint NOT NULL,
+  `codigo_promocion` bigint NOT NULL,
+  `cantidad` int NOT NULL DEFAULT 1,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `precio_total` decimal(10,2) NOT NULL,
+  `notas` text,
+  PRIMARY KEY (`codigo`),
+  KEY `FK_detalle_pedido_pedido` (`codigo_pedido`),
+  KEY `FK_detalle_pedido_promocion` (`codigo_promocion`),
+  CONSTRAINT `FK_detalle_pedido_pedido` FOREIGN KEY (`codigo_pedido`) REFERENCES `pedido` (`codigo`) ON DELETE CASCADE,
+  CONSTRAINT `FK_detalle_pedido_promocion` FOREIGN KEY (`codigo_promocion`) REFERENCES `promocion` (`codigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

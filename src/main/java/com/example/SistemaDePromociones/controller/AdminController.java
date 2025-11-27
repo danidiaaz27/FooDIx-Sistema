@@ -110,10 +110,15 @@ public class AdminController {
         model.addAttribute("clientes", clientes);
         System.out.println("👥 [ADMIN] Clientes cargados: " + clientes.size());
         
-        // Cargar repartidores
-        List<Repartidor> repartidores = repartidorRepository.findAll();
-        model.addAttribute("repartidores", repartidores);
-        System.out.println("🚚 [ADMIN] Repartidores cargados: " + repartidores.size());
+        // Cargar repartidores pendientes de aprobación
+        List<Repartidor> pendingRepartidores = repartidorRepository.findByCodigoEstadoAprobacion(7L);
+        model.addAttribute("pendingRepartidores", pendingRepartidores);
+        System.out.println("🚚 [ADMIN] Repartidores pendientes: " + pendingRepartidores.size());
+        
+        // Cargar repartidores aprobados
+        List<Repartidor> approvedRepartidores = repartidorRepository.findByCodigoEstadoAprobacion(8L);
+        model.addAttribute("approvedRepartidores", approvedRepartidores);
+        System.out.println("✅ [ADMIN] Repartidores aprobados: " + approvedRepartidores.size());
         
         // Cargar todos los roles
         List<Rol> roles = rolRepository.findAll();
@@ -686,6 +691,207 @@ public class AdminController {
         } catch (Exception e) {
             System.err.println("❌ [ADMIN] Error al eliminar rol: " + e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Error al eliminar: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "danger");
+        }
+        
+        return "redirect:/menuAdministrador";
+    }
+    
+    // ============================================
+    // GESTIÓN DE REPARTIDORES (DELIVERY)
+    // ============================================
+    
+    /**
+     * Aprobar un repartidor
+     * POST /menuAdministrador/repartidor/{id}/approve
+     */
+    @PostMapping("/repartidor/{id}/approve")
+    public String aprobarRepartidor(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            System.out.println("✅ [ADMIN] Aprobando repartidor: " + id);
+            
+            Repartidor repartidor = repartidorRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Repartidor no encontrado"));
+            
+            // Verificar que esté pendiente
+            if (!repartidor.getCodigoEstadoAprobacion().equals(7L)) {
+                throw new RuntimeException("El repartidor no está en estado pendiente");
+            }
+            
+            // Obtener el admin actual
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Usuario admin = usuarioRepository.findByCorreoElectronico(authentication.getName())
+                    .orElse(null);
+            Long adminId = admin != null ? admin.getCodigo() : 1L;
+            
+            // Cambiar estado a aprobado (8)
+            repartidor.setCodigoEstadoAprobacion(8L);
+            repartidor.setFechaAprobacion(LocalDateTime.now());
+            repartidor.setCodigoAprobador(adminId);
+            repartidor.setMotivoRechazo(null); // Limpiar cualquier rechazo previo
+            repartidor.setDisponible(true); // Activar disponibilidad
+            
+            repartidorRepository.save(repartidor);
+            
+            // Obtener nombre del repartidor
+            String nombreRepartidor = repartidor.getUsuario() != null ? 
+                    repartidor.getUsuario().getNombre() + " " + repartidor.getUsuario().getApellidoPaterno() : 
+                    "Repartidor #" + id;
+            
+            redirectAttributes.addFlashAttribute("mensaje", 
+                "Repartidor '" + nombreRepartidor + "' aprobado exitosamente");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+            
+            System.out.println("✅ [ADMIN] Repartidor aprobado: " + nombreRepartidor);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al aprobar repartidor: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al aprobar: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "danger");
+        }
+        
+        return "redirect:/menuAdministrador";
+    }
+    
+    /**
+     * Rechazar un repartidor
+     * POST /menuAdministrador/repartidor/{id}/reject
+     */
+    @PostMapping("/repartidor/{id}/reject")
+    public String rechazarRepartidor(
+            @PathVariable Long id,
+            @RequestParam(required = false) String motivo,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            System.out.println("❌ [ADMIN] Rechazando repartidor: " + id);
+            
+            Repartidor repartidor = repartidorRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Repartidor no encontrado"));
+            
+            // Verificar que esté pendiente
+            if (!repartidor.getCodigoEstadoAprobacion().equals(7L)) {
+                throw new RuntimeException("El repartidor no está en estado pendiente");
+            }
+            
+            // Validar motivo
+            if (motivo == null || motivo.trim().isEmpty()) {
+                throw new RuntimeException("Debe proporcionar un motivo de rechazo");
+            }
+            
+            // Obtener el admin actual
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Usuario admin = usuarioRepository.findByCorreoElectronico(authentication.getName())
+                    .orElse(null);
+            Long adminId = admin != null ? admin.getCodigo() : 1L;
+            
+            // Cambiar estado a rechazado (9)
+            repartidor.setCodigoEstadoAprobacion(9L);
+            repartidor.setFechaAprobacion(LocalDateTime.now());
+            repartidor.setCodigoAprobador(adminId);
+            repartidor.setMotivoRechazo(motivo);
+            repartidor.setDisponible(false);
+            
+            repartidorRepository.save(repartidor);
+            
+            // Obtener nombre del repartidor
+            String nombreRepartidor = repartidor.getUsuario() != null ? 
+                    repartidor.getUsuario().getNombre() + " " + repartidor.getUsuario().getApellidoPaterno() : 
+                    "Repartidor #" + id;
+            
+            // Enviar correo de notificación
+            try {
+                if (repartidor.getUsuario() != null && repartidor.getUsuario().getCorreoElectronico() != null) {
+                    emailService.sendDeliveryRejectionNotification(
+                        repartidor.getUsuario().getCorreoElectronico(),
+                        nombreRepartidor,
+                        motivo
+                    );
+                    System.out.println("✅ [ADMIN] Correo de rechazo enviado a: " + repartidor.getUsuario().getCorreoElectronico());
+                }
+            } catch (Exception emailError) {
+                System.err.println("⚠️ [ADMIN] No se pudo enviar el correo: " + emailError.getMessage());
+                // Continuar aunque falle el envío de correo
+            }
+            
+            redirectAttributes.addFlashAttribute("mensaje", 
+                "Repartidor '" + nombreRepartidor + "' rechazado");
+            redirectAttributes.addFlashAttribute("tipo", "warning");
+            
+            System.out.println("❌ [ADMIN] Repartidor rechazado: " + nombreRepartidor);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al rechazar repartidor: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al rechazar: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "danger");
+        }
+        
+        return "redirect:/menuAdministrador";
+    }
+    
+    /**
+     * Cambiar disponibilidad de un repartidor
+     * POST /menuAdministrador/repartidor/{id}/toggle-disponibilidad
+     */
+    @PostMapping("/repartidor/{id}/toggle-disponibilidad")
+    public String cambiarDisponibilidadRepartidor(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            System.out.println("🔄 [ADMIN] Cambiando disponibilidad de repartidor: " + id);
+            
+            Repartidor repartidor = repartidorRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Repartidor no encontrado"));
+            
+            repartidor.setDisponible(!repartidor.getDisponible());
+            repartidorRepository.save(repartidor);
+            
+            String nuevoEstado = repartidor.getDisponible() ? "disponible" : "no disponible";
+            redirectAttributes.addFlashAttribute("mensaje", "Repartidor marcado como " + nuevoEstado);
+            redirectAttributes.addFlashAttribute("tipo", "success");
+            
+            System.out.println("✅ [ADMIN] Repartidor ahora " + nuevoEstado + ": " + id);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al cambiar disponibilidad: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al cambiar disponibilidad: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "danger");
+        }
+        
+        return "redirect:/menuAdministrador";
+    }
+    
+    /**
+     * Cambiar estado de un repartidor (activar/desactivar)
+     * POST /menuAdministrador/repartidor/{id}/toggle-status
+     */
+    @PostMapping("/repartidor/{id}/toggle-status")
+    public String cambiarEstadoRepartidor(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            System.out.println("🔄 [ADMIN] Cambiando estado de repartidor: " + id);
+            
+            Repartidor repartidor = repartidorRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Repartidor no encontrado"));
+            
+            repartidor.setEstado(!repartidor.getEstado());
+            repartidorRepository.save(repartidor);
+            
+            String nuevoEstado = repartidor.getEstado() ? "activado" : "desactivado";
+            redirectAttributes.addFlashAttribute("mensaje", "Repartidor " + nuevoEstado + " exitosamente");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+            
+            System.out.println("✅ [ADMIN] Repartidor " + nuevoEstado + ": " + id);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al cambiar estado: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al cambiar estado: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipo", "danger");
         }
         
