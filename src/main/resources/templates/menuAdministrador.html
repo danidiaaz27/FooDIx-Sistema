@@ -508,8 +508,11 @@
                     </div>
                 </div>
 
-                <!-- Lista de repartidores (usuarios con rol DELIVERY) -->
-                <div class="card">
+                <!-- Repartidores Pendientes de Aprobación -->
+                <div class="card mb-3" th:if="${pendingRepartidores != null and #lists.size(pendingRepartidores) > 0}">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-clock"></i> Repartidores Pendientes de Aprobación</h5>
+                    </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped">
@@ -520,88 +523,104 @@
                                         <th>Email</th>
                                         <th>Teléfono</th>
                                         <th>Licencia</th>
-                                        <th>Estado Aprobacion</th>
+                                        <th>Vehículo</th>
+                                        <th>Fecha Registro</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="delivery : ${pendingRepartidores}">
+                                        <td th:text="${delivery.codigo}">1</td>
+                                        <td th:text="${delivery.usuario != null ? (delivery.usuario.nombre + ' ' + delivery.usuario.apellidoPaterno) : 'N/A'}">Juan Pérez</td>
+                                        <td th:text="${delivery.usuario != null ? delivery.usuario.correoElectronico : 'N/A'}">delivery@example.com</td>
+                                        <td th:text="${delivery.usuario != null and delivery.usuario.telefono != null ? delivery.usuario.telefono : 'N/A'}">999999999</td>
+                                        <td th:text="${delivery.numeroLicencia}">ABC123456</td>
+                                        <td th:text="${delivery.tipoVehiculo != null ? delivery.tipoVehiculo.nombre : 'N/A'}">Motocicleta</td>
+                                        <td th:text="${#temporals.format(delivery.fechaCreacion, 'dd/MM/yyyy HH:mm')}">01/01/2025 10:00</td>
+                                        <td>
+                                            <form th:action="@{/menuAdministrador/repartidor/{id}/approve(id=${delivery.codigo})}" 
+                                                  method="post" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm btn-success" title="Aprobar">
+                                                    <i class="fas fa-check"></i> Aprobar
+                                                </button>
+                                            </form>
+                                            <button type="button" class="btn btn-sm btn-danger" title="Rechazar"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#rejectDeliveryModal"
+                                                    th:data-id="${delivery.codigo}"
+                                                    th:data-name="${delivery.usuario != null ? (delivery.usuario.nombre + ' ' + delivery.usuario.apellidoPaterno) : 'Repartidor'}">
+                                                <i class="fas fa-times"></i> Rechazar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensaje si no hay pendientes -->
+                <div class="alert alert-info" th:if="${pendingRepartidores == null or #lists.isEmpty(pendingRepartidores)}">
+                    <i class="fas fa-info-circle"></i> No hay repartidores pendientes de aprobación
+                </div>
+
+                <!-- Repartidores Aprobados -->
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-check-circle"></i> Repartidores Aprobados</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Licencia</th>
+                                        <th>Vehículo</th>
+                                        <th>Disponible</th>
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="delivery : ${repartidores}">
+                                    <tr th:each="delivery : ${approvedRepartidores}">
                                         <td th:text="${delivery.codigo}">1</td>
-                                        <td th:text="${delivery.usuario != null ? delivery.usuario.nombreCompleto : 'N/A'}">Juan Pérez</td>
+                                        <td th:text="${delivery.usuario != null ? (delivery.usuario.nombre + ' ' + delivery.usuario.apellidoPaterno) : 'N/A'}">Juan Pérez</td>
                                         <td th:text="${delivery.usuario != null ? delivery.usuario.correoElectronico : 'N/A'}">delivery@example.com</td>
                                         <td th:text="${delivery.usuario != null and delivery.usuario.telefono != null ? delivery.usuario.telefono : 'N/A'}">999999999</td>
                                         <td th:text="${delivery.numeroLicencia}">ABC123456</td>
+                                        <td th:text="${delivery.tipoVehiculo != null ? delivery.tipoVehiculo.nombre : 'N/A'}">Motocicleta</td>
                                         <td>
-                                            <span th:if="${delivery.codigoEstadoAprobacion == 7}" class="badge bg-warning text-dark">Pendiente</span>
-                                            <span th:if="${delivery.codigoEstadoAprobacion == 8}" class="badge bg-success">Aprobado</span>
-                                            <span th:if="${delivery.codigoEstadoAprobacion == 9}" class="badge bg-danger">Rechazado</span>
+                                            <span th:class="${delivery.disponible ? 'badge bg-success' : 'badge bg-secondary'}"
+                                                  th:text="${delivery.disponible ? 'Disponible' : 'No disponible'}">
+                                                Disponible
+                                            </span>
                                         </td>
                                         <td>
-                                            <span th:class="${delivery.estado != null and delivery.estado ? 'badge bg-success' : 'badge bg-danger'}"
-                                                  th:text="${delivery.estado != null and delivery.estado ? 'Activo' : 'Inactivo'}">
+                                            <span th:class="${delivery.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${delivery.estado ? 'Activo' : 'Inactivo'}">
                                                 Activo
                                             </span>
                                         </td>
                                         <td>
-                                            <!-- Botones para PENDIENTE -->
-                                            <div th:if="${delivery.codigoEstadoAprobacion == 7}">
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/approve(id=${delivery.codigo})}" 
-                                                      method="post" style="display: inline;">
-                                                    <button type="submit" class="btn btn-sm btn-success" title="Aprobar">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                </form>
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/reject(id=${delivery.codigo})}" 
-                                                      method="post" style="display: inline;">
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Rechazar">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            
-                                            <!-- Botones para APROBADO -->
-                                            <div th:if="${delivery.codigoEstadoAprobacion == 8}">
-                                                <button type="button" class="btn btn-sm btn-info" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#editDeliveryModal"
-                                                        th:data-id="${delivery.codigo}"
-                                                        th:data-name="${delivery.usuario != null ? delivery.usuario.nombre : ''}"
-                                                        th:data-lastname="${delivery.usuario != null ? (delivery.usuario.apellidoPaterno + ' ' + delivery.usuario.apellidoMaterno) : ''}"
-                                                        th:data-email="${delivery.usuario != null ? delivery.usuario.correoElectronico : ''}"
-                                                        th:data-phone="${delivery.usuario != null ? delivery.usuario.telefono : ''}"
-                                                        th:data-address="${delivery.usuario != null ? delivery.usuario.direccion : ''}"
-                                                        title="Modificar">
-                                                    <i class="fas fa-edit"></i>
+                                            <form th:action="@{/menuAdministrador/repartidor/{id}/toggle-disponibilidad(id=${delivery.codigo})}" 
+                                                  method="post" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm btn-info" 
+                                                        th:title="${delivery.disponible ? 'Marcar no disponible' : 'Marcar disponible'}">
+                                                    <i th:class="${delivery.disponible ? 'fas fa-user-check' : 'fas fa-user-times'}"></i>
                                                 </button>
-                                                
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/toggle-status(id=${delivery.codigo})}" 
-                                                      method="post" style="display: inline;">
-                                                    <button type="submit" class="btn btn-sm btn-warning" 
-                                                            th:title="${delivery.estado ? 'Desactivar' : 'Activar'}">
-                                                        <i th:class="${delivery.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
-                                                    </button>
-                                                </form>
-                                                
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.codigo})}" 
-                                                      method="post" style="display: inline;"
-                                                      onsubmit="return confirm('¿Está seguro de eliminar este repartidor?');">
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
+                                            </form>
                                             
-                                            <!-- Botones para RECHAZADO -->
-                                            <div th:if="${delivery.codigoEstadoAprobacion == 9}">
-                                                <form th:action="@{/menuAdministrador/delivery/{id}/delete(id=${delivery.codigo})}" 
-                                                      method="post" style="display: inline;"
-                                                      onsubmit="return confirm('¿Está seguro de eliminar este repartidor rechazado?');">
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
+                                            <form th:action="@{/menuAdministrador/repartidor/{id}/toggle-status(id=${delivery.codigo})}" 
+                                                  method="post" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm btn-warning" 
+                                                        th:title="${delivery.estado ? 'Desactivar' : 'Activar'}">
+                                                    <i th:class="${delivery.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -609,9 +628,9 @@
                         </div>
                     </div>
                     <div class="card-footer text-end">
-                        <a href="/api/export/delivery" class="btn btn-success">
-                            <i class="fas fa-file-excel"></i> Exportar a Excel
-                        </a>
+                        <p class="text-muted mb-0">
+                            Total: <strong th:text="${approvedRepartidores != null ? #lists.size(approvedRepartidores) : 0}">0</strong> repartidores aprobados
+                        </p>
                     </div>
                 </div>
             </section>
@@ -993,6 +1012,38 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Rechazar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para rechazar repartidor -->
+<div class="modal fade" id="rejectDeliveryModal" tabindex="-1" aria-labelledby="rejectDeliveryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="rejectDeliveryModalLabel"><i class="fas fa-times-circle"></i> Rechazar Repartidor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="rejectDeliveryForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="section" value="delivery">
+                    <p>¿Está seguro de rechazar al repartidor <strong id="rejectDeliveryNombre"></strong>?</p>
+                    <div class="mb-3">
+                        <label for="motivoRechazoDelivery" class="form-label">Motivo del Rechazo <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="motivoRechazoDelivery" name="motivo" rows="4" 
+                                  placeholder="Explique el motivo del rechazo (ej: Documentos incompletos, licencia vencida, etc.)" 
+                                  required minlength="10"></textarea>
+                        <div class="form-text">Este motivo será enviado por email al repartidor.</div>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Se enviará un correo electrónico al repartidor con el motivo del rechazo.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Rechazar y Notificar</button>
                 </div>
             </form>
         </div>

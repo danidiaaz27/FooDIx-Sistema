@@ -160,6 +160,7 @@ function initModales() {
     initModalVerCliente();
     initModalVerRestaurante();
     initModalRechazarRestaurante();
+    initModalRechazarRepartidor();
     initModalEditarDelivery();
     initModalEditarRestaurante();
     initModalEditarRol();
@@ -224,6 +225,19 @@ function initModalRechazarRestaurante() {
         document.getElementById('rejectRestaurantNombre').textContent = button.getAttribute('data-nombre');
         document.getElementById('motivoRechazo').value = '';
         document.getElementById('rejectRestaurantForm').action = '/menuAdministrador/restaurant/' + button.getAttribute('data-id') + '/reject';
+    });
+}
+
+function initModalRechazarRepartidor() {
+    const modal = document.getElementById('rejectDeliveryModal');
+    if (!modal) return;
+    
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        
+        document.getElementById('rejectDeliveryNombre').textContent = button.getAttribute('data-name');
+        document.getElementById('motivoRechazoDelivery').value = '';
+        document.getElementById('rejectDeliveryForm').action = '/menuAdministrador/repartidor/' + button.getAttribute('data-id') + '/reject';
     });
 }
 
