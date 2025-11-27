@@ -69,9 +69,14 @@ public class MenuDeliveryController {
             model.addAttribute("estadisticas", estadisticasRepartidorService.calcularEstadisticas(repartidor.getCodigo()));
 
             // Pedidos disponibles: estado pendiente (1) y sin repartidor asignado
-            java.util.List<com.example.SistemaDePromociones.model.Pedido> pedidosDisponibles = pedidoRepository.findByCodigoEstadoPedidoAndCodigoRepartidorIsNull(1L);
-            model.addAttribute("pedidosDisponibles", pedidosDisponibles);
-            System.out.println("📦 [MENU DELIVERY] Pedidos disponibles: " + (pedidosDisponibles != null ? pedidosDisponibles.size() : 0));
+            try {
+                java.util.List<com.example.SistemaDePromociones.model.Pedido> pedidosDisponibles = pedidoRepository.findByCodigoEstadoPedidoAndCodigoRepartidorIsNull(1L);
+                model.addAttribute("pedidosDisponibles", pedidosDisponibles);
+                System.out.println("📦 [MENU DELIVERY] Pedidos disponibles: " + (pedidosDisponibles != null ? pedidosDisponibles.size() : 0));
+            } catch (Exception e) {
+                System.out.println("⚠️ [MENU DELIVERY] No se pudieron cargar pedidos (tabla no existe aún): " + e.getMessage());
+                model.addAttribute("pedidosDisponibles", new java.util.ArrayList<>());
+            }
 
             System.out.println("✅ [MENU DELIVERY] Repartidor cargado: " + usuario.getNombre());
             return "menuDelivery";

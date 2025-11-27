@@ -194,8 +194,12 @@ CREATE TABLE `usuario` (
 -- =====================================================
 -- INSERTAR USUARIOS DE PRUEBA
 -- =====================================================
+-- ⚠️ NOTA: Todos los usuarios usan la contraseña: Admin123!
+-- Hash BCrypt: $2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge
+-- Para cambiar la contraseña, usa: http://localhost:8080/api/test-password/hash?password=tucontraseña
+-- =====================================================
 
--- Administradores
+-- Administradores (Password: Admin123!)
 INSERT INTO `usuario` (
   `apellido_materno`, `apellido_paterno`, `codigo_rol`, `contrasena`, 
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
@@ -210,7 +214,7 @@ INSERT INTO `usuario` (
 ('Herrera', 'Tania', 1, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
  'Tania@gmail.com', NULL, TRUE, 'Tania', '994518225', '99999997', NOW());
 
--- Usuario restaurante (Daniela)
+-- Usuario restaurante (Daniela) - Password: Admin123!
 INSERT INTO `usuario` (
   `apellido_materno`, `apellido_paterno`, `codigo_rol`, `contrasena`, 
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
@@ -220,7 +224,7 @@ INSERT INTO `usuario` (
  'daniela@test.com', 'Av. Balta 123, Chiclayo', TRUE, 'Daniela', '+51 987654321', 
  '12345678', '1995-05-15', 'femenino', 'Imagen', NOW());
 
--- Repartidores
+-- Repartidores - Password: Admin123!
 INSERT INTO `usuario` (
   `apellido_materno`, `apellido_paterno`, `codigo_rol`, `contrasena`, 
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
@@ -234,7 +238,7 @@ INSERT INTO `usuario` (
  'CarlosDiaz@gmail.com', 'Avenida Saleverry', TRUE, 'Carlos', '975184139', 
  '76543210', NULL, NULL, NULL, NOW());
 
--- Usuarios clientes
+-- Usuarios clientes - Password: Admin123!
 INSERT INTO `usuario` (
   `apellido_materno`, `apellido_paterno`, `codigo_rol`, `contrasena`, 
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 

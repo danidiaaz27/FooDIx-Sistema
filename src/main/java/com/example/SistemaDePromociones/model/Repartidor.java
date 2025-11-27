@@ -9,56 +9,56 @@ import java.time.LocalDateTime;
  * Almacena información específica de los repartidores registrados
  */
 @Entity
-@Table(name = "Repartidor")
+@Table(name = "repartidor")
 @Data
 public class Repartidor {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Codigo")
+    @Column(name = "codigo")
     private Long codigo;
     
-    @Column(name = "CodigoUsuario", nullable = false)
+    @Column(name = "codigo_usuario", nullable = false)
     private Long codigoUsuario;
     
-    @Column(name = "NumeroLicencia", nullable = false, unique = true, length = 15)
+    @Column(name = "numero_licencia", nullable = false, unique = true, length = 15)
     private String numeroLicencia;
     
-    @Column(name = "CodigoTipoVehiculo", nullable = false)
+    @Column(name = "codigo_tipo_vehiculo", nullable = false)
     private Long codigoTipoVehiculo;
     
-    @Column(name = "Disponible", nullable = false)
+    @Column(name = "disponible", nullable = false)
     private Boolean disponible = true;
     
-    @Column(name = "CodigoEstadoAprobacion", nullable = false)
-    private Long codigoEstadoAprobacion = 1L; // 1 = Pendiente, 2 = Aprobado, 3 = Rechazado
+    @Column(name = "codigo_estado_aprobacion", nullable = false)
+    private Long codigoEstadoAprobacion = 7L; // 7 = Pendiente, 8 = Aprobado, 9 = Rechazado
     
-    @Column(name = "FechaAprobacion")
+    @Column(name = "fecha_aprobacion")
     private LocalDateTime fechaAprobacion;
     
-    @Column(name = "CodigoAprobador")
+    @Column(name = "codigo_aprobador")
     private Long codigoAprobador;
     
-    @Column(name = "MotivoRechazo", columnDefinition = "TEXT")
+    @Column(name = "motivo_rechazo", columnDefinition = "TEXT")
     private String motivoRechazo;
     
-    @Column(name = "FechaCreacion", nullable = false, updatable = false)
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
     
-    @Column(name = "Estado", nullable = false)
+    @Column(name = "estado", nullable = false)
     private Boolean estado = true;
     
     // Relaciones (opcional, si deseas usar JPA relationships)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CodigoUsuario", insertable = false, updatable = false)
+    @JoinColumn(name = "codigo_usuario", insertable = false, updatable = false)
     private Usuario usuario;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CodigoTipoVehiculo", insertable = false, updatable = false)
+    @JoinColumn(name = "codigo_tipo_vehiculo", insertable = false, updatable = false)
     private TipoVehiculo tipoVehiculo;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CodigoEstadoAprobacion", insertable = false, updatable = false)
+    @JoinColumn(name = "codigo_estado_aprobacion", insertable = false, updatable = false)
     private EstadoAprobacion estadoAprobacion;
     
     @PrePersist
@@ -68,10 +68,10 @@ public class Repartidor {
             estado = true;
         }
         if (disponible == null) {
-            disponible = true;
+            disponible = false;
         }
         if (codigoEstadoAprobacion == null) {
-            codigoEstadoAprobacion = 1L; // Pendiente
+            codigoEstadoAprobacion = 7L; // 7 = Pendiente
         }
     }
 }

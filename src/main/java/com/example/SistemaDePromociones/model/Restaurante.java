@@ -22,6 +22,9 @@ public class Restaurante {
         return codigo;
     }
     
+    @Column(name = "codigo_usuario", nullable = false)
+    private Long codigoUsuario;
+    
     @Column(name = "nombre")
     private String nombre;
 
@@ -122,5 +125,13 @@ public class Restaurante {
         public void setDistrito(Distrito distrito) {
             this.distrito = distrito;
         }
+
+    public Long getCodigoUsuario() {
+        return codigoUsuario;
+    }
+
+    public void setCodigoUsuario(Long codigoUsuario) {
+        this.codigoUsuario = codigoUsuario;
+    }
 
 }

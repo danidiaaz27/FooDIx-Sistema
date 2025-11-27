@@ -31,7 +31,7 @@ public class Usuario {
     @Column(name = "numero_documento", nullable = false, unique = true, length = 15)
     private String numeroDocumento;
     
-    @Column(name = "fecha_nacimiento", nullable = false)
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
     
     @Column(name = "correo_electronico", nullable = false, unique = true, length = 50)

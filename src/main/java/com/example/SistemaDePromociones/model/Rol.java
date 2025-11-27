@@ -38,11 +38,6 @@ public class Rol {
     )
     private Set<Permiso> permisos = new HashSet<>();
     
-    // Relación ManyToOne con Usuario
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "codigo_rol", referencedColumnName = "codigo", insertable = false, updatable = false)
-    private Rol rol;
-    
     // Constantes para facilitar el manejo de roles
     public static final Long ADMINISTRADOR = 1L;
     public static final Long RESTAURANTE = 2L;

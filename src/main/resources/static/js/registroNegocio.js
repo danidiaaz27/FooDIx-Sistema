@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // =============================================
-    // CASCADA DE SELECTS: DEPARTAMENTO → PROVINCIA → DISTRITO
+    // CASCADA DE SELECTS: DEPARTAMENTO → PROVINCIA → DISTRITO (Personal)
     // =============================================
     if (deptSelect) {
         deptSelect.addEventListener('change', async function() {
@@ -607,6 +607,81 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('❌ Error cargando distritos:', error);
                 distSelect.innerHTML = '<option value="">Error al cargar distritos</option>';
+            }
+        });
+    }
+    
+    // =============================================
+    // CASCADA DE SELECTS: DEPARTAMENTO → PROVINCIA → DISTRITO (Negocio)
+    // =============================================
+    const deptNegocioSelect = document.getElementById('DepartamentoNegocio');
+    const provNegocioSelect = document.getElementById('ProvinciaNegocio');
+    const distNegocioSelect = document.getElementById('DistritoNegocio');
+    
+    if (deptNegocioSelect) {
+        deptNegocioSelect.addEventListener('change', async function() {
+            const codigoDepartamento = this.value;
+            
+            // Resetear provincia y distrito
+            provNegocioSelect.innerHTML = '<option value="">Seleccionar provincia</option>';
+            provNegocioSelect.disabled = true;
+            distNegocioSelect.innerHTML = '<option value="">Seleccione provincia primero</option>';
+            distNegocioSelect.disabled = true;
+            
+            if (!codigoDepartamento) return;
+            
+            try {
+                console.log('🌎 [NEGOCIO] Cargando provincias para departamento:', codigoDepartamento);
+                const response = await fetch(`/api/provincias/${codigoDepartamento}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const provincias = await response.json();
+                console.log('✅ [NEGOCIO] Provincias cargadas:', provincias.length);
+                
+                provNegocioSelect.innerHTML = '<option value="">Seleccionar provincia</option>';
+                provincias.forEach(prov => {
+                    provNegocioSelect.innerHTML += `<option value="${prov.codigo}">${prov.nombre}</option>`;
+                });
+                provNegocioSelect.disabled = false;
+            } catch (error) {
+                console.error('❌ Error cargando provincias del negocio:', error);
+                provNegocioSelect.innerHTML = '<option value="">Error al cargar provincias</option>';
+            }
+        });
+    }
+    
+    if (provNegocioSelect) {
+        provNegocioSelect.addEventListener('change', async function() {
+            const codigoProvincia = this.value;
+            
+            // Resetear distrito
+            distNegocioSelect.innerHTML = '<option value="">Seleccionar distrito</option>';
+            distNegocioSelect.disabled = true;
+            
+            if (!codigoProvincia) return;
+            
+            try {
+                console.log('🏘️ [NEGOCIO] Cargando distritos para provincia:', codigoProvincia);
+                const response = await fetch(`/api/distritos/${codigoProvincia}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const distritos = await response.json();
+                console.log('✅ [NEGOCIO] Distritos cargados:', distritos.length);
+                
+                distNegocioSelect.innerHTML = '<option value="">Seleccionar distrito</option>';
+                distritos.forEach(dist => {
+                    distNegocioSelect.innerHTML += `<option value="${dist.codigo}">${dist.nombre}</option>`;
+                });
+                distNegocioSelect.disabled = false;
+            } catch (error) {
+                console.error('❌ Error cargando distritos del negocio:', error);
+                distNegocioSelect.innerHTML = '<option value="">Error al cargar distritos</option>';
             }
         });
     }
