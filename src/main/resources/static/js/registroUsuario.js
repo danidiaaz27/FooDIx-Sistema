@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const provSelect = document.getElementById('CodigoProvincia');
     const distSelect = document.getElementById('CodigoDistrito');
     const togglePasswordBtn = document.getElementById('toggleContrasena');
+    const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmarContrasena');
     const dniSpinner = document.getElementById('dniSpinner');
     const btnVerificarDNI = document.getElementById('btnVerificarDNI');
     
@@ -44,6 +45,15 @@ document.addEventListener('DOMContentLoaded', function() {
         togglePasswordBtn.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    }
+    
+    if (toggleConfirmPasswordBtn) {
+        toggleConfirmPasswordBtn.addEventListener('click', function() {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
             this.querySelector('i').classList.toggle('fa-eye');
             this.querySelector('i').classList.toggle('fa-eye-slash');
         });
@@ -216,6 +226,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     // VALIDACIÓN DE CONTRASEÑA SEGURA
     // =============================================
+    const passwordRequirementsPopup = document.getElementById('passwordRequirements');
+    
     function validatePassword(password) {
         const minLength = password.length >= 8;
         const hasUppercase = /[A-Z]/.test(password);
@@ -223,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasNumber = /[0-9]/.test(password);
         const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-        // Actualizar visualización de requisitos
+        // Actualizar visualización de requisitos en el popup
         const reqLength = document.getElementById('reqLength');
         const reqUppercase = document.getElementById('reqUppercase');
         const reqLowercase = document.getElementById('reqLowercase');
@@ -231,24 +243,53 @@ document.addEventListener('DOMContentLoaded', function() {
         const reqSymbol = document.getElementById('reqSymbol');
         
         if (reqLength) {
-            reqLength.className = minLength ? 'text-success small' : 'text-danger small';
-            reqLength.textContent = (minLength ? '✓' : '✗') + ' 8+ caracteres';
+            if (minLength) {
+                reqLength.className = 'requirement-item valid';
+                reqLength.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqLength.className = 'requirement-item invalid';
+                reqLength.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
+        
         if (reqUppercase) {
-            reqUppercase.className = hasUppercase ? 'text-success small' : 'text-danger small';
-            reqUppercase.textContent = (hasUppercase ? '✓' : '✗') + ' 1 mayúscula';
+            if (hasUppercase) {
+                reqUppercase.className = 'requirement-item valid';
+                reqUppercase.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqUppercase.className = 'requirement-item invalid';
+                reqUppercase.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
+        
         if (reqLowercase) {
-            reqLowercase.className = hasLowercase ? 'text-success small' : 'text-danger small';
-            reqLowercase.textContent = (hasLowercase ? '✓' : '✗') + ' 1 minúscula';
+            if (hasLowercase) {
+                reqLowercase.className = 'requirement-item valid';
+                reqLowercase.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqLowercase.className = 'requirement-item invalid';
+                reqLowercase.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
+        
         if (reqNumber) {
-            reqNumber.className = hasNumber ? 'text-success small' : 'text-danger small';
-            reqNumber.textContent = (hasNumber ? '✓' : '✗') + ' 1 número';
+            if (hasNumber) {
+                reqNumber.className = 'requirement-item valid';
+                reqNumber.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqNumber.className = 'requirement-item invalid';
+                reqNumber.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
+        
         if (reqSymbol) {
-            reqSymbol.className = hasSymbol ? 'text-success small' : 'text-danger small';
-            reqSymbol.textContent = (hasSymbol ? '✓' : '✗') + ' 1 símbolo';
+            if (hasSymbol) {
+                reqSymbol.className = 'requirement-item valid';
+                reqSymbol.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqSymbol.className = 'requirement-item invalid';
+                reqSymbol.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
 
         // Validar el input visualmente
@@ -267,8 +308,23 @@ document.addEventListener('DOMContentLoaded', function() {
         return minLength && hasUppercase && hasLowercase && hasNumber && hasSymbol;
     }
 
-    // Validación en tiempo real de la contraseña
+    // Mostrar popup cuando el usuario enfoca el campo de contraseña
     if (passwordInput) {
+        passwordInput.addEventListener('focus', function() {
+            if (passwordRequirementsPopup) {
+                passwordRequirementsPopup.classList.add('show');
+            }
+        });
+        
+        passwordInput.addEventListener('blur', function() {
+            // Ocultar después de un pequeño delay para mejor UX
+            setTimeout(() => {
+                if (passwordRequirementsPopup) {
+                    passwordRequirementsPopup.classList.remove('show');
+                }
+            }, 200);
+        });
+        
         passwordInput.addEventListener('input', function() {
             validatePassword(this.value);
             validatePasswordMatch();

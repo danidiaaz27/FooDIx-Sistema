@@ -60,6 +60,63 @@
             font-weight: 600;
         }
         
+        /* Estilos para validaciones de contraseña flotantes */
+        .password-requirements {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .password-requirements.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .requirement-item {
+            font-size: 0.8rem;
+            padding: 3px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .requirement-item i {
+            font-size: 0.7rem;
+            min-width: 14px;
+        }
+        
+        .requirement-item.valid {
+            color: #198754;
+        }
+        
+        .requirement-item.invalid {
+            color: #6c757d;
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
         /* Estilos para formularios dinámicos */
         .form-step {
             display: none;
@@ -156,7 +213,7 @@
                             
                             <!-- Tipo y Número de Documento -->
                             <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label for="CodigoTipoDocumento" class="form-label">Tipo de Documento *</label>
                                     <select class="form-select" id="CodigoTipoDocumento" name="codigoTipoDocumento" required>
                                         <option value="">Seleccionar</option>
@@ -165,7 +222,7 @@
                                         <option value="3">Pasaporte</option>
                                     </select>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label for="NumeroDocumento" class="form-label">Número de Documento *</label>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="NumeroDocumento" name="numeroDocumento" 
@@ -180,6 +237,11 @@
                                     <div class="spinner-border spinner-border-sm text-primary" role="status" id="dniSpinner" style="display: none;">
                                         <span class="visually-hidden">Cargando...</span>
                                     </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="FechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                                    <input type="date" class="form-control" id="FechaNacimiento" name="fechaNacimiento" required>
+                                    <div class="form-text text-muted">Debes ser mayor de 18 años</div>
                                 </div>
                             </div>
                             
@@ -208,13 +270,8 @@
                                 </div>
                             </div>
                             
-                            <!-- Fecha de Nacimiento y Teléfono -->
+                            <!-- Teléfono y correo -->
                             <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="FechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
-                                    <input type="date" class="form-control" id="FechaNacimiento" name="fechaNacimiento" required>
-                                    <div class="form-text text-muted">Debes ser mayor de 18 años</div>
-                                </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="Telefono" class="form-label">Teléfono</label>
                                     <input type="tel" class="form-control" id="Telefono" name="telefono" 
@@ -224,10 +281,6 @@
                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                     <div class="form-text text-muted">9 dígitos</div>
                                 </div>
-                            </div>
-                            
-                            <!-- Email y Contraseñas -->
-                            <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="CorreoElectronico" class="form-label">Correo Electrónico *</label>
                                     <input type="email" class="form-control" id="CorreoElectronico" name="correoElectronico" 
@@ -239,40 +292,54 @@
                                         <span th:if="${verifiedEmail != null}">✓ Email verificado</span>
                                     </div>
                                 </div>
+                            </div>
+                            
+                            <!-- Contraseñas y validaciones -->
+                            <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="Contrasena" class="form-label">Contraseña *</label>
+                                    <div class="password-wrapper">
+                                        <!-- Popup de requisitos flotante -->
+                                        <div id="passwordRequirements" class="password-requirements">
+                                            <div class="requirement-item invalid" id="reqLength">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Mínimo 8 caracteres</span>
+                                            </div>
+                                            <div class="requirement-item invalid" id="reqUppercase">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Una letra mayúscula</span>
+                                            </div>
+                                            <div class="requirement-item invalid" id="reqLowercase">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Una letra minúscula</span>
+                                            </div>
+                                            <div class="requirement-item invalid" id="reqNumber">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Un número</span>
+                                            </div>
+                                            <div class="requirement-item invalid" id="reqSymbol">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Un símbolo (!@#$%...)</span>
+                                            </div>
+                                        </div>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="Contrasena" name="contrasena" 
+                                                required minlength="8" maxlength="255">
+                                            <button class="btn btn-outline-secondary" type="button" id="toggleContrasena">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="ConfirmarContrasena" class="form-label">Confirmar Contraseña *</label>
                                     <div class="input-group">
-                                        <input type="password" class="form-control" id="Contrasena" name="contrasena" 
-                                            required minlength="8" maxlength="255">
-                                        <button class="btn btn-outline-secondary" type="button" id="toggleContrasena">
+                                        <input type="password" class="form-control" id="ConfirmarContrasena" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="toggleConfirmarContrasena">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Confirmar Contraseña y Validaciones -->
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="ConfirmarContrasena" class="form-label">Confirmar Contraseña *</label>
-                                    <input type="password" class="form-control" id="ConfirmarContrasena" required>
                                     <div class="form-text text-muted" id="passwordMatchText">Las contraseñas deben coincidir</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-muted small">Requisitos de contraseña:</label>
-                                    <div id="contrasenaFeedback" class="form-text">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div id="reqLength" class="text-muted small">✗ 8+ caracteres</div>
-                                                <div id="reqUppercase" class="text-muted small">✗ 1 mayúscula</div>
-                                                <div id="reqLowercase" class="text-muted small">✗ 1 minúscula</div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div id="reqNumber" class="text-muted small">✗ 1 número</div>
-                                                <div id="reqSymbol" class="text-muted small">✗ 1 símbolo</div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             
