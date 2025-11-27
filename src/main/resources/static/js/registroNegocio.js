@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const provSelect = document.getElementById('CodigoProvincia');
     const distSelect = document.getElementById('CodigoDistrito');
     const togglePasswordBtn = document.getElementById('toggleContrasena');
+    const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmarContrasena');
     const dniSpinner = document.getElementById('dniSpinner');
     const btnVerificarDNI = document.getElementById('btnVerificarDNI');
+    const passwordRequirementsPopup = document.getElementById('passwordRequirements');
     
     // =============================================
     // SISTEMA MULTIROL (SOLO RESTAURANTE Y REPARTIDOR)
@@ -230,6 +232,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    if (toggleConfirmPasswordBtn) {
+        toggleConfirmPasswordBtn.addEventListener('click', function() {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    }
+    
     // =============================================
     // AUTO-COMPLETADO DE DNI
     // =============================================
@@ -397,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
             symbol: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
         };
         
-        // Actualizar indicadores visuales
+        // Actualizar indicadores visuales en el popup
         const reqLength = document.getElementById('reqLength');
         const reqUppercase = document.getElementById('reqUppercase');
         const reqLowercase = document.getElementById('reqLowercase');
@@ -405,34 +416,88 @@ document.addEventListener('DOMContentLoaded', function() {
         const reqSymbol = document.getElementById('reqSymbol');
         
         if (reqLength) {
-            reqLength.className = requirements.length ? 'text-success small' : 'text-danger small';
-            reqLength.innerHTML = (requirements.length ? '✓' : '✗') + ' 8+ caracteres';
+            if (requirements.length) {
+                reqLength.className = 'requirement-item valid';
+                reqLength.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqLength.className = 'requirement-item invalid';
+                reqLength.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
         
         if (reqUppercase) {
-            reqUppercase.className = requirements.uppercase ? 'text-success small' : 'text-danger small';
-            reqUppercase.innerHTML = (requirements.uppercase ? '✓' : '✗') + ' 1 mayúscula';
+            if (requirements.uppercase) {
+                reqUppercase.className = 'requirement-item valid';
+                reqUppercase.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqUppercase.className = 'requirement-item invalid';
+                reqUppercase.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
         
         if (reqLowercase) {
-            reqLowercase.className = requirements.lowercase ? 'text-success small' : 'text-danger small';
-            reqLowercase.innerHTML = (requirements.lowercase ? '✓' : '✗') + ' 1 minúscula';
+            if (requirements.lowercase) {
+                reqLowercase.className = 'requirement-item valid';
+                reqLowercase.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqLowercase.className = 'requirement-item invalid';
+                reqLowercase.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
         
         if (reqNumber) {
-            reqNumber.className = requirements.number ? 'text-success small' : 'text-danger small';
-            reqNumber.innerHTML = (requirements.number ? '✓' : '✗') + ' 1 número';
+            if (requirements.number) {
+                reqNumber.className = 'requirement-item valid';
+                reqNumber.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqNumber.className = 'requirement-item invalid';
+                reqNumber.querySelector('i').className = 'fas fa-circle-xmark';
+            }
         }
         
         if (reqSymbol) {
-            reqSymbol.className = requirements.symbol ? 'text-success small' : 'text-danger small';
-            reqSymbol.innerHTML = (requirements.symbol ? '✓' : '✗') + ' 1 símbolo';
+            if (requirements.symbol) {
+                reqSymbol.className = 'requirement-item valid';
+                reqSymbol.querySelector('i').className = 'fas fa-circle-check';
+            } else {
+                reqSymbol.className = 'requirement-item invalid';
+                reqSymbol.querySelector('i').className = 'fas fa-circle-xmark';
+            }
+        }
+        
+        // Validar el input visualmente
+        if (passwordInput) {
+            if (password.length === 0) {
+                passwordInput.classList.remove('is-valid', 'is-invalid');
+            } else if (Object.values(requirements).every(v => v)) {
+                passwordInput.classList.remove('is-invalid');
+                passwordInput.classList.add('is-valid');
+            } else {
+                passwordInput.classList.remove('is-valid');
+                passwordInput.classList.add('is-invalid');
+            }
         }
         
         return Object.values(requirements).every(v => v);
     }
     
+    // Mostrar popup cuando el usuario enfoca el campo de contraseña
     if (passwordInput) {
+        passwordInput.addEventListener('focus', function() {
+            if (passwordRequirementsPopup) {
+                passwordRequirementsPopup.classList.add('show');
+            }
+        });
+        
+        passwordInput.addEventListener('blur', function() {
+            // Ocultar después de un pequeño delay para mejor UX
+            setTimeout(() => {
+                if (passwordRequirementsPopup) {
+                    passwordRequirementsPopup.classList.remove('show');
+                }
+            }, 200);
+        });
+        
         passwordInput.addEventListener('input', function() {
             validatePassword();
             validatePasswordMatch();
