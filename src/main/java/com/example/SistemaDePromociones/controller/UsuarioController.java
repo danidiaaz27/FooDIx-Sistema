@@ -1,6 +1,8 @@
 package com.example.SistemaDePromociones.controller;
 
+import com.example.SistemaDePromociones.model.Promocion;
 import com.example.SistemaDePromociones.model.Usuario;
+import com.example.SistemaDePromociones.repository.PromocionRepository;
 import com.example.SistemaDePromociones.repository.UsuarioRepository;
 import com.example.SistemaDePromociones.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 /**
  * Controller para gestionar el menú y funcionalidades del usuario (cliente)
@@ -19,6 +23,9 @@ public class UsuarioController {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
+    
+    @Autowired
+    private PromocionRepository promocionRepository;
     
     /**
      * Mostrar menú principal del usuario
@@ -47,6 +54,12 @@ public class UsuarioController {
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("nombreCompleto", 
                 usuario.getNombre() + " " + usuario.getApellidoPaterno());
+            
+            // Cargar promociones activas y vigentes
+            List<Promocion> promocionesActivas = promocionRepository.findPromocionesActivasVigentes();
+            model.addAttribute("promociones", promocionesActivas);
+            
+            System.out.println("🎉 [PROMOCIONES] Se encontraron " + promocionesActivas.size() + " promociones activas");
             
             // Datos simulados para las vistas (por ahora vacíos)
             model.addAttribute("cartItemCount", 0);

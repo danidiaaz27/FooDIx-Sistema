@@ -160,6 +160,5 @@ public class MenuRestauranteController {
         System.out.println("   - Promociones borrador: " + (promocionesBorrador != null ? promocionesBorrador.size() : 0));
         System.out.println("   - Estadísticas: " + (model.getAttribute("estadisticas") != null ? "CARGADAS" : "NULL"));
     }
-    }
-
+}
 
