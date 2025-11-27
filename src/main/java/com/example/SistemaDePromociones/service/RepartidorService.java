@@ -51,7 +51,7 @@ public class RepartidorService {
         repartidor.setNumeroLicencia(dto.getNumeroLicencia());
         repartidor.setCodigoTipoVehiculo(dto.getCodigoTipoVehiculo());
         repartidor.setDisponible(true);
-        repartidor.setCodigoEstadoAprobacion(1L); // Pendiente
+        repartidor.setCodigoEstadoAprobacion(7L); // 7 = Pendiente (según datos_iniciales.sql)
         repartidor.setEstado(true);
         
         repartidor = repartidorRepository.save(repartidor);

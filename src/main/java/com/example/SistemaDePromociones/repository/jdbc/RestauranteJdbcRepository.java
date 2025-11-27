@@ -65,4 +65,17 @@ public class RestauranteJdbcRepository {
         
         return keyHolder.getKey().longValue();
     }
+    
+    /**
+     * Insertar un documento del restaurante
+     */
+    public void insertDocumento(Long codigoRestaurante, String tipoDocumento, String rutaArchivo) {
+        String sql = "INSERT INTO documento_restaurante " +
+                    "(codigo_restaurante, tipo_documento, ruta_archivo, estado, fecha_subida) " +
+                    "VALUES (?, ?, ?, 1, NOW())";
+        
+        jdbcTemplate.update(sql, codigoRestaurante, tipoDocumento, rutaArchivo);
+        
+        System.out.println("💾 [JDBC] Documento insertado: " + tipoDocumento + " -> " + rutaArchivo);
+    }
 }

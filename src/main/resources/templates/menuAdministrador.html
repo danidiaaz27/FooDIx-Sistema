@@ -935,8 +935,8 @@
                                 <i class="fas fa-utensils fa-3x text-warning mb-3"></i>
                                 <h6 class="card-title">Carta del Restaurante</h6>
                                 <p class="card-text text-muted small">Menú y oferta gastronómica</p>
-                                <button type="button" class="btn btn-sm btn-outline-primary w-100" 
-                                        onclick="verDocumento('CARTA_RESTAURANTE', document.getElementById('viewRestaurantModal').dataset.restaurantId)">
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100" id="btnVerCarta"
+                                        onclick="if(this.dataset.ruta) window.open('/files/view/' + this.dataset.ruta, '_blank'); else alert('Documento no disponible');">
                                     <i class="fas fa-eye"></i> Ver Documento
                                 </button>
                             </div>
@@ -950,8 +950,8 @@
                                 <i class="fas fa-notes-medical fa-3x text-success mb-3"></i>
                                 <h6 class="card-title">Carnet de Sanidad</h6>
                                 <p class="card-text text-muted small">Certificado sanitario vigente</p>
-                                <button type="button" class="btn btn-sm btn-outline-primary w-100" 
-                                        onclick="verDocumento('CarnetSanidad', document.getElementById('viewRestaurantModal').dataset.restaurantId)">
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100" id="btnVerSanidad"
+                                        onclick="if(this.dataset.ruta) window.open('/files/view/' + this.dataset.ruta, '_blank'); else alert('Documento no disponible');">
                                     <i class="fas fa-eye"></i> Ver Documento
                                 </button>
                             </div>
@@ -965,8 +965,8 @@
                                 <i class="fas fa-certificate fa-3x text-info mb-3"></i>
                                 <h6 class="card-title">Licencia de Funcionamiento</h6>
                                 <p class="card-text text-muted small">Autorización municipal</p>
-                                <button type="button" class="btn btn-sm btn-outline-primary w-100" 
-                                        onclick="verDocumento('LicenciaFuncionamiento', document.getElementById('viewRestaurantModal').dataset.restaurantId)">
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100" id="btnVerLicencia"
+                                        onclick="if(this.dataset.ruta) window.open('/files/view/' + this.dataset.ruta, '_blank'); else alert('Documento no disponible');">
                                     <i class="fas fa-eye"></i> Ver Documento
                                 </button>
                             </div>
@@ -979,10 +979,90 @@
                     <strong>Nota:</strong> Todos los documentos son obligatorios para la aprobación del restaurante. 
                     Verifica que estén completos y actualizados antes de aprobar.
                 </div>
+                
+                <!-- Sección para subir/actualizar documentos -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="fas fa-upload text-primary"></i> Subir/Actualizar Documentos
+                        </h5>
+                    </div>
+                </div>
+                
+                <form id="uploadDocumentsForm" enctype="multipart/form-data">
+                    <input type="hidden" id="uploadRestaurantId" name="restaurantId">
+                    
+                    <div class="row g-3">
+                        <!-- Upload Carta -->
+                        <div class="col-md-4">
+                            <div class="card border-warning">
+                                <div class="card-body">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-utensils text-warning"></i> Carta del Restaurante
+                                    </label>
+                                    <input type="file" class="form-control form-control-sm" 
+                                           name="cartaRestaurante" 
+                                           accept=".pdf,.jpg,.jpeg,.png"
+                                           onchange="previewFileName(this)">
+                                    <small class="text-muted d-block mt-1">PDF o Imagen (Max 5MB)</small>
+                                    <small class="text-success d-none upload-status-carta">
+                                        <i class="fas fa-check-circle"></i> Listo para subir
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Carnet Sanidad -->
+                        <div class="col-md-4">
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-notes-medical text-success"></i> Carnet de Sanidad
+                                    </label>
+                                    <input type="file" class="form-control form-control-sm" 
+                                           name="carnetSanidad" 
+                                           accept=".pdf,.jpg,.jpeg,.png"
+                                           onchange="previewFileName(this)">
+                                    <small class="text-muted d-block mt-1">PDF o Imagen (Max 5MB)</small>
+                                    <small class="text-success d-none upload-status-sanidad">
+                                        <i class="fas fa-check-circle"></i> Listo para subir
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Licencia -->
+                        <div class="col-md-4">
+                            <div class="card border-info">
+                                <div class="card-body">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-certificate text-info"></i> Licencia de Funcionamiento
+                                    </label>
+                                    <input type="file" class="form-control form-control-sm" 
+                                           name="licenciaFuncionamiento" 
+                                           accept=".pdf,.jpg,.jpeg,.png"
+                                           onchange="previewFileName(this)">
+                                    <small class="text-muted d-block mt-1">PDF o Imagen (Max 5MB)</small>
+                                    <small class="text-success d-none upload-status-licencia">
+                                        <i class="fas fa-check-circle"></i> Listo para subir
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <strong>Importante:</strong> Solo sube los documentos que quieras actualizar. Los campos vacíos no se modificarán.
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="uploadDocuments()">
+                    <i class="fas fa-upload"></i> Subir Documentos
                 </button>
             </div>
         </div>
@@ -2095,6 +2175,148 @@ try {
 <script src="/js/admin.js"></script>
 <script src="/js/admin-permisos.js"></script>
 <script src="/js/admin-form-validation.js"></script>
+
+<!-- ========================================
+     FUNCIONALIDAD DE SUBIDA DE DOCUMENTOS
+     ======================================== -->
+<script>
+// Función para previsualizar nombre de archivo seleccionado
+function previewFileName(input) {
+    const fileName = input.files[0]?.name;
+    const statusElement = input.parentElement.querySelector('.upload-status-carta, .upload-status-sanidad, .upload-status-licencia');
+    
+    if (fileName && statusElement) {
+        statusElement.classList.remove('d-none');
+        statusElement.innerHTML = '<i class="fas fa-check-circle"></i> ' + fileName;
+    }
+}
+
+// Función para subir documentos del restaurante
+function uploadDocuments() {
+    const restaurantId = document.getElementById('uploadRestaurantId').value;
+    
+    if (!restaurantId) {
+        alert('Error: No se ha seleccionado ningún restaurante');
+        return;
+    }
+    
+    const formData = new FormData(document.getElementById('uploadDocumentsForm'));
+    
+    // Verificar que al menos un archivo haya sido seleccionado
+    const files = formData.getAll('cartaRestaurante').concat(
+        formData.getAll('carnetSanidad'),
+        formData.getAll('licenciaFuncionamiento')
+    ).filter(file => file.size > 0);
+    
+    if (files.length === 0) {
+        alert('Por favor selecciona al menos un documento para subir');
+        return;
+    }
+    
+    // Mostrar loading
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+    
+    fetch('/menuAdministrador/restaurant/' + restaurantId + '/upload-documents', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        button.disabled = false;
+        button.innerHTML = originalText;
+        
+        if (data.success) {
+            alert('✅ Documentos subidos exitosamente');
+            location.reload(); // Recargar para ver los cambios
+        } else {
+            alert('❌ Error: ' + (data.message || 'No se pudieron subir los documentos'));
+        }
+    })
+    .catch(error => {
+        button.disabled = false;
+        button.innerHTML = originalText;
+        console.error('Error:', error);
+        alert('❌ Error al subir documentos: ' + error.message);
+    });
+}
+
+// Cuando se abre el modal, cargar el ID del restaurante y documentos existentes
+document.addEventListener('DOMContentLoaded', function() {
+    const viewModal = document.getElementById('viewRestaurantModal');
+    
+    if (viewModal) {
+        viewModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const restaurantId = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre');
+            const razon = button.getAttribute('data-razon');
+            const ruc = button.getAttribute('data-ruc');
+            const email = button.getAttribute('data-email');
+            const telefono = button.getAttribute('data-telefono');
+            const direccion = button.getAttribute('data-direccion');
+            
+            // Actualizar información general
+            document.getElementById('viewRestaurantNombre').textContent = nombre || '-';
+            document.getElementById('viewRestaurantRazon').textContent = razon || '-';
+            document.getElementById('viewRestaurantRuc').textContent = ruc || '-';
+            document.getElementById('viewRestaurantEmail').textContent = email || '-';
+            document.getElementById('viewRestaurantTelefono').textContent = telefono || '-';
+            document.getElementById('viewRestaurantDireccion').textContent = direccion || '-';
+            
+            // Guardar ID para upload
+            document.getElementById('uploadRestaurantId').value = restaurantId;
+            
+            // Cargar documentos existentes
+            fetch('/menuAdministrador/restaurant/' + restaurantId + '/documents')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Documentos cargados:', data);
+                    
+                    // Actualizar botones de visualización
+                    const btnCarta = document.getElementById('btnVerCarta');
+                    const btnSanidad = document.getElementById('btnVerSanidad');
+                    const btnLicencia = document.getElementById('btnVerLicencia');
+                    
+                    if (data.CARTA_RESTAURANTE) {
+                        btnCarta.dataset.ruta = data.CARTA_RESTAURANTE;
+                        btnCarta.classList.remove('btn-outline-primary');
+                        btnCarta.classList.add('btn-primary');
+                    } else {
+                        btnCarta.dataset.ruta = '';
+                        btnCarta.classList.remove('btn-primary');
+                        btnCarta.classList.add('btn-outline-primary');
+                    }
+                    
+                    if (data.CarnetSanidad) {
+                        btnSanidad.dataset.ruta = data.CarnetSanidad;
+                        btnSanidad.classList.remove('btn-outline-primary');
+                        btnSanidad.classList.add('btn-primary');
+                    } else {
+                        btnSanidad.dataset.ruta = '';
+                        btnSanidad.classList.remove('btn-primary');
+                        btnSanidad.classList.add('btn-outline-primary');
+                    }
+                    
+                    if (data.LicenciaFuncionamiento) {
+                        btnLicencia.dataset.ruta = data.LicenciaFuncionamiento;
+                        btnLicencia.classList.remove('btn-outline-primary');
+                        btnLicencia.classList.add('btn-primary');
+                    } else {
+                        btnLicencia.dataset.ruta = '';
+                        btnLicencia.classList.remove('btn-primary');
+                        btnLicencia.classList.add('btn-outline-primary');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando documentos:', error);
+                });
+        });
+    }
+});
+</script>
 
 </body>
 </html>

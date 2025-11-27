@@ -204,7 +204,8 @@ function initModalVerRestaurante() {
     
     modal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
-        modal.dataset.restaurantId = button.getAttribute('data-id');
+        const restaurantId = button.getAttribute('data-id');
+        modal.dataset.restaurantId = restaurantId;
         
         document.getElementById('viewRestaurantNombre').textContent = button.getAttribute('data-nombre') || 'N/A';
         document.getElementById('viewRestaurantRazon').textContent = button.getAttribute('data-razon') || 'N/A';
@@ -212,6 +213,27 @@ function initModalVerRestaurante() {
         document.getElementById('viewRestaurantEmail').textContent = button.getAttribute('data-email') || 'N/A';
         document.getElementById('viewRestaurantTelefono').textContent = button.getAttribute('data-telefono') || 'N/A';
         document.getElementById('viewRestaurantDireccion').textContent = button.getAttribute('data-direccion') || 'N/A';
+        
+        // Configurar botones de documentos con las rutas estándar del sistema
+        const btnVerCarta = document.getElementById('btnVerCarta');
+        const btnVerSanidad = document.getElementById('btnVerSanidad');
+        const btnVerLicencia = document.getElementById('btnVerLicencia');
+        
+        // Las rutas siguen el patrón: restaurante/{id}/{TIPO_DOCUMENTO}.{extension}
+        const docTypes = ['CARTA_RESTAURANTE', 'CarnetSanidad', 'LicenciaFuncionamiento'];
+        const buttons = [btnVerCarta, btnVerSanidad, btnVerLicencia];
+        
+        buttons.forEach((btn, index) => {
+            if (btn) {
+                // Construir ruta basada en el patrón del sistema de archivos
+                const ruta = `restaurante/${restaurantId}/${docTypes[index]}`;
+                btn.dataset.ruta = ruta;
+                // Los botones siempre están habilitados; si el archivo no existe, el backend devolverá 404
+                btn.disabled = false;
+                btn.classList.remove('btn-outline-secondary');
+                btn.classList.add('btn-outline-primary');
+            }
+        });
     });
 }
 

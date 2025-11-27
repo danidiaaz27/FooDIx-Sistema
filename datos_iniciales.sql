@@ -140,6 +140,8 @@ INSERT INTO `distrito` VALUES
 
 -- =====================================================
 -- TABLA: rol
+-- ⚠️ IMPORTANTE: Los códigos son 1=ADMIN, 2=RESTAURANTE, 3=REPARTIDOR, 4=USUARIO
+-- Estos valores son constantes definidas en Rol.java
 -- =====================================================
 DROP TABLE IF EXISTS `rol`;
 CREATE TABLE `rol` (
@@ -256,7 +258,14 @@ INSERT INTO `usuario` (
 -- TABLAS RESTANTES DEL SISTEMA (sin productos)
 -- =====================================================
 
+-- =====================================================
 -- Tabla: estado_aprobacion
+-- ⚠️ IMPORTANTE: Los códigos son 7, 8, 9 (NO 1, 2, 3)
+-- Este estándar es usado en TODO el código Java:
+--   - Repartidor.java (línea 34 y 74): usa 7L
+--   - RestauranteJdbcRepository.java (línea 48): usa 7
+--   - AdminController.java: usa 8L y 9L
+-- =====================================================
 DROP TABLE IF EXISTS `estado_aprobacion`;
 CREATE TABLE `estado_aprobacion` (
   `codigo` bigint NOT NULL AUTO_INCREMENT,

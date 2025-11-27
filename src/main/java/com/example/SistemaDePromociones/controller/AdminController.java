@@ -13,20 +13,27 @@ import com.example.SistemaDePromociones.repository.RepartidorRepository;
 import com.example.SistemaDePromociones.repository.RolRepository;
 import com.example.SistemaDePromociones.repository.PermisoRepository;
 import com.example.SistemaDePromociones.service.EmailService;
+import com.example.SistemaDePromociones.service.FileStorageService;
+import com.example.SistemaDePromociones.repository.jdbc.RestauranteJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Controlador para el menú de administrador
@@ -58,6 +65,15 @@ public class AdminController {
     
     @Autowired
     private EmailService emailService;
+    
+    @Autowired
+    private FileStorageService fileStorageService;
+    
+    @Autowired
+    private RestauranteJdbcRepository restauranteJdbcRepository;
+    
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     
     /**
      * Mostrar el menú de administrador
@@ -896,5 +912,131 @@ public class AdminController {
         }
         
         return "redirect:/menuAdministrador";
+    }
+    
+    /**
+     * Obtener documentos de un restaurante (JSON)
+     * GET /menuAdministrador/restaurant/{id}/documents
+     */
+    @GetMapping("/restaurant/{id}/documents")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> obtenerDocumentosRestaurante(@PathVariable Long id) {
+        try {
+            System.out.println("📄 [ADMIN] Obteniendo documentos del restaurante: " + id);
+            
+            String sql = "SELECT tipo_documento, ruta_archivo FROM documento_restaurante " +
+                        "WHERE codigo_restaurante = ? AND estado = 1";
+            
+            Map<String, String> documentos = new HashMap<>();
+            
+            jdbcTemplate.query(sql, rs -> {
+                documentos.put(rs.getString("tipo_documento"), rs.getString("ruta_archivo"));
+            }, id);
+            
+            System.out.println("✅ [ADMIN] Documentos encontrados: " + documentos.size());
+            return ResponseEntity.ok(documentos);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al obtener documentos: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.ok(new HashMap<>()); // Retornar vacío en caso de error
+        }
+    }
+    
+    /**
+     * Subir/actualizar documentos de un restaurante
+     * POST /menuAdministrador/restaurant/{id}/upload-documents
+     */
+    @PostMapping("/restaurant/{id}/upload-documents")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> subirDocumentosRestaurante(
+            @PathVariable Long id,
+            @RequestParam(required = false) MultipartFile cartaRestaurante,
+            @RequestParam(required = false) MultipartFile carnetSanidad,
+            @RequestParam(required = false) MultipartFile licenciaFuncionamiento) {
+        
+        Map<String, Object> response = new HashMap<>();
+        int documentosSubidos = 0;
+        
+        try {
+            System.out.println("📤 [ADMIN] Subiendo documentos para restaurante: " + id);
+            
+            // Verificar que el restaurante existe
+            if (!restauranteRepository.existsById(id)) {
+                response.put("success", false);
+                response.put("message", "Restaurante no encontrado");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Subir Carta del Restaurante
+            if (cartaRestaurante != null && !cartaRestaurante.isEmpty()) {
+                String rutaCarta = fileStorageService.guardarArchivoRestaurante(
+                    cartaRestaurante, id, "CARTA_RESTAURANTE"
+                );
+                
+                // Eliminar documento anterior si existe
+                jdbcTemplate.update(
+                    "DELETE FROM documento_restaurante WHERE codigo_restaurante = ? AND tipo_documento = 'CARTA_RESTAURANTE'",
+                    id
+                );
+                
+                // Insertar nuevo documento
+                restauranteJdbcRepository.insertDocumento(id, "CARTA_RESTAURANTE", rutaCarta);
+                documentosSubidos++;
+                System.out.println("   ✓ Carta subida: " + rutaCarta);
+            }
+            
+            // Subir Carnet de Sanidad
+            if (carnetSanidad != null && !carnetSanidad.isEmpty()) {
+                String rutaSanidad = fileStorageService.guardarArchivoRestaurante(
+                    carnetSanidad, id, "CarnetSanidad"
+                );
+                
+                jdbcTemplate.update(
+                    "DELETE FROM documento_restaurante WHERE codigo_restaurante = ? AND tipo_documento = 'CarnetSanidad'",
+                    id
+                );
+                
+                restauranteJdbcRepository.insertDocumento(id, "CarnetSanidad", rutaSanidad);
+                documentosSubidos++;
+                System.out.println("   ✓ Carnet de Sanidad subido: " + rutaSanidad);
+            }
+            
+            // Subir Licencia de Funcionamiento
+            if (licenciaFuncionamiento != null && !licenciaFuncionamiento.isEmpty()) {
+                String rutaLicencia = fileStorageService.guardarArchivoRestaurante(
+                    licenciaFuncionamiento, id, "LicenciaFuncionamiento"
+                );
+                
+                jdbcTemplate.update(
+                    "DELETE FROM documento_restaurante WHERE codigo_restaurante = ? AND tipo_documento = 'LicenciaFuncionamiento'",
+                    id
+                );
+                
+                restauranteJdbcRepository.insertDocumento(id, "LicenciaFuncionamiento", rutaLicencia);
+                documentosSubidos++;
+                System.out.println("   ✓ Licencia de Funcionamiento subida: " + rutaLicencia);
+            }
+            
+            if (documentosSubidos == 0) {
+                response.put("success", false);
+                response.put("message", "No se seleccionó ningún archivo");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            response.put("success", true);
+            response.put("message", documentosSubidos + " documento(s) subido(s) exitosamente");
+            response.put("count", documentosSubidos);
+            
+            System.out.println("✅ [ADMIN] Total de documentos subidos: " + documentosSubidos);
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al subir documentos: " + e.getMessage());
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error al subir documentos: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
     }
 }

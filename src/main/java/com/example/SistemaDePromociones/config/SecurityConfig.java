@@ -49,7 +49,9 @@ public class SecurityConfig {
                     "/css/**",                  // Recursos estáticos CSS
                     "/js/**",                   // Recursos estáticos JS
                     "/img/**",                  // Imágenes
-                    "/images/**"                // Imágenes alternativo
+                    "/images/**",               // Imágenes alternativo
+                    "/uploads/**",              // ✅ Archivos subidos (documentos, imágenes de promociones)
+                    "/files/**"                 // ✅ Controlador de archivos (view/download)
                 ).permitAll()
                 
                 // ========================================
@@ -91,7 +93,9 @@ public class SecurityConfig {
                     "/auth/send-code",
                     "/auth/verify-code",
                     "/auth/recovery/**",
-                    "/api/**"
+                    "/api/**",
+                    "/menuAdministrador/restaurant/*/upload-documents",  // ✅ Subida de documentos
+                    "/menuAdministrador/restaurant/*/documents"          // ✅ Consulta de documentos
                 )
             )
             .sessionManagement(session -> session
