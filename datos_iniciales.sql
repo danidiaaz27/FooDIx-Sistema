@@ -399,6 +399,54 @@ CREATE TABLE `documento_repartidor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- =====================================================
+-- TABLA: promocion
+-- =====================================================
+DROP TABLE IF EXISTS `promocion`;
+CREATE TABLE `promocion` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `titulo` varchar(200) NOT NULL,
+  `descripcion` text,
+  `codigo_restaurante` bigint NOT NULL,
+  `precio_original` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `precio_promocional` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `tipo_descuento` varchar(50) DEFAULT NULL,
+  `valor_descuento` decimal(10,2) DEFAULT 0.00,
+  `categoria_promocion` varchar(100) DEFAULT NULL,
+  `fecha_inicio` datetime(6) DEFAULT NULL,
+  `fecha_fin` datetime(6) DEFAULT NULL,
+  `estado` varchar(50) NOT NULL DEFAULT 'borrador',
+  `contador_vistas` int NOT NULL DEFAULT 0,
+  `contador_pedidos` int NOT NULL DEFAULT 0,
+  `ingresos_totales` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `fecha_creacion` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `fecha_modificacion` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `FK_promocion_restaurante` (`codigo_restaurante`),
+  CONSTRAINT `FK_promocion_restaurante` FOREIGN KEY (`codigo_restaurante`) REFERENCES `restaurante` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- INSERTAR RESTAURANTE PARA DANIELA
+-- =====================================================
+INSERT INTO `restaurante` (
+  `nombre`, `razon_social`, `ruc`, `telefono`, `direccion`, 
+  `correo_electronico`, `codigo_distrito`, `codigo_estado_aprobacion`, 
+  `codigo_usuario`, `estado`, `fecha_creacion`
+) VALUES (
+  'Restaurante Daniela', 
+  'DANIELA CHANAME E.I.R.L.', 
+  '20543210987', 
+  '+51 987654321', 
+  'Av. Balta 123, Chiclayo', 
+  'daniela@test.com', 
+  1, 
+  8, 
+  (SELECT codigo FROM usuario WHERE correo_electronico = 'daniela@test.com' LIMIT 1), 
+  TRUE, 
+  NOW()
+);
+
+-- =====================================================
 -- SISTEMA DE PERMISOS (opcional, si lo usas)
 -- =====================================================
 
@@ -425,7 +473,3 @@ CREATE TABLE `rol_permiso` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-model.addAttribute("clientes", clienteService.findAll());
-model.addAttribute("restaurantes", restauranteService.findAll());
-model.addAttribute("repartidores", repartidorService.findAll());
