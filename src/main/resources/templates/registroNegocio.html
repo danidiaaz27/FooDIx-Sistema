@@ -446,21 +446,19 @@
                                                 th:text="${dept.nombre}"></option>
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="ProvinciaNegocio" class="form-label">Provincia *</label>
-                                    <select class="form-select" id="ProvinciaNegocio" name="codigoProvinciaNegocio" required disabled>
-                                        <option value="">Seleccione departamento primero</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="DistritoNegocio" class="form-label">Distrito *</label>
-                                    <select class="form-select" id="DistritoNegocio" name="codigoDistritoNegocio" required disabled>
-                                        <option value="">Seleccione provincia primero</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <!-- Teléfono -->
+                <div class="col-md-4 mb-3">
+                    <label for="ProvinciaNegocio" class="form-label">Provincia *</label>
+                    <select class="form-select" id="ProvinciaNegocio" name="codigoProvinciaNegocio" disabled>
+                        <option value="">Seleccione departamento primero</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="DistritoNegocio" class="form-label">Distrito *</label>
+                    <select class="form-select" id="DistritoNegocio" name="codigoDistritoNegocio" disabled>
+                        <option value="">Seleccione provincia primero</option>
+                    </select>
+                </div>
+            </div>                            <!-- Teléfono -->
                             <div class="mb-3">
                                 <label for="TelefonoRestaurante" class="form-label">Teléfono del Negocio *</label>
                                 <input type="tel" class="form-control" id="TelefonoRestaurante" name="telefonoNegocio" 

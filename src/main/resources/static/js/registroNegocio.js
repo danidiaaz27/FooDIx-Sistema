@@ -785,6 +785,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     if (restaurantForm) {
         restaurantForm.addEventListener('submit', function(e) {
+            // Habilitar campos disabled antes de validar
+            const provSelect = document.getElementById('ProvinciaNegocio');
+            const distSelect = document.getElementById('DistritoNegocio');
+            
+            if (provSelect) provSelect.disabled = false;
+            if (distSelect) distSelect.disabled = false;
+            
             if (!this.checkValidity()) {
                 e.preventDefault();
                 this.reportValidity();
