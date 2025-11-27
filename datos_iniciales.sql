@@ -391,11 +391,25 @@ CREATE TABLE `documento_restaurante` (
   `fecha_subida` datetime(6) NOT NULL,
   `fecha_vencimiento` date DEFAULT NULL,
   `ruta_archivo` varchar(255) NOT NULL,
-  `tipo_documento` enum('CarnetSanidad','LicenciaFuncionamiento','Otros','RUC') NOT NULL,
+  `tipo_documento` enum('CARTA_RESTAURANTE','CarnetSanidad','LicenciaFuncionamiento','RUC','Otros') NOT NULL,
   PRIMARY KEY (`codigo`),
   KEY `FK_documento_restaurante_restaurante` (`codigo_restaurante`),
   CONSTRAINT `FK_documento_restaurante_restaurante` FOREIGN KEY (`codigo_restaurante`) REFERENCES `restaurante` (`codigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- NOTA IMPORTANTE: ENUM de tipo_documento
+-- =====================================================
+-- El ENUM incluye 'CARTA_RESTAURANTE' como primer valor
+-- para que coincida con el código Java en FileStorageService
+-- y RestauranteService que usa este valor al guardar documentos.
+-- Los valores deben estar en este orden específico:
+--   1. CARTA_RESTAURANTE (menú del restaurante)
+--   2. CarnetSanidad (certificado sanitario)
+--   3. LicenciaFuncionamiento (autorización municipal)
+--   4. RUC (documento tributario)
+--   5. Otros (documentos adicionales)
+-- =====================================================
 
 DROP TABLE IF EXISTS `documento_repartidor`;
 CREATE TABLE `documento_repartidor` (

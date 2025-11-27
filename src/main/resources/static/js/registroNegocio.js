@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch('/api/tipos-vehiculo');
             const tipos = await response.json();
-            const select = document.getElementById('TipoVehiculo');
+            const select = document.getElementById('codigoTipoVehiculo');
             if (select) {
                 select.innerHTML = '<option value="">Seleccionar</option>';
                 tipos.forEach(tipo => {
