@@ -5,6 +5,11 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // =============================================
+    // DETECCIÓN DE PASO INICIAL (viene del servidor después de PASO 1)
+    // =============================================
+    const pasoInicial = window.mostrarPasoInicial; // 'restaurante' o 'repartidor' o null
+    
+    // =============================================
     // DETECCIÓN DE SELECCIÓN PREVIA DESDE INDEX
     // =============================================
     // Detectar tipo desde parámetro URL o localStorage
@@ -42,15 +47,55 @@ document.addEventListener('DOMContentLoaded', function() {
     const restaurantForm = document.getElementById('restaurantForm');
     const deliveryForm = document.getElementById('deliveryForm');
     const btnSiguiente = document.getElementById('btnSiguiente');
-    const rolInput = document.querySelector('input[name="CodigoRol"]');
+    const rolInput = document.querySelector('input[name="codigoRol"]');
     
     // Inicializar formularios
     if (registerForm) registerForm.style.display = 'block';
     if (restaurantForm) restaurantForm.style.display = 'none';
     if (deliveryForm) deliveryForm.style.display = 'none';
     
+    // SI VIENE DEL SERVIDOR (PASO 2), MOSTRAR EL FORMULARIO CORRESPONDIENTE
+    if (pasoInicial) {
+        console.log('🔄 [PASO 2] Detectado paso inicial desde servidor:', pasoInicial);
+        
+        // Ocultar formulario de datos personales
+        if (registerForm) registerForm.style.display = 'none';
+        
+        // Mostrar formulario correspondiente
+        if (pasoInicial === 'restaurante') {
+            console.log('🏪 [PASO 2] Mostrando formulario de restaurante');
+            if (restaurantForm) {
+                restaurantForm.style.display = 'block';
+                restaurantForm.classList.add('active');
+            }
+            // Seleccionar botón de restaurante
+            const btnRestaurante = document.querySelector('[data-type="restaurante"]');
+            if (btnRestaurante) {
+                typeButtons.forEach(b => b.classList.remove('active'));
+                btnRestaurante.classList.add('active');
+            }
+            currentUserType = 'restaurante';
+            if (rolInput) rolInput.value = '2';
+            
+        } else if (pasoInicial === 'repartidor') {
+            console.log('🚴 [PASO 2] Mostrando formulario de repartidor');
+            if (deliveryForm) {
+                deliveryForm.style.display = 'block';
+                deliveryForm.classList.add('active');
+            }
+            // Seleccionar botón de repartidor
+            const btnRepartidor = document.querySelector('[data-type="repartidor"]');
+            if (btnRepartidor) {
+                typeButtons.forEach(b => b.classList.remove('active'));
+                btnRepartidor.classList.add('active');
+            }
+            currentUserType = 'repartidor';
+            if (rolInput) rolInput.value = '3';
+            cargarTiposVehiculo();
+        }
+    }
     // Auto-seleccionar tipo de usuario si viene desde index.html
-    if (businessType) {
+    else if (businessType) {
         console.log('🎯 Tipo de negocio detectado desde localStorage:', businessType);
         
         // Buscar y hacer clic en el botón correspondiente
@@ -96,22 +141,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Botón Siguiente
+    // Botón Siguiente - ENVÍA EL FORMULARIO AL SERVIDOR (PASO 1)
     if (btnSiguiente) {
-        btnSiguiente.addEventListener('click', function() {
+        btnSiguiente.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevenir comportamiento por defecto
+            
+            // Validar formulario
             if (!registerForm.checkValidity()) {
                 registerForm.reportValidity();
                 return;
             }
             
-            registerForm.style.display = 'none';
-            if (currentUserType === 'restaurante') {
-                restaurantForm.style.display = 'block';
-                restaurantForm.classList.add('active');
-            } else if (currentUserType === 'repartidor') {
-                deliveryForm.style.display = 'block';
-                deliveryForm.classList.add('active');
+            // Validar que las contraseñas coincidan
+            if (!validatePasswordMatch()) {
+                alert('Las contraseñas no coinciden.');
+                return;
             }
+            
+            // Validar contraseña fuerte
+            if (!validatePassword()) {
+                alert('La contraseña no cumple con los requisitos mínimos.');
+                return;
+            }
+            
+            console.log('📝 [PASO 1] Enviando datos personales al servidor...');
+            console.log('📝 [PASO 1] Rol seleccionado:', rolInput.value);
+            
+            // Enviar el formulario al servidor (POST /registro)
+            // El servidor creará el usuario y redirigirá a /registro-restaurante o /registro-repartidor
+            registerForm.submit();
         });
     }
     
@@ -469,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
                 console.log('🌎 Cargando provincias para departamento:', codigoDepartamento);
-                const response = await fetch(`/api/provincias?departamento=${codigoDepartamento}`);
+                const response = await fetch(`/api/provincias/${codigoDepartamento}`);
                 
                 console.log('📬 Response status:', response.status);
                 console.log('📬 Response headers:', response.headers.get('content-type'));
@@ -517,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
                 console.log('🏘️ Cargando distritos para provincia:', codigoProvincia);
-                const response = await fetch(`/api/distritos?provincia=${codigoProvincia}`);
+                const response = await fetch(`/api/distritos/${codigoProvincia}`);
                 
                 console.log('📬 Response status:', response.status);
                 console.log('📬 Response headers:', response.headers.get('content-type'));

@@ -26,7 +26,7 @@ services:
       - LOGGING_LEVEL_COM_EXAMPLE=DEBUG
       
       # Configuración de API externa (DNI/RUC) - IMPORTANTE: Sin espacios
-      - API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1NjksImV4cCI6MTc2MzU5NTU2OH0.3ItfHTxxl_OrfkZN8UrxK26nVh7LztIPda2kigV5B7A
+      - API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2MTAsImV4cCI6MTc2NDgyOTIzOH0.tLw51zidB8GyhkoM18lHfeIm5xeKD2FrxnLnj8fgBww
     volumes:
       - app-uploads:/uploads
     # --- MODIFICACIÓN AQUÍ ---

@@ -33,47 +33,82 @@ public class RepartidorController {
     private RepartidorService repartidorService;
     
     /**
-     * Mostrar formulario de registro de repartidor
+     * Mostrar formulario de registro de repartidor (PASO 2)
      * GET /registro-repartidor
+     * Requiere que el usuario haya completado el paso 1 (datos personales)
      */
     @GetMapping
-    public String mostrarFormulario(Model model, HttpSession session) {
-        // Obtener email verificado de la sesión
-        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
-        if (verifiedEmail != null) {
-            model.addAttribute("verifiedEmail", verifiedEmail);
-            System.out.println("📧 [REPARTIDOR] Email verificado encontrado: " + verifiedEmail);
+    public String mostrarFormulario(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        // Verificar que existe un usuario temporal (paso 1 completado)
+        Long usuarioCodigo = (Long) session.getAttribute("usuarioCodigoTemporal");
+        String usuarioEmail = (String) session.getAttribute("usuarioEmailTemporal");
+        
+        if (usuarioCodigo == null || usuarioEmail == null) {
+            System.out.println("⚠️ [REPARTIDOR PASO 2] No se encontró usuario temporal, redirigiendo a registro");
+            redirectAttributes.addFlashAttribute("error", "Debes completar el registro de datos personales primero");
+            return "redirect:/registroNegocio";
         }
+        
+        System.out.println("🚴 [REPARTIDOR PASO 2] Usuario temporal encontrado: " + usuarioEmail + " (Código: " + usuarioCodigo + ")");
+        
+        // Pasar datos del usuario al modelo
+        model.addAttribute("usuarioCodigo", usuarioCodigo);
+        model.addAttribute("usuarioEmail", usuarioEmail);
+        model.addAttribute("mostrarPaso", "repartidor"); // Indicar qué paso mostrar
         
         // Cargar departamentos para el select usando JDBC
         List<Departamento> departamentos = departamentoRepository.findAllActivos();
-        System.out.println("🔍 Departamentos cargados: " + departamentos.size());
+        System.out.println("🚴 [REPARTIDOR PASO 2] Departamentos cargados: " + departamentos.size());
         departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
         model.addAttribute("departamentos", departamentos);
         
         // Cargar tipos de vehículo para el select
         List<TipoVehiculo> tiposVehiculo = tipoVehiculoRepository.findByEstadoTrue();
-        System.out.println("🔍 Tipos de vehículo cargados: " + tiposVehiculo.size());
+        System.out.println("🚴 [REPARTIDOR PASO 2] Tipos de vehículo cargados: " + tiposVehiculo.size());
         model.addAttribute("tiposVehiculo", tiposVehiculo);
         
-        return "registro-Repartidor";
+        return "registroNegocio";
     }
     
     /**
-     * Procesar registro de repartidor
+     * Procesar registro de repartidor (PASO 2)
      * POST /registro-repartidor
      */
     @PostMapping
     public String registrarRepartidor(
             @ModelAttribute RepartidorRegistroDTO dto,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
         try {
-            Repartidor repartidor = repartidorService.registrarRepartidor(dto);
+            // Verificar que existe el usuario temporal
+            Long usuarioCodigo = (Long) session.getAttribute("usuarioCodigoTemporal");
+            
+            if (usuarioCodigo == null) {
+                System.out.println("⚠️ [REPARTIDOR PASO 2] No se encontró usuario temporal");
+                redirectAttributes.addFlashAttribute("error", "Sesión expirada. Debes volver a registrarte.");
+                return "redirect:/registroNegocio";
+            }
+            
+            System.out.println("🚴 [REPARTIDOR PASO 2] Registrando repartidor para usuario: " + usuarioCodigo);
+            
+            // Registrar el repartidor vinculándolo al usuario existente
+            Repartidor repartidor = repartidorService.registrarRepartidor(dto, usuarioCodigo);
+            
+            // Limpiar sesión temporal
+            session.removeAttribute("usuarioCodigoTemporal");
+            session.removeAttribute("usuarioEmailTemporal");
+            
+            System.out.println("✅ [REPARTIDOR PASO 2] Repartidor registrado exitosamente: " + repartidor.getCodigo());
+            
             redirectAttributes.addFlashAttribute("mensaje", 
                 "¡Registro exitoso! Tu solicitud está en revisión. Código: " + repartidor.getCodigo());
             redirectAttributes.addFlashAttribute("tipo", "success");
             return "redirect:/login";
+            
         } catch (Exception e) {
+            System.err.println("❌ [REPARTIDOR PASO 2] Error al registrar: " + e.getMessage());
+            e.printStackTrace();
+            
             redirectAttributes.addFlashAttribute("error", 
                 "Error al registrar: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipo", "danger");

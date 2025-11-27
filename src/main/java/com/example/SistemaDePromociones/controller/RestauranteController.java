@@ -32,47 +32,82 @@ public class RestauranteController {
     private RestauranteService restauranteService;
     
     /**
-     * Mostrar formulario de registro de restaurante
+     * Mostrar formulario de registro de restaurante (PASO 2)
      * GET /registro-restaurante
+     * Requiere que el usuario haya completado el paso 1 (datos personales)
      */
     @GetMapping
-    public String mostrarFormulario(Model model, HttpSession session) {
-        // Obtener email verificado de la sesión
-        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
-        if (verifiedEmail != null) {
-            model.addAttribute("verifiedEmail", verifiedEmail);
-            System.out.println("📧 [RESTAURANTE] Email verificado encontrado: " + verifiedEmail);
+    public String mostrarFormulario(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        // Verificar que existe un usuario temporal (paso 1 completado)
+        Long usuarioCodigo = (Long) session.getAttribute("usuarioCodigoTemporal");
+        String usuarioEmail = (String) session.getAttribute("usuarioEmailTemporal");
+        
+        if (usuarioCodigo == null || usuarioEmail == null) {
+            System.out.println("⚠️ [RESTAURANTE PASO 2] No se encontró usuario temporal, redirigiendo a registro");
+            redirectAttributes.addFlashAttribute("error", "Debes completar el registro de datos personales primero");
+            return "redirect:/registroNegocio";
         }
+        
+        System.out.println("🏪 [RESTAURANTE PASO 2] Usuario temporal encontrado: " + usuarioEmail + " (Código: " + usuarioCodigo + ")");
+        
+        // Pasar datos del usuario al modelo
+        model.addAttribute("usuarioCodigo", usuarioCodigo);
+        model.addAttribute("usuarioEmail", usuarioEmail);
+        model.addAttribute("mostrarPaso", "restaurante"); // Indicar qué paso mostrar
         
         // Cargar departamentos para los selects usando JDBC
         List<Departamento> departamentos = departamentoRepository.findAllActivos();
-        System.out.println("🏪 [RESTAURANTE] Departamentos cargados: " + departamentos.size());
+        System.out.println("🏪 [RESTAURANTE PASO 2] Departamentos cargados: " + departamentos.size());
         departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
         model.addAttribute("departamentos", departamentos);
         
         // Cargar categorías para los checkboxes
         List<Categoria> categorias = categoriaRepository.findByEstadoTrue();
-        System.out.println("🏪 [RESTAURANTE] Categorías cargadas: " + categorias.size());
+        System.out.println("🏪 [RESTAURANTE PASO 2] Categorías cargadas: " + categorias.size());
         model.addAttribute("categorias", categorias);
         
-        return "registro-Restaurante";
+        return "registroNegocio";
     }
     
     /**
-     * Procesar registro de restaurante
+     * Procesar registro de restaurante (PASO 2)
      * POST /registro-restaurante
      */
     @PostMapping
     public String registrarRestaurante(
             @ModelAttribute RestauranteRegistroDTO dto,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
         try {
-            Long codigoRestaurante = restauranteService.registrarRestaurante(dto);
+            // Verificar que existe el usuario temporal
+            Long usuarioCodigo = (Long) session.getAttribute("usuarioCodigoTemporal");
+            
+            if (usuarioCodigo == null) {
+                System.out.println("⚠️ [RESTAURANTE PASO 2] No se encontró usuario temporal");
+                redirectAttributes.addFlashAttribute("error", "Sesión expirada. Debes volver a registrarte.");
+                return "redirect:/registroNegocio";
+            }
+            
+            System.out.println("🏪 [RESTAURANTE PASO 2] Registrando restaurante para usuario: " + usuarioCodigo);
+            
+            // Registrar el restaurante vinculándolo al usuario existente
+            Long codigoRestaurante = restauranteService.registrarRestaurante(dto, usuarioCodigo);
+            
+            // Limpiar sesión temporal
+            session.removeAttribute("usuarioCodigoTemporal");
+            session.removeAttribute("usuarioEmailTemporal");
+            
+            System.out.println("✅ [RESTAURANTE PASO 2] Restaurante registrado exitosamente: " + codigoRestaurante);
+            
             redirectAttributes.addFlashAttribute("mensaje", 
                 "¡Registro exitoso! Tu solicitud está en revisión. Código: " + codigoRestaurante);
             redirectAttributes.addFlashAttribute("tipo", "success");
             return "redirect:/login";
+            
         } catch (Exception e) {
+            System.err.println("❌ [RESTAURANTE PASO 2] Error al registrar: " + e.getMessage());
+            e.printStackTrace();
+            
             redirectAttributes.addFlashAttribute("error", 
                 "Error al registrar: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipo", "danger");

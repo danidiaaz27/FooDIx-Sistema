@@ -1,6 +1,8 @@
 package com.example.SistemaDePromociones.controller;
 
+import com.example.SistemaDePromociones.dto.UsuarioRegistroDTO;
 import com.example.SistemaDePromociones.model.Departamento;
+import com.example.SistemaDePromociones.model.Usuario;
 import com.example.SistemaDePromociones.repository.jdbc.DepartamentoJdbcRepository;
 import com.example.SistemaDePromociones.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -139,65 +142,76 @@ public class HomeController {
     }
     
     /**
-     * Procesar registro de usuario
+     * Procesar registro de usuario (PASO 1 - Datos Personales)
      * POST /registro
+     * Redirige según el rol seleccionado:
+     * - Rol 1 (Cliente): Login directo
+     * - Rol 2 (Restaurante): /registro-restaurante
+     * - Rol 3 (Repartidor): /registro-repartidor
      */
     @PostMapping("/registro")
     public String registrarUsuario(
-            @RequestParam String Nombre,
-            @RequestParam String ApellidoPaterno,
-            @RequestParam String ApellidoMaterno,
-            @RequestParam String NumeroDocumento,
-            @RequestParam LocalDate FechaNacimiento,
-            @RequestParam String CorreoElectronico,
-            @RequestParam String Contrasena,
-            @RequestParam(required = false) String Telefono,
-            @RequestParam(required = false) String Direccion,
-            @RequestParam Integer CodigoTipoDocumento,
-            @RequestParam Integer CodigoRol,
-            @RequestParam Long CodigoDistrito,
-            RedirectAttributes redirectAttributes,
-            Model model
+            @ModelAttribute UsuarioRegistroDTO dto,
+            HttpSession session,
+            RedirectAttributes redirectAttributes
     ) {
         try {
-            System.out.println("📝 [REGISTRO] Procesando registro de usuario: " + CorreoElectronico);
+            System.out.println("📝 [REGISTRO PASO 1] Procesando registro de usuario: " + dto.getCorreoElectronico());
+            System.out.println("📝 [REGISTRO PASO 1] Rol seleccionado: " + dto.getCodigoRol());
             
             // Encriptar contraseña
-            String contrasenaEncriptada = passwordEncoder.encode(Contrasena);
+            String contrasenaEncriptada = passwordEncoder.encode(dto.getContrasena());
             
-            // Crear usuario
+            // Crear usuario en la base de datos
             Long codigoUsuario = usuarioService.crearUsuario(
-                Nombre,
-                ApellidoPaterno,
-                ApellidoMaterno,
-                NumeroDocumento,
-                FechaNacimiento,
-                CorreoElectronico,
+                dto.getNombre(),
+                dto.getApellidoPaterno(),
+                dto.getApellidoMaterno(),
+                dto.getNumeroDocumento(),
+                dto.getFechaNacimiento(),
+                dto.getCorreoElectronico(),
                 contrasenaEncriptada,
-                Telefono,
-                Direccion,
-                CodigoTipoDocumento,
-                CodigoRol,
-                CodigoDistrito
+                dto.getTelefono(),
+                dto.getDireccion(),
+                dto.getCodigoTipoDocumento(),
+                dto.getCodigoRol(),
+                dto.getCodigoDistrito()
             );
             
-            System.out.println("✅ [REGISTRO] Usuario creado exitosamente con código: " + codigoUsuario);
+            System.out.println("✅ [REGISTRO PASO 1] Usuario creado exitosamente con código: " + codigoUsuario);
             
-            redirectAttributes.addFlashAttribute("message", 
-                "¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.");
+            // Guardar código de usuario en sesión para el paso 2
+            session.setAttribute("usuarioCodigoTemporal", codigoUsuario);
+            session.setAttribute("usuarioEmailTemporal", dto.getCorreoElectronico());
             
-            return "redirect:/login";
+            // Redirigir según el rol
+            if (dto.getCodigoRol() == 2) { // Restaurante
+                System.out.println("🏪 [REGISTRO PASO 1] Redirigiendo a registro de restaurante");
+                redirectAttributes.addFlashAttribute("mensaje", "Datos personales guardados. Completa los datos del restaurante.");
+                return "redirect:/registro-restaurante";
+                
+            } else if (dto.getCodigoRol() == 3) { // Repartidor
+                System.out.println("🚴 [REGISTRO PASO 1] Redirigiendo a registro de repartidor");
+                redirectAttributes.addFlashAttribute("mensaje", "Datos personales guardados. Completa los datos del repartidor.");
+                return "redirect:/registro-repartidor";
+                
+            } else { // Cliente (rol 1) u otro
+                System.out.println("👤 [REGISTRO PASO 1] Usuario cliente registrado, redirigiendo a login");
+                // Limpiar sesión temporal
+                session.removeAttribute("usuarioCodigoTemporal");
+                session.removeAttribute("usuarioEmailTemporal");
+                
+                redirectAttributes.addFlashAttribute("message", 
+                    "¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.");
+                return "redirect:/login";
+            }
             
         } catch (Exception e) {
-            System.err.println("❌ [REGISTRO] Error al registrar usuario: " + e.getMessage());
+            System.err.println("❌ [REGISTRO PASO 1] Error al registrar usuario: " + e.getMessage());
             e.printStackTrace();
             
-            // Recargar departamentos
-            List<Departamento> departamentos = departamentoRepository.findAllActivos();
-            model.addAttribute("departamentos", departamentos);
-            model.addAttribute("error", "Error al registrar: " + e.getMessage());
-            
-            return "registro";
+            redirectAttributes.addFlashAttribute("error", "Error al registrar: " + e.getMessage());
+            return "redirect:/registroNegocio";
         }
     }
 

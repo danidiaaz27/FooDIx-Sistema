@@ -152,13 +152,13 @@
                         <form action="/registro" th:action="@{/registro}" method="post" id="registerForm">
                             
                             <!-- Campo oculto para Rol -->
-                            <input type="hidden" name="CodigoRol" id="CodigoRol" value="2">
+                            <input type="hidden" name="codigoRol" id="CodigoRol" value="2">
                             
                             <!-- Tipo y Número de Documento -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="CodigoTipoDocumento" class="form-label">Tipo de Documento *</label>
-                                    <select class="form-select" id="CodigoTipoDocumento" name="CodigoTipoDocumento" required>
+                                    <select class="form-select" id="CodigoTipoDocumento" name="codigoTipoDocumento" required>
                                         <option value="">Seleccionar</option>
                                         <option value="1" selected>DNI</option>
                                         <option value="2">Carnet de Extranjería</option>
@@ -168,7 +168,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="NumeroDocumento" class="form-label">Número de Documento *</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="NumeroDocumento" name="NumeroDocumento" 
+                                        <input type="text" class="form-control" id="NumeroDocumento" name="numeroDocumento" 
                                                required maxlength="8" pattern="[0-9]{8}"
                                                title="Debe contener exactamente 8 dígitos"
                                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -187,21 +187,21 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="Nombre" class="form-label">Nombre *</label>
-                                    <input type="text" class="form-control" id="Nombre" name="Nombre" 
+                                    <input type="text" class="form-control" id="Nombre" name="nombre" 
                                            required maxlength="50"
                                            pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                            title="Solo se permiten letras y espacios">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="ApellidoPaterno" class="form-label">Apellido Paterno *</label>
-                                    <input type="text" class="form-control" id="ApellidoPaterno" name="ApellidoPaterno" 
+                                    <input type="text" class="form-control" id="ApellidoPaterno" name="apellidoPaterno" 
                                            required maxlength="50"
                                            pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                            title="Solo se permiten letras y espacios">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="ApellidoMaterno" class="form-label">Apellido Materno *</label>
-                                    <input type="text" class="form-control" id="ApellidoMaterno" name="ApellidoMaterno" 
+                                    <input type="text" class="form-control" id="ApellidoMaterno" name="apellidoMaterno" 
                                            required maxlength="50"
                                            pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                            title="Solo se permiten letras y espacios">
@@ -212,12 +212,12 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="FechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
-                                    <input type="date" class="form-control" id="FechaNacimiento" name="FechaNacimiento" required>
+                                    <input type="date" class="form-control" id="FechaNacimiento" name="fechaNacimiento" required>
                                     <div class="form-text text-muted">Debes ser mayor de 18 años</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="Telefono" class="form-label">Teléfono</label>
-                                    <input type="tel" class="form-control" id="Telefono" name="Telefono" 
+                                    <input type="tel" class="form-control" id="Telefono" name="telefono" 
                                            maxlength="9"
                                            pattern="[0-9]{9}" 
                                            title="Debe contener exactamente 9 dígitos"
@@ -230,7 +230,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="CorreoElectronico" class="form-label">Correo Electrónico *</label>
-                                    <input type="email" class="form-control" id="CorreoElectronico" name="CorreoElectronico" 
+                                    <input type="email" class="form-control" id="CorreoElectronico" name="correoElectronico" 
                                         th:value="${verifiedEmail ?: ''}"
                                         th:readonly="${verifiedEmail != null}"
                                         th:style="${verifiedEmail != null ? 'background-color: #e7f5e7;' : ''}"
@@ -242,7 +242,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="Contrasena" class="form-label">Contraseña *</label>
                                     <div class="input-group">
-                                        <input type="password" class="form-control" id="Contrasena" name="Contrasena" 
+                                        <input type="password" class="form-control" id="Contrasena" name="contrasena" 
                                             required minlength="8" maxlength="255">
                                         <button class="btn btn-outline-secondary" type="button" id="toggleContrasena">
                                             <i class="fas fa-eye"></i>
@@ -280,7 +280,7 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="CodigoDepartamento" class="form-label">Departamento *</label>
-                                    <select class="form-select" id="CodigoDepartamento" required>
+                                    <select class="form-select" id="CodigoDepartamento" name="codigoDepartamento" required>
                                         <option value="">Seleccionar</option>
                                         <option th:each="dept : ${departamentos}" 
                                                 th:value="${dept.codigo}" 
@@ -289,13 +289,13 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="CodigoProvincia" class="form-label">Provincia *</label>
-                                    <select class="form-select" id="CodigoProvincia" required disabled>
+                                    <select class="form-select" id="CodigoProvincia" name="codigoProvincia" required disabled>
                                         <option value="">Seleccione departamento primero</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="CodigoDistrito" class="form-label">Distrito *</label>
-                                    <select class="form-select" id="CodigoDistrito" name="CodigoDistrito" required disabled>
+                                    <select class="form-select" id="CodigoDistrito" name="codigoDistrito" required disabled>
                                         <option value="">Seleccione provincia primero</option>
                                     </select>
                                 </div>
@@ -304,7 +304,7 @@
                             <!-- Dirección -->
                             <div class="mb-3">
                                 <label for="Direccion" class="form-label">Dirección</label>
-                                <textarea class="form-control" id="Direccion" name="Direccion" rows="2" 
+                                <textarea class="form-control" id="Direccion" name="direccion" rows="2" 
                                         maxlength="100"
                                         placeholder="Ej: Av. Balta 123, Chiclayo"></textarea>
                                 <div class="form-text text-muted">Máximo 100 caracteres</div>
@@ -515,6 +515,14 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/theme-toggle.js}"></script>
+
+<!-- Script para mostrar automáticamente el paso correcto cuando viene del servidor -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    window.mostrarPasoInicial = /*[[${mostrarPaso}]]*/ null;
+    /*]]>*/
+</script>
+
 <script th:src="@{/js/registroNegocio.js}"></script>
 <script th:src="@{/js/registro-restaurante.js}"></script>
 <script th:src="@{/js/modales-registro-restaurante.js}"></script>

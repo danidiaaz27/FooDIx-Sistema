@@ -21,45 +21,31 @@ public class RepartidorService {
     private JdbcRepartidorRepository repartidorRepository;
     
     @Autowired
-    private UsuarioService usuarioService;
-    
-    @Autowired
     private FileStorageService fileStorageService;
     
     @PersistenceContext
     private EntityManager entityManager;
     
     /**
-     * Registrar un nuevo repartidor
+     * Registrar un nuevo repartidor (PASO 2)
+     * El usuario ya debe existir (creado en PASO 1)
      */
     @Transactional
-    public Repartidor registrarRepartidor(RepartidorRegistroDTO dto) throws Exception {
+    public Repartidor registrarRepartidor(RepartidorRegistroDTO dto, Long codigoUsuario) throws Exception {
+        
+        // Validar que el usuario existe
+        if (codigoUsuario == null) {
+            throw new RuntimeException("El código de usuario es requerido");
+        }
         
         // Validar que no exista la licencia
         if (repartidorRepository.existsByNumeroLicencia(dto.getNumeroLicencia())) {
             throw new RuntimeException("El número de licencia ya está registrado");
         }
         
-        // 1. Crear usuario
-    Integer codigoTipoDocumento = "DNI".equals(dto.getTipoDocumento()) ? 1 : 2;
-        Integer codigoRol = 3; // 3 = Repartidor
+        System.out.println("🚴 [SERVICE] Registrando repartidor para usuario: " + codigoUsuario);
         
-        Long codigoUsuario = usuarioService.crearUsuario(
-            dto.getNombre(),
-            dto.getApellidoPaterno(),
-            dto.getApellidoMaterno(),
-            dto.getNumeroDocumento(),
-            dto.getFechaNacimiento(),
-            dto.getCorreoElectronico(),
-            dto.getContrasena(),
-            dto.getTelefono(),
-            dto.getDireccion(),
-            codigoTipoDocumento,
-            codigoRol,
-            dto.getCodigoDistrito()
-        );
-        
-        // 2. Crear repartidor
+        // Crear repartidor vinculándolo al usuario existente
         Repartidor repartidor = new Repartidor();
         repartidor.setCodigoUsuario(codigoUsuario);
         repartidor.setNumeroLicencia(dto.getNumeroLicencia());
@@ -69,6 +55,8 @@ public class RepartidorService {
         repartidor.setEstado(true);
         
         repartidor = repartidorRepository.save(repartidor);
+        
+        System.out.println("✅ [SERVICE] Repartidor registrado con código: " + repartidor.getCodigo());
         
         // 3. Guardar documentos
         String rutaLicencia = fileStorageService.guardarArchivo(

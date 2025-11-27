@@ -19,23 +19,21 @@ public class RestauranteService {
     private RestauranteJdbcRepository restauranteRepository;
     
     @Autowired
-    private UsuarioService usuarioService;
-    
-    @Autowired
     private FileStorageService fileStorageService;
     
     @PersistenceContext
     private EntityManager entityManager;
     
     /**
-     * Registrar un nuevo restaurante usando SQL directo
+     * Registrar un nuevo restaurante usando SQL directo (PASO 2)
+     * El usuario ya debe existir (creado en PASO 1)
      */
     @Transactional
-    public Long registrarRestaurante(RestauranteRegistroDTO dto) throws Exception {
+    public Long registrarRestaurante(RestauranteRegistroDTO dto, Long codigoUsuario) throws Exception {
         
-        // Validar campos requeridos
-        if (dto.getTipoDocumento() == null || dto.getTipoDocumento().isEmpty()) {
-            throw new RuntimeException("El tipo de documento es requerido");
+        // Validar que el usuario existe
+        if (codigoUsuario == null) {
+            throw new RuntimeException("El código de usuario es requerido");
         }
         
         // Validar que no exista el RUC
@@ -43,26 +41,9 @@ public class RestauranteService {
             throw new RuntimeException("El RUC ya está registrado");
         }
         
-        // 1. Crear usuario (representante del restaurante)
-    Integer codigoTipoDocumento = "DNI".equals(dto.getTipoDocumento()) ? 1 : 2;
-        Integer codigoRol = 4; // 4 = Restaurante
+        System.out.println("🏪 [SERVICE] Registrando restaurante para usuario: " + codigoUsuario);
         
-        Long codigoUsuario = usuarioService.crearUsuario(
-            dto.getNombre(),
-            dto.getApellidoPaterno(),
-            dto.getApellidoMaterno(),
-            dto.getNumeroDocumento(),
-            dto.getFechaNacimiento(),
-            dto.getCorreoElectronico(),
-            dto.getContrasena(),
-            dto.getTelefono(),
-            dto.getDireccionPersonal(),
-            codigoTipoDocumento,
-            codigoRol,
-            dto.getCodigoDistritoPersonal()
-        );
-        
-        // 2. Crear restaurante usando JDBC
+        // Crear restaurante usando JDBC vinculándolo al usuario existente
         Long codigoRestaurante = restauranteRepository.insertRestaurante(
             codigoUsuario,
             dto.getRuc(),
@@ -74,6 +55,8 @@ public class RestauranteService {
             dto.getCorreoNegocio(),
             dto.getCodigoDistritoNegocio()
         );
+        
+        System.out.println("✅ [SERVICE] Restaurante registrado con código: " + codigoRestaurante);
         
         // Por ahora retornar el ID (simplificado)
         // TODO: Agregar categorías y documentos después
