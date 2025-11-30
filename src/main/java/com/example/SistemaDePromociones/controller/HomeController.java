@@ -102,34 +102,6 @@ public class HomeController {
         return "registroUsuario";
     }
     
-    /**
-     * Página de registro de negocio (restaurante/repartidor)
-     * ❌ DEPRECADO - Ya no se usa, ahora cada uno tiene su propia página
-     * Se mantiene comentado por si se necesita referencia
-     */
-    /*
-    @GetMapping("/registroNegocio")
-    public String registroNegocio(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        System.out.println("🏪 [REGISTRO NEGOCIO] Cargando formulario de registro de negocio");
-        
-        // Verificar que el email esté verificado
-        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
-        if (verifiedEmail == null) {
-            System.out.println("⚠️ [REGISTRO NEGOCIO] Email no verificado, redirigiendo a /verificacion");
-            redirectAttributes.addFlashAttribute("error", "Debes verificar tu correo electrónico primero");
-            return "redirect:/verificacion?tipo=negocio";
-        }
-        
-        model.addAttribute("verifiedEmail", verifiedEmail);
-        System.out.println("📧 [REGISTRO NEGOCIO] Email verificado: " + verifiedEmail);
-        
-        List<Departamento> departamentos = departamentoRepository.findAllActivos();
-        System.out.println("🏪 [REGISTRO NEGOCIO] Departamentos cargados: " + departamentos.size());
-        departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
-        model.addAttribute("departamentos", departamentos);
-        return "registroNegocio";
-    }
-    */
     
     /**
      * Página de registro de restaurante
