@@ -32,9 +32,11 @@ public class SecurityConfig {
                     "/login",                   // Login
                     "/registro",                // Registro de usuarios (legacy)
                     "/registroUsuario",         // Registro de usuario/cliente
-                    "/registroNegocio",         // Registro de negocio (restaurante/repartidor)
-                    "/registro-repartidor",     // Registro de repartidores
-                    "/registro-restaurante",    // Registro de restaurantes
+                    // "/registroNegocio",      // ❌ DEPRECADO - Ya no se usa
+                    "/registroRestaurante",     // Registro de restaurantes
+                    "/registroDelivery",        // Registro de delivery/repartidores
+                    "/registro-repartidor",     // Registro de repartidores (legacy)
+                    "/registro-restaurante",    // Registro de restaurantes (legacy)
                     "/verificacion",            // Verificación de email
                     "/auth/send-code",          // Envío de código de verificación
                     "/auth/verify-code",        // Verificación de código

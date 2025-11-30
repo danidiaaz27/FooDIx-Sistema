@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registro de Repartidor - FoodIx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
+    <style>
+        .password-mismatch {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        }
+        .invalid-input {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        }
+        .form-text {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Estilos para validaciones de contraseña flotantes */
+        .password-requirements {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .password-requirements.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .requirement-item {
+            font-size: 0.8rem;
+            padding: 3px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .requirement-item i {
+            font-size: 0.7rem;
+            min-width: 14px;
+        }
+        
+        .requirement-item.valid {
+            color: #198754;
+        }
+        
+        .requirement-item.invalid {
+            color: #6c757d;
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        /* Estilos para formularios dinámicos */
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Estilos para modales de notificación */
+        #notificationModal .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        #notificationModal .modal-header {
+            padding: 1.5rem;
+        }
+        
+        #notificationModal .modal-body {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        #notificationModal .modal-header.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        #notificationModal .modal-header.error {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+        
+        #notificationModal .modal-header.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: white;
+        }
+        
+        #notificationModal .modal-header.info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+        
+        #notificationModal .modal-title i {
+            font-size: 1.5rem;
+        }
+        
+        #notificationModal .btn-close {
+            opacity: 0.8;
+        }
+        
+        #notificationModal .btn-close:hover {
+            opacity: 1;
+        }
+        
+        #notificationModal .modal-footer {
+            padding: 1rem 1.5rem;
+        }
+        
+        #modalCloseBtn.btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        
+        #modalCloseBtn.btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+        
+        #modalCloseBtn.btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+        
+        #modalCloseBtn.btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #notificationModal.show .modal-dialog {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barra de Navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/" th:href="@{/}">
+            <i class="fas fa-utensils"></i> FoodIx
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
+                        <i class="fas fa-question-circle"></i> Tutorial
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login" th:href="@{/login}">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contacto" th:href="@{/contacto}">
+                        <i class="fas fa-envelope"></i> Contacto
+                    </a>
+                </li>
+                <!-- Botón de Tema Claro/Oscuro -->
+                <li class="nav-item d-flex align-items-center">
+                    <button class="theme-toggle" type="button" aria-label="Cambiar tema">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </li>             
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido Principal -->
+<main style="padding-top: 80px; padding-bottom: 40px; min-height: 100vh; background: var(--bg-primary); transition: background-color 0.3s ease;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="card shadow-lg mt-4">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-motorcycle" style="font-size: 3rem; color: #F5A623;"></i>
+                            </div>
+                            <h2 class="fw-bold">Registro de Repartidor</h2>
+                            <p class="text-muted">Completa el registro en 2 pasos</p>
+                        </div>
+
+                        <!-- Mensajes de notificación (ocultos - se muestran como modales) -->
+                        <div id="serverMessage" 
+                             th:attr="data-message=${message}, data-type='success'" 
+                             th:if="${message}" 
+                             style="display: none;"></div>
+                        <div id="serverError" 
+                             th:attr="data-message=${error}, data-type='error'" 
+                             th:if="${error}" 
+                             style="display: none;"></div>                        <!-- Formulario Personal (Paso 1) -->
+                        <form action="/registro" th:action="@{/registro}" method="post" id="registerForm">
+                            
+                            <!-- Campo oculto para Rol (3 = Repartidor) -->
+                            <input type="hidden" name="codigoRol" id="CodigoRol" value="3">
+                            
+                            <!-- Tipo y Número de Documento -->
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="CodigoTipoDocumento" class="form-label">Tipo de Documento *</label>
+                                    <select class="form-select" id="CodigoTipoDocumento" name="codigoTipoDocumento" required>
+                                        <option value="">Seleccionar</option>
+                                        <option value="1" selected>DNI</option>
+                                        <option value="2">Carnet de Extranjería</option>
+                                        <option value="3">Pasaporte</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="NumeroDocumento" class="form-label">Número de Documento *</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="NumeroDocumento" name="numeroDocumento" 
+                                               required maxlength="8" pattern="[0-9]{8}"
+                                               title="Debe contener exactamente 8 dígitos"
+                                               oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                        <button class="btn btn-outline-primary" type="button" id="btnVerificarDNI" style="display: none;">
+                                            <i class="fas fa-search"></i> Verificar
+                                        </button>
+                                    </div>
+                                    <div class="form-text text-muted" id="docNumberHelp">8 dígitos numéricos - Se autocompletará al escribir</div>
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status" id="dniSpinner" style="display: none;">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="FechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                                    <input type="date" class="form-control" id="FechaNacimiento" name="fechaNacimiento" required>
+                                    <div class="form-text text-muted">Debes ser mayor de 18 años</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Nombre y Apellidos -->
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="Nombre" class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="Nombre" name="nombre" 
+                                           required maxlength="50"
+                                           pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                           title="Solo se permiten letras y espacios">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="ApellidoPaterno" class="form-label">Apellido Paterno *</label>
+                                    <input type="text" class="form-control" id="ApellidoPaterno" name="apellidoPaterno" 
+                                           required maxlength="50"
+                                           pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                           title="Solo se permiten letras y espacios">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="ApellidoMaterno" class="form-label">Apellido Materno *</label>
+                                    <input type="text" class="form-control" id="ApellidoMaterno" name="apellidoMaterno" 
+                                           required maxlength="50"
+                                           pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                           title="Solo se permiten letras y espacios">
+                                </div>
+                            </div>
+                            
+                            <!-- Teléfono y correo -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="Telefono" class="form-label">Teléfono *</label>
+                                    <input type="tel" class="form-control" id="Telefono" name="telefono" 
+                                           required maxlength="9"
+                                           pattern="[0-9]{9}" 
+                                           title="Debe contener exactamente 9 dígitos"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                    <div class="form-text text-muted">9 dígitos (importante para contacto de pedidos)</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="CorreoElectronico" class="form-label">Correo Electrónico *</label>
+                                    <input type="email" class="form-control" id="CorreoElectronico" name="correoElectronico" 
+                                        th:value="${verifiedEmail ?: ''}"
+                                        th:readonly="${verifiedEmail != null}"
+                                        th:style="${verifiedEmail != null ? 'background-color: #e7f5e7;' : ''}"
+                                        required maxlength="50">
+                                    <div class="form-text" th:classappend="${verifiedEmail != null ? 'text-success' : 'text-muted'}">
+                                        <span th:if="${verifiedEmail != null}">✓ Email verificado</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Contraseñas y validaciones -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="Contrasena" class="form-label">Contraseña *</label>
+                                    <div class="password-wrapper">
+                                        <!-- Popup de requisitos flotante -->
+                                        <div id="passwordRequirements" class="password-requirements">
+                                            <div class="requirement-item invalid" id="reqLength">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Mínimo 8 caracteres</span>
+                                            </div>
+                                            <div class="requirement-item invalid" id="reqUppercase">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Una letra mayúscula</span>
+                                            </div>
+                                            <div class="requirement-item invalid" id="reqLowercase">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Una letra minúscula</span>
+                                            </div>
+                                            <div class="requirement-item invalid" id="reqNumber">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Un número</span>
+                                            </div>
+                                            <div class="requirement-item invalid" id="reqSymbol">
+                                                <i class="fas fa-circle-xmark"></i>
+                                                <span>Un símbolo (!@#$%...)</span>
+                                            </div>
+                                        </div>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="Contrasena" name="contrasena" 
+                                                required minlength="8" maxlength="255">
+                                            <button class="btn btn-outline-secondary" type="button" id="toggleContrasena">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="ConfirmarContrasena" class="form-label">Confirmar Contraseña *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="ConfirmarContrasena" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="toggleConfirmarContrasena">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text text-muted" id="passwordMatchText">Las contraseñas deben coincidir</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Ubicación -->
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="CodigoDepartamento" class="form-label">Departamento *</label>
+                                    <select class="form-select" id="CodigoDepartamento" name="codigoDepartamento" required>
+                                        <option value="">Seleccionar</option>
+                                        <option th:each="dept : ${departamentos}" 
+                                                th:value="${dept.codigo}" 
+                                                th:text="${dept.nombre}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="CodigoProvincia" class="form-label">Provincia *</label>
+                                    <select class="form-select" id="CodigoProvincia" name="codigoProvincia" required disabled>
+                                        <option value="">Seleccione departamento primero</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="CodigoDistrito" class="form-label">Distrito *</label>
+                                    <select class="form-select" id="CodigoDistrito" name="codigoDistrito" required disabled>
+                                        <option value="">Seleccione provincia primero</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="mb-3">
+                                <label for="Direccion" class="form-label">Dirección</label>
+                                <textarea class="form-control" id="Direccion" name="direccion" rows="2" 
+                                        maxlength="100"
+                                        placeholder="Ej: Av. Balta 123, Chiclayo"></textarea>
+                                <div class="form-text text-muted">Máximo 100 caracteres</div>
+                            </div>
+                            
+                            <!-- Términos y Condiciones -->
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="termsUser" required>
+                                <label class="form-check-label" for="termsUser">
+                                    Acepto los <a href="#" class="text-decoration-none">Términos y Condiciones</a>
+                                </label>
+                            </div>
+                            
+                            <!-- Botón Siguiente -->
+                            <button type="button" class="btn btn-primary w-100 mb-3" id="btnSiguiente">
+                                Siguiente <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+
+                        <!-- Formulario para Repartidor (Paso 2) -->
+                        <form action="/registro" th:action="@{/registro}" method="post" id="deliveryForm" class="form-step" enctype="multipart/form-data">
+                            <h5 class="mb-3"><i class="fas fa-motorcycle me-2"></i>Datos del Repartidor</h5>
+                            
+                            <!-- Campos ocultos del Paso 1 -->
+                            <input type="hidden" name="codigoRol" value="3">
+                            <input type="hidden" name="codigoTipoDocumento" id="hiddenTipoDocumento">
+                            <input type="hidden" name="numeroDocumento" id="hiddenNumeroDocumento">
+                            <input type="hidden" name="fechaNacimiento" id="hiddenFechaNacimiento">
+                            <input type="hidden" name="nombre" id="hiddenNombre">
+                            <input type="hidden" name="apellidoPaterno" id="hiddenApellidoPaterno">
+                            <input type="hidden" name="apellidoMaterno" id="hiddenApellidoMaterno">
+                            <input type="hidden" name="telefono" id="hiddenTelefono">
+                            <input type="hidden" name="correoElectronico" id="hiddenCorreoElectronico">
+                            <input type="hidden" name="contrasena" id="hiddenContrasena">
+                            <input type="hidden" name="codigoDepartamento" id="hiddenCodigoDepartamento">
+                            <input type="hidden" name="codigoProvincia" id="hiddenCodigoProvincia">
+                            <input type="hidden" name="codigoDistrito" id="hiddenCodigoDistrito">
+                            <input type="hidden" name="direccion" id="hiddenDireccion">
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="TipoVehiculo" class="form-label">Tipo de Vehículo *</label>
+                                    <select class="form-select" id="TipoVehiculo" name="TipoVehiculo" required>
+                                        <option value="">Seleccionar</option>
+                                    </select>
+                                    <div class="form-text text-muted">Selecciona el vehículo con el que realizarás los repartos</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="NumeroLicencia" class="form-label">Número de Licencia *</label>
+                                    <input type="text" class="form-control" id="NumeroLicencia" name="NumeroLicencia" 
+                                           required maxlength="10" placeholder="Ej: A12345678">
+                                    <div class="form-text text-muted">Licencia de conducir vigente</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="NumeroPlaca" class="form-label">Número de Placa *</label>
+                                <input type="text" class="form-control" id="NumeroPlaca" name="NumeroPlaca" 
+                                       required maxlength="7" placeholder="Ej: ABC-123"
+                                       style="text-transform: uppercase;"
+                                       oninput="this.value = this.value.toUpperCase()">
+                                <div class="form-text text-muted">Placa del vehículo (hasta 7 caracteres)</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="Antecedentes" class="form-label">
+                                    <i class="fas fa-file-pdf me-1"></i>Antecedentes Policiales/Penales
+                                    <span class="text-muted small">(Opcional)</span>
+                                </label>
+                                <input type="file" class="form-control" id="Antecedentes" name="Antecedentes" accept=".pdf">
+                                <div class="form-text text-muted">
+                                    Documento opcional pero recomendado para generar confianza
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading mb-2">
+                                    <i class="fas fa-info-circle me-2"></i>Información Importante
+                                </h6>
+                                <ul class="mb-0 small">
+                                    <li>Debes tener licencia de conducir vigente</li>
+                                    <li>El vehículo debe estar en buen estado</li>
+                                    <li>Recibirás notificaciones de pedidos por tu teléfono registrado</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="button" class="btn btn-secondary" id="btnVolverRepartidor">
+                                    <i class="fas fa-arrow-left"></i> Volver
+                                </button>
+                                <button type="submit" class="btn btn-success flex-grow-1">
+                                    <i class="fas fa-motorcycle"></i> Registrar Repartidor
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-3">
+                            <p class="mb-0">¿Ya tienes cuenta? 
+                                <a href="/login" th:href="@{/login}" class="text-decoration-none">
+                                    Inicia sesión aquí
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal de Notificaciones (Reutilizable) -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0" id="modalHeader">
+                <h5 class="modal-title d-flex align-items-center" id="modalTitle">
+                    <i class="me-2" id="modalIcon"></i>
+                    <span id="modalTitleText"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body py-4" id="modalBody">
+                <p class="mb-0" id="modalMessage"></p>
+            </div>
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-sm" id="modalCloseBtn" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-1"></i>Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Información Repartidor -->
+<div class="modal fade" id="modalInfoRepartidor" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #F5A623; color: white;">
+                <h5 class="modal-title">
+                    <i class="fas fa-motorcycle me-2"></i>Registro de Repartidor
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Proceso de registro en 2 pasos:</p>
+                <ol class="mb-0">
+                    <li class="mb-2"><strong>Paso 1:</strong> Tus datos personales</li>
+                    <li><strong>Paso 2:</strong> Datos del vehículo (licencia, placa, tipo de vehículo)</li>
+                </ol>
+                <div class="alert alert-success mt-3 mb-0">
+                    <small>
+                        <i class="fas fa-check-circle me-1"></i>
+                        Una vez registrado, podrás empezar a recibir pedidos en tu zona.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-1"></i>Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/theme-toggle.js}"></script>
+
+<!-- Script para mostrar automáticamente el paso correcto cuando viene del servidor -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    window.mostrarPasoInicial = /*[[${mostrarPaso}]]*/ null;
+    /*]]>*/
+</script>
+
+<script th:src="@{/js/registroDelivery.js}"></script>
+</body>
+</html>

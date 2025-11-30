@@ -23,17 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /**
  * Selecciona el tipo de negocio (restaurante o repartidor)
- * y redirige a verificacion.html con tipo=negocio
+ * y redirige a verificacion.html con el tipo específico
  */
 function selectBusinessType(type) {
     console.log('📌 Tipo de negocio seleccionado:', type);
     
-    // Guardar en localStorage para uso posterior
-    localStorage.setItem('selectedBusinessType', type);
-    console.log('💾 Guardado en localStorage:', type);
-    
-    // Redirigir a verificación con tipo=negocio
-    window.location.href = '/verificacion?tipo=negocio';
+    // Redirigir directamente a verificación con el tipo específico
+    window.location.href = '/verificacion?tipo=' + type;
 }
 
 /**

@@ -45,7 +45,7 @@ public class RestauranteController {
         if (usuarioCodigo == null || usuarioEmail == null) {
             System.out.println("⚠️ [RESTAURANTE PASO 2] No se encontró usuario temporal, redirigiendo a registro");
             redirectAttributes.addFlashAttribute("error", "Debes completar el registro de datos personales primero");
-            return "redirect:/registroNegocio";
+            return "redirect:/registroRestaurante";
         }
         
         System.out.println("🏪 [RESTAURANTE PASO 2] Usuario temporal encontrado: " + usuarioEmail + " (Código: " + usuarioCodigo + ")");
@@ -66,7 +66,7 @@ public class RestauranteController {
         System.out.println("🏪 [RESTAURANTE PASO 2] Categorías cargadas: " + categorias.size());
         model.addAttribute("categorias", categorias);
         
-        return "registroNegocio";
+        return "registroRestaurante";
     }
     
     /**
@@ -85,7 +85,7 @@ public class RestauranteController {
             if (usuarioCodigo == null) {
                 System.out.println("⚠️ [RESTAURANTE PASO 2] No se encontró usuario temporal");
                 redirectAttributes.addFlashAttribute("error", "Sesión expirada. Debes volver a registrarte.");
-                return "redirect:/registroNegocio";
+                return "redirect:/registroRestaurante";
             }
             
             System.out.println("🏪 [RESTAURANTE PASO 2] Registrando restaurante para usuario: " + usuarioCodigo);

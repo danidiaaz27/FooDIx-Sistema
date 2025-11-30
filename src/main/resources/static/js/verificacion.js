@@ -269,10 +269,12 @@ document.getElementById('verificationForm').addEventListener('submit', async fun
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
     
     try {
+        const tipo = document.getElementById('tipoRegistro').value || 'usuario';
         const formData = new URLSearchParams();
         formData.append('code', code);
+        formData.append('tipo', tipo);
         
-        console.log('🔐 Verificando código:', code);
+        console.log('🔐 Verificando código:', code, 'Tipo:', tipo);
         
         const response = await fetch('/auth/verify-code', {
             method: 'POST',
