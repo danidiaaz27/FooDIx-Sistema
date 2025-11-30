@@ -45,30 +45,42 @@ public class VerificationController {
 
     @PostMapping("/auth/verify-code")
     @ResponseBody
-    public String verifyCode(@RequestParam String code, HttpSession session) {
+    public String verifyCode(@RequestParam String code, 
+                            @RequestParam(required = false) String tipo,
+                            HttpSession session) {
         String email = (String) session.getAttribute("verificationEmail");
-        String tipo = (String) session.getAttribute("tipoRegistro");
+        String tipoSession = (String) session.getAttribute("tipoRegistro");
+        
+        // Usar el tipo del parámetro si viene, sino el de sesión
+        String tipoFinal = (tipo != null && !tipo.isEmpty()) ? tipo : tipoSession;
         
         if (email == null) {
             return "{\"success\": false, \"error\": \"Sesión expirada\"}";
         }
         
-        if (tipo == null) {
-            tipo = "usuario"; // Por defecto
+        if (tipoFinal == null) {
+            tipoFinal = "usuario"; // Por defecto
         }
+        
+        System.out.println("🔐 [VERIFY-CODE] Email: " + email + ", Tipo: " + tipoFinal + ", Code: " + code);
 
         boolean isValid = verificationService.verifyCode(email, code);
         if (isValid) {
             session.setAttribute("verifiedEmail", email);
             
             // Redirigir según el tipo de registro
-            String redirectUrl = switch (tipo) {
-                case "negocio", "restaurante", "repartidor" -> "/registroNegocio";
+            String redirectUrl = switch (tipoFinal) {
+                case "restaurante" -> "/registroRestaurante";
+                case "repartidor" -> "/registroDelivery";
+                // case "negocio" -> "/registroNegocio"; // ❌ DEPRECADO - Ya no se usa
                 default -> "/registroUsuario";
             };
             
+            System.out.println("✅ [VERIFY-CODE] Código válido. Redirigiendo a: " + redirectUrl);
+            
             return "{\"success\": true, \"redirectUrl\": \"" + redirectUrl + "\"}";
         } else {
+            System.out.println("❌ [VERIFY-CODE] Código inválido");
             return "{\"success\": false, \"error\": \"Código inválido\"}";
         }
     }

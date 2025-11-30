@@ -99,8 +99,10 @@ public class HomeController {
     
     /**
      * Página de registro de negocio (restaurante/repartidor)
-     * Requiere verificación de email previa
+     * ❌ DEPRECADO - Ya no se usa, ahora cada uno tiene su propia página
+     * Se mantiene comentado por si se necesita referencia
      */
+    /*
     @GetMapping("/registroNegocio")
     public String registroNegocio(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         System.out.println("🏪 [REGISTRO NEGOCIO] Cargando formulario de registro de negocio");
@@ -121,6 +123,59 @@ public class HomeController {
         departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
         model.addAttribute("departamentos", departamentos);
         return "registroNegocio";
+    }
+    */
+    
+    /**
+     * Página de registro de restaurante
+     * Requiere verificación de email previa
+     */
+    @GetMapping("/registroRestaurante")
+    public String registroRestaurante(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        System.out.println("🏪 [REGISTRO RESTAURANTE] Cargando formulario de registro de restaurante");
+        
+        // Verificar que el email esté verificado
+        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
+        if (verifiedEmail == null) {
+            System.out.println("⚠️ [REGISTRO RESTAURANTE] Email no verificado, redirigiendo a /verificacion");
+            redirectAttributes.addFlashAttribute("error", "Debes verificar tu correo electrónico primero");
+            return "redirect:/verificacion?tipo=restaurante";
+        }
+        
+        model.addAttribute("verifiedEmail", verifiedEmail);
+        System.out.println("📧 [REGISTRO RESTAURANTE] Email verificado: " + verifiedEmail);
+        
+        List<Departamento> departamentos = departamentoRepository.findAllActivos();
+        System.out.println("🏪 [REGISTRO RESTAURANTE] Departamentos cargados: " + departamentos.size());
+        departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
+        model.addAttribute("departamentos", departamentos);
+        return "registroRestaurante";
+    }
+    
+    /**
+     * Página de registro de delivery/repartidor
+     * Requiere verificación de email previa
+     */
+    @GetMapping("/registroDelivery")
+    public String registroDelivery(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        System.out.println("🚴 [REGISTRO DELIVERY] Cargando formulario de registro de delivery");
+        
+        // Verificar que el email esté verificado
+        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
+        if (verifiedEmail == null) {
+            System.out.println("⚠️ [REGISTRO DELIVERY] Email no verificado, redirigiendo a /verificacion");
+            redirectAttributes.addFlashAttribute("error", "Debes verificar tu correo electrónico primero");
+            return "redirect:/verificacion?tipo=repartidor";
+        }
+        
+        model.addAttribute("verifiedEmail", verifiedEmail);
+        System.out.println("📧 [REGISTRO DELIVERY] Email verificado: " + verifiedEmail);
+        
+        List<Departamento> departamentos = departamentoRepository.findAllActivos();
+        System.out.println("🚴 [REGISTRO DELIVERY] Departamentos cargados: " + departamentos.size());
+        departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
+        model.addAttribute("departamentos", departamentos);
+        return "registroDelivery";
     }
     
     /**
@@ -207,11 +262,19 @@ public class HomeController {
             }
             
         } catch (Exception e) {
-            System.err.println("❌ [REGISTRO PASO 1] Error al registrar usuario: " + e.getMessage());
+            System.err.println("❌ [REGISTRO] Error al registrar: " + e.getMessage());
             e.printStackTrace();
             
+            // Redirigir a la página correcta según el rol
             redirectAttributes.addFlashAttribute("error", "Error al registrar: " + e.getMessage());
-            return "redirect:/registroNegocio";
+            
+            if (dto.getCodigoRol() == 2) { // Restaurante
+                return "redirect:/registroRestaurante";
+            } else if (dto.getCodigoRol() == 3) { // Repartidor
+                return "redirect:/registroDelivery";
+            } else {
+                return "redirect:/registro";
+            }
         }
     }
 

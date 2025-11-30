@@ -46,7 +46,7 @@ public class RepartidorController {
         if (usuarioCodigo == null || usuarioEmail == null) {
             System.out.println("⚠️ [REPARTIDOR PASO 2] No se encontró usuario temporal, redirigiendo a registro");
             redirectAttributes.addFlashAttribute("error", "Debes completar el registro de datos personales primero");
-            return "redirect:/registroNegocio";
+            return "redirect:/registroDelivery";
         }
         
         System.out.println("🚴 [REPARTIDOR PASO 2] Usuario temporal encontrado: " + usuarioEmail + " (Código: " + usuarioCodigo + ")");
@@ -67,7 +67,7 @@ public class RepartidorController {
         System.out.println("🚴 [REPARTIDOR PASO 2] Tipos de vehículo cargados: " + tiposVehiculo.size());
         model.addAttribute("tiposVehiculo", tiposVehiculo);
         
-        return "registroNegocio";
+        return "registroDelivery";
     }
     
     /**
@@ -86,7 +86,7 @@ public class RepartidorController {
             if (usuarioCodigo == null) {
                 System.out.println("⚠️ [REPARTIDOR PASO 2] No se encontró usuario temporal");
                 redirectAttributes.addFlashAttribute("error", "Sesión expirada. Debes volver a registrarte.");
-                return "redirect:/registroNegocio";
+                return "redirect:/registroDelivery";
             }
             
             System.out.println("🚴 [REPARTIDOR PASO 2] Registrando repartidor para usuario: " + usuarioCodigo);
