@@ -94,15 +94,17 @@ public class RepartidorController {
             // Registrar el repartidor vinculándolo al usuario existente
             Repartidor repartidor = repartidorService.registrarRepartidor(dto, usuarioCodigo);
             
+            System.out.println("✅ [REPARTIDOR PASO 2] Repartidor registrado exitosamente: " + repartidor.getCodigo());
+            
             // Limpiar sesión temporal
             session.removeAttribute("usuarioCodigoTemporal");
             session.removeAttribute("usuarioEmailTemporal");
             
-            System.out.println("✅ [REPARTIDOR PASO 2] Repartidor registrado exitosamente: " + repartidor.getCodigo());
+            // Mensaje de éxito
+            redirectAttributes.addFlashAttribute("registroExitoso", true);
+            redirectAttributes.addFlashAttribute("mensajeRegistro", 
+                "¡Registro exitoso! Tu solicitud está en revisión. Recibirás un correo electrónico con el resultado de la aprobación en las próximas 24-48 horas.");
             
-            redirectAttributes.addFlashAttribute("mensaje", 
-                "¡Registro exitoso! Tu solicitud está en revisión. Código: " + repartidor.getCodigo());
-            redirectAttributes.addFlashAttribute("tipo", "success");
             return "redirect:/login";
             
         } catch (Exception e) {

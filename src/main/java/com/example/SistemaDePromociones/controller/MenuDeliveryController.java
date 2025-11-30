@@ -47,17 +47,32 @@ public class MenuDeliveryController {
             Repartidor repartidor = repartidorRepository.findByCodigoUsuario(usuario.getCodigo())
                     .orElseThrow(() -> new RuntimeException("Repartidor no encontrado"));
             
-            // Verificar estado de aprobación
+            // Verificar estado de aprobación - BLOQUEAR ACCESO si no está aprobado
             if (repartidor.getCodigoEstadoAprobacion() == 7L) {
+                // Pendiente de aprobación
+                System.out.println("⚠️ [MENU DELIVERY] Repartidor pendiente de aprobación");
                 model.addAttribute("mensaje", "Tu solicitud está en revisión. Espera la aprobación del administrador.");
                 model.addAttribute("estado", "pendiente");
+                model.addAttribute("usuario", usuario);
+                return "estadoAprobacionDelivery"; // Vista especial para pendientes
             } else if (repartidor.getCodigoEstadoAprobacion() == 9L) {
-                model.addAttribute("mensaje", "Tu solicitud fue rechazada. Contacta al administrador.");
+                // Rechazado
+                System.out.println("❌ [MENU DELIVERY] Repartidor rechazado");
+                model.addAttribute("mensaje", "Tu solicitud fue rechazada. Motivo: " + (repartidor.getMotivoRechazo() != null ? repartidor.getMotivoRechazo() : "No especificado"));
                 model.addAttribute("estado", "rechazado");
+                model.addAttribute("usuario", usuario);
+                return "estadoAprobacionDelivery"; // Vista especial para rechazados
             } else if (repartidor.getCodigoEstadoAprobacion() == 8L && !repartidor.getEstado()) {
+                // Desactivado
+                System.out.println("⚠️ [MENU DELIVERY] Repartidor desactivado");
                 model.addAttribute("mensaje", "Tu cuenta está desactivada. Contacta al administrador.");
                 model.addAttribute("estado", "desactivado");
+                model.addAttribute("usuario", usuario);
+                return "estadoAprobacionDelivery"; // Vista especial para desactivados
             }
+            
+            // Si llegamos aquí, el repartidor está aprobado (código 8) y activo
+            System.out.println("✅ [MENU DELIVERY] Repartidor aprobado y activo");
             
 
 

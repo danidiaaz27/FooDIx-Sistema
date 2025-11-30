@@ -168,31 +168,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            console.log('📝 [PASO 1] Validación exitosa, mostrando paso 2...');
+            console.log('📝 [PASO 1] Validación exitosa, enviando al servidor...');
             console.log('📝 [PASO 1] Rol seleccionado: Restaurante (2)');
             
-            // Copiar valores del Paso 1 a campos ocultos del Paso 2
-            document.getElementById('hiddenTipoDocumento').value = docTypeSelect.value;
-            document.getElementById('hiddenNumeroDocumento').value = docNumberInput.value;
-            document.getElementById('hiddenFechaNacimiento').value = birthDateInput.value;
-            document.getElementById('hiddenNombre').value = nameInput.value;
-            document.getElementById('hiddenApellidoPaterno').value = paternalInput.value;
-            document.getElementById('hiddenApellidoMaterno').value = maternalInput.value;
-            document.getElementById('hiddenTelefono').value = phoneInput.value;
-            document.getElementById('hiddenCorreoElectronico').value = document.getElementById('CorreoElectronico').value;
-            document.getElementById('hiddenContrasena').value = passwordInput.value;
-            document.getElementById('hiddenCodigoDepartamento').value = deptSelect.value;
-            document.getElementById('hiddenCodigoProvincia').value = provSelect.value;
-            document.getElementById('hiddenCodigoDistrito').value = distSelect.value;
-            document.getElementById('hiddenDireccion').value = document.getElementById('Direccion').value;
-            
-            // Ocultar paso 1 y mostrar paso 2 (SIN enviar al servidor)
-            registerForm.style.display = 'none';
-            restaurantForm.style.display = 'block';
-            restaurantForm.classList.add('active');
-            
-            // Scroll hacia arriba
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Enviar formulario al servidor (POST /registro)
+            // El servidor creará el usuario y redirigirá a /registro-restaurante para el paso 2
+            registerForm.submit();
         });
     }
     

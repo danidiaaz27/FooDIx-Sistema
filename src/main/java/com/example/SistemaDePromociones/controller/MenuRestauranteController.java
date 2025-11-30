@@ -46,7 +46,9 @@ public class MenuRestauranteController {
 
             // Verificar estado del restaurante
             if (!validarEstadoRestaurante(restaurante, model)) {
-                return "estado-restaurante";
+                // Agregar datos mínimos para la vista de estado
+                model.addAttribute("restaurante", restaurante);
+                return "estadoAprobacionDelivery"; // Usa la misma vista que delivery
             }
 
             // Cargar datos en el modelo
@@ -114,20 +116,24 @@ public class MenuRestauranteController {
 
     private boolean validarEstadoRestaurante(Restaurante restaurante, Model model) {
         if (restaurante.getCodigoEstadoAprobacion() == 7L) {
+            System.out.println("⚠️ [MENU RESTAURANTE] Restaurante pendiente de aprobación");
             model.addAttribute("mensaje", "Tu solicitud está en revisión. Espera la aprobación del administrador.");
             model.addAttribute("estado", "pendiente");
             return false;
         }
         if (restaurante.getCodigoEstadoAprobacion() == 9L) {
-            model.addAttribute("mensaje", "Tu solicitud fue rechazada. Contacta al administrador.");
+            System.out.println("❌ [MENU RESTAURANTE] Restaurante rechazado");
+            model.addAttribute("mensaje", "Tu solicitud fue rechazada. Motivo: " + (restaurante.getMotivoRechazo() != null ? restaurante.getMotivoRechazo() : "No especificado"));
             model.addAttribute("estado", "rechazado");
             return false;
         }
         if (restaurante.getCodigoEstadoAprobacion() == 8L && !restaurante.getEstado()) {
+            System.out.println("⚠️ [MENU RESTAURANTE] Restaurante desactivado");
             model.addAttribute("mensaje", "Tu cuenta está desactivada. Contacta al administrador.");
             model.addAttribute("estado", "desactivado");
             return false;
         }
+        System.out.println("✅ [MENU RESTAURANTE] Restaurante aprobado y activo");
         return true;
     }
 

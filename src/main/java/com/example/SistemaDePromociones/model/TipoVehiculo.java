@@ -7,18 +7,18 @@ import lombok.Data;
  * Entidad TipoVehiculo - Catálogo de tipos de vehículos
  */
 @Entity
-@Table(name = "TipoVehiculo")
+@Table(name = "tipo_vehiculo")
 @Data
 public class TipoVehiculo {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Codigo")
+    @Column(name = "codigo")
     private Long codigo;
     
-    @Column(name = "Nombre", nullable = false, length = 20)
+    @Column(name = "nombre", nullable = false, length = 20)
     private String nombre;
     
-    @Column(name = "Estado", nullable = false)
+    @Column(name = "estado", nullable = false)
     private Boolean estado = true;
 }

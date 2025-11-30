@@ -93,15 +93,17 @@ public class RestauranteController {
             // Registrar el restaurante vinculándolo al usuario existente
             Long codigoRestaurante = restauranteService.registrarRestaurante(dto, usuarioCodigo);
             
+            System.out.println("✅ [RESTAURANTE PASO 2] Restaurante registrado exitosamente: " + codigoRestaurante);
+            
             // Limpiar sesión temporal
             session.removeAttribute("usuarioCodigoTemporal");
             session.removeAttribute("usuarioEmailTemporal");
             
-            System.out.println("✅ [RESTAURANTE PASO 2] Restaurante registrado exitosamente: " + codigoRestaurante);
+            // Mensaje de éxito
+            redirectAttributes.addFlashAttribute("registroExitoso", true);
+            redirectAttributes.addFlashAttribute("mensajeRegistro", 
+                "¡Registro exitoso! Tu solicitud está en revisión. Recibirás un correo electrónico con el resultado de la aprobación en las próximas 24-48 horas.");
             
-            redirectAttributes.addFlashAttribute("mensaje", 
-                "¡Registro exitoso! Tu solicitud está en revisión. Código: " + codigoRestaurante);
-            redirectAttributes.addFlashAttribute("tipo", "success");
             return "redirect:/login";
             
         } catch (Exception e) {

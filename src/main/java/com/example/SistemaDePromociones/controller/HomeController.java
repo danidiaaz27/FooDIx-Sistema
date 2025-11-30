@@ -2,8 +2,10 @@ package com.example.SistemaDePromociones.controller;
 
 import com.example.SistemaDePromociones.dto.UsuarioRegistroDTO;
 import com.example.SistemaDePromociones.model.Departamento;
+import com.example.SistemaDePromociones.model.TipoVehiculo;
 import com.example.SistemaDePromociones.model.Usuario;
 import com.example.SistemaDePromociones.repository.jdbc.DepartamentoJdbcRepository;
+import com.example.SistemaDePromociones.repository.TipoVehiculoRepository;
 import com.example.SistemaDePromociones.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,9 @@ public class HomeController {
     
     @Autowired
     private DepartamentoJdbcRepository departamentoRepository;
+    
+    @Autowired
+    private TipoVehiculoRepository tipoVehiculoRepository;
     
     @Autowired
     private UsuarioService usuarioService;
@@ -175,6 +180,12 @@ public class HomeController {
         System.out.println("🚴 [REGISTRO DELIVERY] Departamentos cargados: " + departamentos.size());
         departamentos.forEach(d -> System.out.println("   - " + d.getCodigo() + ": " + d.getNombre()));
         model.addAttribute("departamentos", departamentos);
+        
+        // Cargar tipos de vehículo para el select
+        List<TipoVehiculo> tiposVehiculo = tipoVehiculoRepository.findByEstadoTrue();
+        System.out.println("🚴 [REGISTRO DELIVERY] Tipos de vehículo cargados: " + tiposVehiculo.size());
+        model.addAttribute("tiposVehiculo", tiposVehiculo);
+        
         return "registroDelivery";
     }
     
@@ -277,6 +288,5 @@ public class HomeController {
             }
         }
     }
-
     
 }

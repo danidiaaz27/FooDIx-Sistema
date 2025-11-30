@@ -2,6 +2,8 @@ package com.example.SistemaDePromociones.repository;
 
 import com.example.SistemaDePromociones.model.Repartidor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,12 +23,14 @@ public interface RepartidorRepository extends JpaRepository<Repartidor, Long> {
     /**
      * Buscar repartidor por número de licencia
      */
-    Optional<Repartidor> findByNumeroLicencia(String numeroLicencia);
+    @Query("SELECT r FROM Repartidor r WHERE r.numeroLicencia = :numeroLicencia")
+    Optional<Repartidor> findByNumeroLicencia(@Param("numeroLicencia") String numeroLicencia);
     
     /**
      * Verificar si existe un número de licencia
      */
-    boolean existsByNumeroLicencia(String numeroLicencia);
+    @Query("SELECT COUNT(r) > 0 FROM Repartidor r WHERE r.numeroLicencia = :numeroLicencia")
+    boolean existsByNumeroLicencia(@Param("numeroLicencia") String numeroLicencia);
     
     /**
      * Buscar repartidores por estado de aprobación

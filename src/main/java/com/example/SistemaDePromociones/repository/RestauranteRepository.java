@@ -2,6 +2,8 @@ package com.example.SistemaDePromociones.repository;
 
 import com.example.SistemaDePromociones.model.Restaurante;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,12 +22,14 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     /**
      * Buscar restaurante por RUC
      */
-    Optional<Restaurante> findByRuc(String ruc);
+    @Query("SELECT r FROM Restaurante r WHERE r.ruc = :ruc")
+    Optional<Restaurante> findByRuc(@Param("ruc") String ruc);
 
     /**
      * Verificar si existe un RUC
      */
-    boolean existsByRuc(String ruc);
+    @Query("SELECT COUNT(r) > 0 FROM Restaurante r WHERE r.ruc = :ruc")
+    boolean existsByRuc(@Param("ruc") String ruc);
 
     /**
      * Buscar restaurantes por estado de aprobación

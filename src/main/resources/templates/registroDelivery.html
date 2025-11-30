@@ -433,7 +433,7 @@
                         </form>
 
                         <!-- Formulario para Repartidor (Paso 2) -->
-                        <form action="/registro" th:action="@{/registro}" method="post" id="deliveryForm" class="form-step" enctype="multipart/form-data">
+                        <form action="/registro-repartidor" th:action="@{/registro-repartidor}" method="post" id="deliveryForm" class="form-step" enctype="multipart/form-data">
                             <h5 class="mb-3"><i class="fas fa-motorcycle me-2"></i>Datos del Repartidor</h5>
                             
                             <!-- Campos ocultos del Paso 1 -->
@@ -455,14 +455,17 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="TipoVehiculo" class="form-label">Tipo de Vehículo *</label>
-                                    <select class="form-select" id="TipoVehiculo" name="TipoVehiculo" required>
+                                    <select class="form-select" id="TipoVehiculo" name="codigoTipoVehiculo" required>
                                         <option value="">Seleccionar</option>
+                                        <option th:each="tipo : ${tiposVehiculo}" 
+                                                th:value="${tipo.codigo}" 
+                                                th:text="${tipo.nombre}"></option>
                                     </select>
                                     <div class="form-text text-muted">Selecciona el vehículo con el que realizarás los repartos</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="NumeroLicencia" class="form-label">Número de Licencia *</label>
-                                    <input type="text" class="form-control" id="NumeroLicencia" name="NumeroLicencia" 
+                                    <input type="text" class="form-control" id="NumeroLicencia" name="numeroLicencia" 
                                            required maxlength="10" placeholder="Ej: A12345678">
                                     <div class="form-text text-muted">Licencia de conducir vigente</div>
                                 </div>

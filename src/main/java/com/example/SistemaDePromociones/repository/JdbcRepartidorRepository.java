@@ -23,20 +23,20 @@ public class JdbcRepartidorRepository {
 
     public boolean existsByNumeroLicencia(String numeroLicencia) {
         Integer count = jdbc.queryForObject(
-                "SELECT COUNT(1) FROM repartidor WHERE NumeroLicencia = ?",
+                "SELECT COUNT(1) FROM repartidor WHERE numero_licencia = ?",
                 Integer.class, numeroLicencia);
         return count != null && count > 0;
     }
 
     public Optional<Repartidor> findByNumeroLicencia(String numeroLicencia) {
         var list = jdbc.query(
-                "SELECT * FROM repartidor WHERE NumeroLicencia = ? LIMIT 1",
+                "SELECT * FROM repartidor WHERE numero_licencia = ? LIMIT 1",
                 new RepartidorRowMapper(), numeroLicencia);
         return list.stream().findFirst();
     }
 
     public Repartidor save(Repartidor r) {
-        String sql = "INSERT INTO repartidor (CodigoUsuario, NumeroLicencia, CodigoTipoVehiculo, Disponible, CodigoEstadoAprobacion, FechaAprobacion, CodigoAprobador, MotivoRechazo, FechaCreacion, Estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO repartidor (codigo_usuario, numero_licencia, codigo_tipo_vehiculo, disponible, codigo_estado_aprobacion, fecha_aprobacion, codigo_aprobador, motivo_rechazo, fecha_creacion, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         try {
             jdbc.update(connection -> {
@@ -45,7 +45,7 @@ public class JdbcRepartidorRepository {
                 ps.setString(2, r.getNumeroLicencia());
                 ps.setLong(3, r.getCodigoTipoVehiculo());
                 ps.setBoolean(4, r.getDisponible() != null ? r.getDisponible() : Boolean.TRUE);
-                ps.setLong(5, r.getCodigoEstadoAprobacion() != null ? r.getCodigoEstadoAprobacion() : 1L);
+                ps.setLong(5, r.getCodigoEstadoAprobacion() != null ? r.getCodigoEstadoAprobacion() : 7L);
                 if (r.getFechaAprobacion() != null) {
                     ps.setObject(6, java.sql.Timestamp.valueOf(r.getFechaAprobacion()));
                 } else {
