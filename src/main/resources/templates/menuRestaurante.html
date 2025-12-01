@@ -20,35 +20,116 @@
         }
         
         .restaurante-header {
-            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            background: linear-gradient(135deg, #C62828 0%, #8B1F1F 100%);
             color: white;
-            padding: 1.5rem 0;
-            box-shadow: 0 4px 20px rgba(198,40,40,0.3);
+            padding: 1.2rem 0;
+            box-shadow: 0 4px 20px rgba(198,40,40,0.4);
+            border-bottom: 2px solid rgba(245,166,35,0.3);
         }
         
         .restaurante-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.3rem 0;
+        }
+        
+        .restaurante-logo-icon {
+            background: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .restaurante-logo-icon:hover {
+            transform: scale(1.05);
+        }
+        
+        .restaurante-logo-icon i {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .restaurante-logo-text {
             font-size: 1.8rem;
             font-weight: 700;
             color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            letter-spacing: -0.5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
         
-        .restaurante-logo img {
-            height: 50px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        .restaurante-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-left: 8px;
         }
         
         .online-status {
-            font-size: 0.9rem;
-            color: #28a745;
+            font-size: 0.75rem;
+            color: #90EE90;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .online-status i {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
         
         .restaurante-name {
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.95);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .header-actions .theme-toggle {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-actions .theme-toggle:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.35);
+        }
+        
+        .header-actions .btn-logout {
+            background: white;
+            color: #C62828;
+            border: none;
+            padding: 0.6rem 1.3rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .header-actions .btn-logout:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
         .restaurante-nav {
@@ -318,6 +399,21 @@
         
         [data-theme="dark"] .restaurante-header {
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #8B1F1F 0%, #5A1313 100%);
+            border-bottom-color: rgba(245,166,35,0.2);
+        }
+        
+        [data-theme="dark"] .restaurante-logo-icon {
+            background: rgba(255,255,255,0.95);
+        }
+        
+        [data-theme="dark"] .header-actions .btn-logout {
+            background: rgba(255,255,255,0.95);
+            color: #8B1F1F;
+        }
+        
+        [data-theme="dark"] .header-actions .btn-logout:hover {
+            background: white;
         }
         
         [data-theme="dark"] .stats-icon {
@@ -337,6 +433,54 @@
         [data-theme="dark"] .restaurante-tabs .nav-link:hover {
             background: rgba(198,40,40,0.15) !important;
         }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .restaurante-header {
+                padding: 1rem 0;
+            }
+            
+            .restaurante-logo-icon {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .restaurante-logo-icon i {
+                font-size: 1.4rem;
+            }
+            
+            .restaurante-logo-text {
+                font-size: 1.4rem;
+            }
+            
+            .restaurante-info {
+                margin-left: 4px;
+            }
+            
+            .online-status {
+                font-size: 0.7rem;
+            }
+            
+            .restaurante-name {
+                font-size: 0.85rem;
+            }
+            
+            .header-actions {
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .header-actions .btn-logout {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .header-actions {
+                justify-content: flex-end !important;
+            }
+        }
     </style>
 </head>
 <body class="restaurante-app">
@@ -344,33 +488,40 @@
     <header class="restaurante-header">
         <div class="container-fluid px-4">
             <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="d-flex align-items-center gap-3">
+                <div class="col-lg-6 col-md-5 mb-3 mb-md-0">
+                    <div class="d-flex align-items-center">
                         <div class="restaurante-logo">
-                            <img th:src="@{/img/logoFoodix.png}" alt="FoodIx Logo" style="height: 50px;">
-                            <span style="font-size: 1.8rem; font-weight: 700; color: white; letter-spacing: -0.5px;">FoodIx</span>
-                        </div>
-                        <div class="ms-2">
-                            <div class="d-flex align-items-center mb-1">
-                                <span class="online-status" style="font-size: 0.85rem; color: #90EE90;">
-                                    <i class="fas fa-circle"></i> En línea
-                                </span>
+                            <div class="restaurante-logo-icon">
+                                <i class="fas fa-utensils"></i>
                             </div>
-                            <div class="restaurante-name" style="font-size: 1.1rem; font-weight: 600;" th:text="'¡Hola ' + ${restaurante != null ? restaurante.nombre : 'Restaurante'} + '!'">¡Hola Restaurante!</div>
+                            <span class="restaurante-logo-text">FoodIx</span>
+                        </div>
+                        <div class="restaurante-info">
+                            <div class="online-status">
+                                <i class="fas fa-circle"></i>
+                                <span>En línea</span>
+                            </div>
+                            <div class="restaurante-name" th:text="'¡Hola ' + ${restaurante != null ? restaurante.nombre : 'Restaurante'} + '!'">
+                                ¡Hola Restaurante!
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 text-end">
-                    <button class="theme-toggle me-3" type="button" aria-label="Cambiar tema" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
-                        <i class="fas fa-sun"></i>
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <form th:action="@{/logout}" method="post" style="display: inline;">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                        <button type="submit" class="btn btn-light btn-sm" style="padding: 0.6rem 1.2rem; font-weight: 600; border-radius: 8px;">
-                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                <div class="col-lg-6 col-md-7 text-md-end text-center">
+                    <div class="header-actions">
+                        <button class="theme-toggle" type="button" aria-label="Cambiar tema">
+                            <i class="fas fa-sun"></i>
+                            <i class="fas fa-moon"></i>
                         </button>
-                    </form>
+                        <form th:action="@{/logout}" method="post" style="display: inline;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button type="submit" class="btn btn-logout">
+                                <i class="fas fa-sign-out-alt me-1"></i>
+                                <span class="d-none d-sm-inline">Cerrar Sesión</span>
+                                <span class="d-inline d-sm-none">Salir</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

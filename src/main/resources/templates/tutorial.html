@@ -8,6 +8,185 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
+    <style>
+        .tutorial-hero {
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            color: white;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tutorial-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        
+        .tutorial-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-icon {
+            background: white;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .hero-icon i {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .video-container {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-top: -80px;
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .step-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            height: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .step-card:hover {
+            transform: translateY(-10px);
+            border-color: #F5A623;
+            box-shadow: 0 12px 30px rgba(198,40,40,0.15);
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 6px 20px rgba(198,40,40,0.3);
+        }
+        
+        .step-card h5 {
+            color: #C62828;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .faq-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            height: 100%;
+            border-left: 4px solid #F5A623;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .faq-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .faq-card .card-title i {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(198,40,40,0.1) 0%, rgba(245,166,35,0.1) 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .section-title {
+            color: #C62828;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #C62828 0%, #F5A623 100%);
+            border-radius: 2px;
+        }
+        
+        [data-theme="dark"] .tutorial-hero {
+            background: linear-gradient(135deg, #8B1F1F 0%, #D48E1F 100%);
+        }
+        
+        [data-theme="dark"] .video-container {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .hero-icon {
+            background: rgba(255,255,255,0.95);
+        }
+    </style>
 </head>
 <body>
 
@@ -72,7 +251,7 @@
 </nav>
 
 <!-- Contenido Principal -->
-<main style="padding-top: 90px;">
+<main style="padding-top: 80px;">
     <!-- Mensajes de notificación -->
     <div th:if="${message}" class="container">
         <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
@@ -87,117 +266,146 @@
         </div>
     </div>
 
-    <section class="tutorial-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center text-center p-5">
-                    <i class="fas fa-chalkboard-teacher fa-5x mb-4 text-primary"></i>
-                    <h2 class="fw-bold">Bienvenido a tu Tutorial</h2>
-                    <p class="tutorial-subtitle">
-                        Aprende cómo iniciar sesión, navegar y usar todas las funciones de nuestra plataforma en este video guiado.
-                        Aquí tendrás una explicación clara y sencilla para que domines cada paso.
+    <!-- Hero Section -->
+    <section class="tutorial-hero">
+        <div class="container tutorial-hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-12 text-center">
+                    <div class="hero-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h1 class="display-4 fw-bold mb-3">Aprende a Usar FoodIx</h1>
+                    <p class="lead mb-4" style="font-size: 1.2rem; opacity: 0.95;">
+                        Descubre todas las funciones de nuestra plataforma con este tutorial completo.<br>
+                        ¡Es fácil, rápido y te ayudará a aprovechar al máximo FoodIx!
                     </p>
-                    <div class="mt-4" th:if="${currentUser == null}">
-                        <a href="/registro" th:href="@{/registro}" class="btn btn-success btn-lg me-2">
-                            <i class="fas fa-user-plus"></i> Crear Cuenta
-                        </a>
-                        <a href="/login" th:href="@{/login}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="video-wrapper">
-                        <iframe src="https://www.youtube.com/embed/dXuHweiNZDU"
-                                title="Tutorial ChiclaYapa"
-                                allowfullscreen></iframe>
-                    </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="py-5" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="video-container">
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/dXuHweiNZDU"
+                            title="Tutorial FoodIx"
+                            allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
             
             <!-- Pasos del tutorial -->
-            <div class="row mt-5">
-                <div class="col-12">
-                    <h3 class="text-center mb-4 fw-bold">Pasos para usar ChiclaYapa</h3>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="tutorial-step">
-                        <div class="step-number">1</div>
-                        <h5>Regístrate</h5>
-                        <p>Crea tu cuenta gratis para acceder a todas las promociones</p>
-                        <div th:if="${currentUser == null}">
-                            <a href="/registro" th:href="@{/registro}" class="btn btn-sm btn-outline-primary">
-                                Registrarme ahora
-                            </a>
+            <section class="py-5">
+                <div class="container">
+                    <div class="text-center mb-5">
+                        <h2 class="section-title">¿Cómo Funciona FoodIx?</h2>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="step-card">
+                                <div class="step-number">1</div>
+                                <h5>Crea tu Cuenta</h5>
+                                <p class="text-muted mb-0">Regístrate gratis en FoodIx y accede a todas las promociones exclusivas de restaurantes</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="step-card">
+                                <div class="step-number">2</div>
+                                <h5>Explora Ofertas</h5>
+                                <p class="text-muted mb-0">Navega por las categorías y descubre las mejores promociones cerca de ti</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="step-card">
+                                <div class="step-number">3</div>
+                                <h5>Agrega al Carrito</h5>
+                                <p class="text-muted mb-0">Selecciona tus platos favoritos y agrégalos a tu carrito de compras</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="step-card">
+                                <div class="step-number">4</div>
+                                <h5>Realiza tu Pedido</h5>
+                                <p class="text-muted mb-0">Confirma tu pedido y disfruta de deliciosa comida a precios increíbles</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-4">
-                    <div class="tutorial-step">
-                        <div class="step-number">2</div>
-                        <h5>Explora</h5>
-                        <p>Navega por las categorías y encuentra tus platos favoritos</p>
-                        <div th:if="${currentUser != null}">
-                            <a href="/menu" th:href="@{/menu}" class="btn btn-sm btn-outline-success">
-                                Ver menú
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="tutorial-step">
-                        <div class="step-number">3</div>
-                        <h5>Agrega al carrito</h5>
-                        <p>Selecciona los productos que quieres y agrégalos a tu carrito</p>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="tutorial-step">
-                        <div class="step-number">4</div>
-                        <h5>Realiza tu pedido</h5>
-                        <p>Elige tu método de pago y confirma tu pedido para recoger</p>
-                    </div>
-                </div>
-            </div>
+            </section>
 
             <!-- Sección de preguntas frecuentes -->
-            <div class="row mt-5 mb-5">
-                <div class="col-12">
-                    <h3 class="text-center mb-4 fw-bold">Preguntas Frecuentes</h3>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-question-circle text-primary"></i> ¿Cómo funciona ChiclaYapa?</h5>
-                            <p class="card-text">ChiclaYapa te permite comprar comida a precios reducidos de restaurantes asociados. Solo necesitas crear una cuenta, explorar las ofertas y realizar tu pedido.</p>
+            <section class="py-5" style="background: var(--bg-secondary);">
+                <div class="container">
+                    <div class="text-center mb-5">
+                        <h2 class="section-title">Preguntas Frecuentes</h2>
+                        <p class="text-muted">Resolvemos tus dudas sobre FoodIx</p>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="faq-card">
+                                <h5 class="card-title mb-3">
+                                    <i class="fas fa-question-circle"></i>
+                                    ¿Cómo funciona FoodIx?
+                                </h5>
+                                <p class="card-text text-muted mb-0">
+                                    FoodIx conecta a restaurantes con clientes, permitiéndote acceder a promociones exclusivas y ofertas especiales. 
+                                    Solo necesitas crear una cuenta, explorar las ofertas disponibles y realizar tu pedido.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="faq-card">
+                                <h5 class="card-title mb-3">
+                                    <i class="fas fa-clock"></i>
+                                    ¿Cuándo puedo recoger mi pedido?
+                                </h5>
+                                <p class="card-text text-muted mb-0">
+                                    Cada promoción tiene un horario específico de disponibilidad que se muestra en su descripción. 
+                                    Asegúrate de revisar los horarios antes de realizar tu pedido.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="faq-card">
+                                <h5 class="card-title mb-3">
+                                    <i class="fas fa-credit-card"></i>
+                                    ¿Qué métodos de pago aceptan?
+                                </h5>
+                                <p class="card-text text-muted mb-0">
+                                    Aceptamos tarjetas de crédito, débito, Yape y Plin. 
+                                    Todos los pagos se procesan de forma segura a través de nuestra plataforma.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="faq-card">
+                                <h5 class="card-title mb-3">
+                                    <i class="fas fa-shield-alt"></i>
+                                    ¿Es seguro usar FoodIx?
+                                </h5>
+                                <p class="card-text text-muted mb-0">
+                                    Sí, todos los restaurantes están verificados y los pagos son procesados de forma segura. 
+                                    Protegemos tu información personal y garantizamos transacciones seguras.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CTA Section -->
+                    <div class="text-center mt-5">
+                        <div class="p-4 rounded-4" style="background: linear-gradient(135deg, rgba(198,40,40,0.1) 0%, rgba(245,166,35,0.1) 100%); border: 2px dashed #F5A623;">
+                            <h4 class="mb-3" style="color: #C62828;">¿Listo para comenzar?</h4>
+                            <p class="text-muted mb-4">Descubre las mejores promociones de restaurantes en tu ciudad</p>
+                            <a href="/login" th:href="@{/login}" class="btn btn-lg" style="background: linear-gradient(135deg, #C62828 0%, #F5A623 100%); color: white; border: none; padding: 1rem 2.5rem; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(198,40,40,0.3);">
+                                <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-clock text-primary"></i> ¿Cuándo puedo recoger mi pedido?</h5>
-                            <p class="card-text">Cada producto tiene un horario específico de recogida que se muestra en su descripción. Asegúrate de llegar en el horario establecido.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-credit-card text-primary"></i> ¿Qué métodos de pago aceptan?</h5>
-                            <p class="card-text">Aceptamos tarjetas de crédito, débito, Yape y Plin. Todos los pagos se realizan de forma segura a través de nuestra plataforma.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-leaf text-primary"></i> ¿Por qué los precios son tan bajos?</h5>
-                            <p class="card-text">Ayudamos a reducir el desperdicio de comida rescatando productos que de otra manera no se venderían. ¡Tú ahorras y el planeta también gana!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </section>
         </div>
     </section>
 </main>
