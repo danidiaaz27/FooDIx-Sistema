@@ -366,6 +366,43 @@ CREATE TABLE `repartidor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- =====================================================
+-- INSERTAR REPARTIDORES DE PRUEBA
+-- =====================================================
+-- Repartidor 1: dann27@gmail.com (Daniela Diaz) - APROBADO
+INSERT INTO `repartidor` (
+  `codigo_usuario`, `numero_licencia`, `codigo_tipo_vehiculo`, 
+  `codigo_estado_aprobacion`, `codigo_aprobador`, `disponible`, 
+  `estado`, `fecha_creacion`, `fecha_aprobacion`
+) VALUES (
+  (SELECT codigo FROM usuario WHERE correo_electronico = 'dann27@gmail.com' LIMIT 1),
+  'LIC-2024-001',
+  10, -- Motocicleta
+  8,  -- Aprobado
+  (SELECT codigo FROM usuario WHERE correo_electronico = 'admin@local.dev' LIMIT 1),
+  TRUE,
+  TRUE,
+  NOW(),
+  NOW()
+);
+
+-- Repartidor 2: CarlosDiaz@gmail.com (Carlos Diaz) - APROBADO
+INSERT INTO `repartidor` (
+  `codigo_usuario`, `numero_licencia`, `codigo_tipo_vehiculo`, 
+  `codigo_estado_aprobacion`, `codigo_aprobador`, `disponible`, 
+  `estado`, `fecha_creacion`, `fecha_aprobacion`
+) VALUES (
+  (SELECT codigo FROM usuario WHERE correo_electronico = 'CarlosDiaz@gmail.com' LIMIT 1),
+  'LIC-2024-002',
+  10, -- Motocicleta
+  8,  -- Aprobado
+  (SELECT codigo FROM usuario WHERE correo_electronico = 'admin@local.dev' LIMIT 1),
+  TRUE,
+  TRUE,
+  NOW(),
+  NOW()
+);
+
+-- =====================================================
 -- TABLAS DE DOCUMENTOS E IMÁGENES
 -- =====================================================
 
