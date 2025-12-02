@@ -72,16 +72,18 @@ public class PlatoMenuDTO {
      */
     public static class UnidadMedidaDTO {
         private Long codigo;
-        private String nombre;
+        private Long codigoTipoUnidad;  // Ahora usa FK en lugar de nombre
+        private String nombreTipoUnidad; // Solo para lectura desde el frontend
         private String descripcion;
         private Double precioOriginal;
         
         public UnidadMedidaDTO() {
         }
         
-        public UnidadMedidaDTO(Long codigo, String nombre, String descripcion, Double precioOriginal) {
+        public UnidadMedidaDTO(Long codigo, Long codigoTipoUnidad, String nombreTipoUnidad, String descripcion, Double precioOriginal) {
             this.codigo = codigo;
-            this.nombre = nombre;
+            this.codigoTipoUnidad = codigoTipoUnidad;
+            this.nombreTipoUnidad = nombreTipoUnidad;
             this.descripcion = descripcion;
             this.precioOriginal = precioOriginal;
         }
@@ -94,12 +96,20 @@ public class PlatoMenuDTO {
             this.codigo = codigo;
         }
         
-        public String getNombre() {
-            return nombre;
+        public Long getCodigoTipoUnidad() {
+            return codigoTipoUnidad;
         }
         
-        public void setNombre(String nombre) {
-            this.nombre = nombre;
+        public void setCodigoTipoUnidad(Long codigoTipoUnidad) {
+            this.codigoTipoUnidad = codigoTipoUnidad;
+        }
+        
+        public String getNombreTipoUnidad() {
+            return nombreTipoUnidad;
+        }
+        
+        public void setNombreTipoUnidad(String nombreTipoUnidad) {
+            this.nombreTipoUnidad = nombreTipoUnidad;
         }
         
         public String getDescripcion() {

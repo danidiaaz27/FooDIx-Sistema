@@ -435,6 +435,34 @@ CREATE TABLE `documento_restaurante` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- =====================================================
+-- TABLA: tipo_unidad_medida
+-- Catálogo simple de unidades de medida
+-- =====================================================
+DROP TABLE IF EXISTS `tipo_unidad_medida`;
+CREATE TABLE `tipo_unidad_medida` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `UK_nombre_unidad` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insertar unidades predefinidas
+INSERT INTO `tipo_unidad_medida` (`codigo`, `nombre`) VALUES
+(1, 'Entero'),
+(2, 'Medio (½)'),
+(3, 'Un cuarto (¼)'),
+(4, 'Tres cuartos (¾)'),
+(5, 'Personal'),
+(6, 'Mediano'),
+(7, 'Grande'),
+(8, 'Familiar'),
+(9, 'Media fuente'),
+(10, 'Fuente entera'),
+(11, 'Ración simple'),
+(12, 'Ración doble'),
+(13, 'Combo');
+
+-- =====================================================
 -- TABLA: plato_menu
 -- Almacena los platos del menú de cada restaurante
 -- =====================================================
@@ -449,21 +477,20 @@ CREATE TABLE `plato_menu` (
   `fecha_modificacion` datetime(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`codigo`),
   KEY `FK_plato_menu_restaurante` (`codigo_restaurante`),
-  KEY `IDX_plato_estado` (`estado`),
+  INDEX `idx_estado` (`estado`),
   CONSTRAINT `FK_plato_menu_restaurante` FOREIGN KEY (`codigo_restaurante`) REFERENCES `restaurante` (`codigo`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================
 -- TABLA: unidad_medida_plato
 -- Almacena las unidades de medida de cada plato
--- (Personal, Familiar, 1/4, 1/2, etc.)
--- Cada unidad tiene su propio precio
+-- Ahora usa una FK hacia tipo_unidad_medida para mantener consistencia
 -- =====================================================
 DROP TABLE IF EXISTS `unidad_medida_plato`;
 CREATE TABLE `unidad_medida_plato` (
   `codigo` bigint NOT NULL AUTO_INCREMENT,
   `codigo_plato` bigint NOT NULL,
-  `nombre` varchar(100) NOT NULL COMMENT 'Ej: Personal, Familiar, 1/4, 1/2, Entero',
+  `codigo_tipo_unidad` bigint NOT NULL COMMENT 'FK hacia tipo_unidad_medida',
   `descripcion` varchar(255) DEFAULT NULL COMMENT 'Ej: Porción individual, Para 4-6 personas',
   `precio_original` decimal(10,2) NOT NULL COMMENT 'Precio base de esta unidad',
   `estado` BOOLEAN NOT NULL DEFAULT TRUE,
@@ -471,8 +498,10 @@ CREATE TABLE `unidad_medida_plato` (
   `fecha_modificacion` datetime(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`codigo`),
   KEY `FK_unidad_medida_plato` (`codigo_plato`),
+  KEY `FK_unidad_tipo` (`codigo_tipo_unidad`),
   KEY `IDX_unidad_estado` (`estado`),
   CONSTRAINT `FK_unidad_medida_plato` FOREIGN KEY (`codigo_plato`) REFERENCES `plato_menu` (`codigo`) ON DELETE CASCADE,
+  CONSTRAINT `FK_unidad_tipo` FOREIGN KEY (`codigo_tipo_unidad`) REFERENCES `tipo_unidad_medida` (`codigo`),
   CONSTRAINT `CHK_precio_positivo` CHECK (`precio_original` > 0)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

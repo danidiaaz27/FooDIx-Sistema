@@ -19,8 +19,9 @@ public class UnidadMedidaPlato {
     @JoinColumn(name = "codigo_plato", nullable = false)
     private PlatoMenu plato;
     
-    @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "codigo_tipo_unidad", nullable = false)
+    private TipoUnidadMedida tipoUnidad;
     
     @Column(name = "descripcion", length = 500)
     private String descripcion;
@@ -59,12 +60,12 @@ public class UnidadMedidaPlato {
         this.codigo = codigo;
     }
     
-    public String getNombre() {
-        return nombre;
+    public TipoUnidadMedida getTipoUnidad() {
+        return tipoUnidad;
     }
     
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setTipoUnidad(TipoUnidadMedida tipoUnidad) {
+        this.tipoUnidad = tipoUnidad;
     }
     
     public String getDescripcion() {

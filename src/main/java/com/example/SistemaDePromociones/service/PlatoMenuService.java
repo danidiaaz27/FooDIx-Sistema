@@ -2,8 +2,10 @@ package com.example.SistemaDePromociones.service;
 
 import com.example.SistemaDePromociones.dto.PlatoMenuDTO;
 import com.example.SistemaDePromociones.model.PlatoMenu;
+import com.example.SistemaDePromociones.model.TipoUnidadMedida;
 import com.example.SistemaDePromociones.model.UnidadMedidaPlato;
 import com.example.SistemaDePromociones.repository.PlatoMenuRepository;
+import com.example.SistemaDePromociones.repository.TipoUnidadMedidaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,9 @@ public class PlatoMenuService {
     
     @Autowired
     private PlatoMenuRepository platoMenuRepository;
+    
+    @Autowired
+    private TipoUnidadMedidaRepository tipoUnidadMedidaRepository;
     
     /**
      * Obtener todos los platos activos de un restaurante
@@ -71,8 +76,12 @@ public class PlatoMenuService {
         
         // Agregar unidades de medida
         for (PlatoMenuDTO.UnidadMedidaDTO unidadDTO : platoDTO.getUnidadesMedida()) {
+            // Buscar el tipo de unidad
+            TipoUnidadMedida tipoUnidad = tipoUnidadMedidaRepository.findById(unidadDTO.getCodigoTipoUnidad())
+                    .orElseThrow(() -> new RuntimeException("Tipo de unidad no encontrado: " + unidadDTO.getCodigoTipoUnidad()));
+            
             UnidadMedidaPlato unidad = new UnidadMedidaPlato();
-            unidad.setNombre(unidadDTO.getNombre());
+            unidad.setTipoUnidad(tipoUnidad);
             unidad.setDescripcion(unidadDTO.getDescripcion());
             unidad.setPrecioOriginal(unidadDTO.getPrecioOriginal());
             unidad.setEstado(true);
@@ -119,8 +128,12 @@ public class PlatoMenuService {
         
         // Agregar nuevas unidades
         for (PlatoMenuDTO.UnidadMedidaDTO unidadDTO : platoDTO.getUnidadesMedida()) {
+            // Buscar el tipo de unidad
+            TipoUnidadMedida tipoUnidad = tipoUnidadMedidaRepository.findById(unidadDTO.getCodigoTipoUnidad())
+                    .orElseThrow(() -> new RuntimeException("Tipo de unidad no encontrado: " + unidadDTO.getCodigoTipoUnidad()));
+            
             UnidadMedidaPlato unidad = new UnidadMedidaPlato();
-            unidad.setNombre(unidadDTO.getNombre());
+            unidad.setTipoUnidad(tipoUnidad);
             unidad.setDescripcion(unidadDTO.getDescripcion());
             unidad.setPrecioOriginal(unidadDTO.getPrecioOriginal());
             unidad.setEstado(true);
@@ -165,7 +178,8 @@ public class PlatoMenuService {
                 .map(u -> {
                     PlatoMenuDTO.UnidadMedidaDTO unidadDTO = new PlatoMenuDTO.UnidadMedidaDTO();
                     unidadDTO.setCodigo(u.getCodigo());
-                    unidadDTO.setNombre(u.getNombre());
+                    unidadDTO.setCodigoTipoUnidad(u.getTipoUnidad().getCodigo());
+                    unidadDTO.setNombreTipoUnidad(u.getTipoUnidad().getNombre());
                     unidadDTO.setDescripcion(u.getDescripcion());
                     unidadDTO.setPrecioOriginal(u.getPrecioOriginal());
                     return unidadDTO;

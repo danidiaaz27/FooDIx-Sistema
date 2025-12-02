@@ -12,6 +12,9 @@ let measurementUnitCounter = 1;
 // Variable para almacenar el plato que se está editando
 let currentEditingDishId = null;
 
+// Catálogo de tipos de unidades de medida
+let tiposUnidadMedida = [];
+
 /**
  * Obtener token CSRF para peticiones POST/PUT/DELETE
  */
@@ -20,9 +23,36 @@ function getCsrfToken() {
 }
 
 /**
+ * Cargar tipos de unidades de medida desde el backend
+ */
+async function loadTiposUnidadMedida() {
+    try {
+        const response = await fetch('/api/tipos-unidad-medida', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al cargar tipos de unidades');
+        }
+        
+        tiposUnidadMedida = await response.json();
+        console.log('Tipos de unidades cargados:', tiposUnidadMedida);
+    } catch (error) {
+        console.error('Error al cargar tipos de unidades:', error);
+        alert('⚠️ Error al cargar los tipos de unidades de medida');
+    }
+}
+
+/**
  * Inicialización del modal de gestión de menú
  */
 document.addEventListener('DOMContentLoaded', function() {
+    // Cargar tipos de unidades al iniciar
+    loadTiposUnidadMedida();
+    
     const manageMenuModal = document.getElementById('manageMenuModal');
     
     if (manageMenuModal) {
@@ -168,7 +198,7 @@ function renderDishUnits(units) {
         <div class="col-md-${units.length <= 2 ? '6' : '4'}">
             <div class="p-3" style="background-color: white; border-radius: 8px; border: 1px solid #e0e0e0;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span style="font-weight: 600; color: #555;">${unit.nombre}</span>
+                    <span style="font-weight: 600; color: #555;">${unit.nombreTipoUnidad}</span>
                     <span class="badge badge-price">S/ ${unit.precioOriginal.toFixed(2)}</span>
                 </div>
                 ${unit.descripcion ? `<small class="text-muted">${unit.descripcion}</small>` : ''}
@@ -216,6 +246,12 @@ function closeAddDishModal() {
 function addMeasurementUnit() {
     const container = document.getElementById('measurementUnitsContainer');
     
+    // Generar opciones del combobox desde los tipos cargados
+    let optionsHtml = '<option value="">-- Seleccione una unidad --</option>';
+    tiposUnidadMedida.forEach(tipo => {
+        optionsHtml += `<option value="${tipo.codigo}">${tipo.nombre}</option>`;
+    });
+    
     const unitHtml = `
         <div class="measurement-unit-item card mb-3 shadow-sm" style="border-radius: 10px; border: 2px solid #e0e0e0;">
             <div class="card-body" style="background-color: white; border-radius: 10px;">
@@ -227,10 +263,10 @@ function addMeasurementUnit() {
                 </div>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">Nombre de la Unidad <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control unit-name" 
-                               placeholder="Ej: Personal, 1/4, Familiar"
-                               required style="border-radius: 8px;">
+                        <label class="form-label">Tipo de Unidad <span class="text-danger">*</span></label>
+                        <select class="form-select unit-type" required style="border-radius: 8px;">
+                            ${optionsHtml}
+                        </select>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Precio Original (S/) <span class="text-danger">*</span></label>
@@ -305,11 +341,12 @@ async function saveDish() {
     
     let isValid = true;
     unitItems.forEach((item, index) => {
-        const name = item.querySelector('.unit-name').value.trim();
+        const tipoUnidadSelect = item.querySelector('.unit-type');
+        const codigoTipoUnidad = tipoUnidadSelect.value;
         const price = item.querySelector('.unit-price').value;
         const description = item.querySelector('.unit-description').value.trim();
         
-        if (!name || !price) {
+        if (!codigoTipoUnidad || !price) {
             alert(`⚠️ Complete todos los campos obligatorios de la Unidad #${index + 1}`);
             isValid = false;
             return;
@@ -322,7 +359,7 @@ async function saveDish() {
         }
         
         units.push({
-            nombre: name,
+            codigoTipoUnidad: parseInt(codigoTipoUnidad),
             descripcion: description,
             precioOriginal: parseFloat(price)
         });
@@ -431,7 +468,7 @@ async function editDish(dishId) {
             units.forEach(unit => {
                 addMeasurementUnit();
                 const lastUnit = container.querySelector('.measurement-unit-item:last-child');
-                lastUnit.querySelector('.unit-name').value = unit.nombre;
+                lastUnit.querySelector('.unit-type').value = unit.codigoTipoUnidad;
                 lastUnit.querySelector('.unit-price').value = unit.precioOriginal;
                 lastUnit.querySelector('.unit-description').value = unit.descripcion || '';
             });
@@ -487,3 +524,14 @@ async function deleteDish(dishId, dishName) {
         alert(`❌ Error al eliminar el plato: ${error.message}`);
     }
 }
+
+// ========================================
+// EXPORTAR FUNCIONES AL SCOPE GLOBAL
+// ========================================
+window.openAddDishModal = openAddDishModal;
+window.closeAddDishModal = closeAddDishModal;
+window.addMeasurementUnit = addMeasurementUnit;
+window.removeMeasurementUnit = removeMeasurementUnit;
+window.saveDish = saveDish;
+window.editDish = editDish;
+window.deleteDish = deleteDish;
