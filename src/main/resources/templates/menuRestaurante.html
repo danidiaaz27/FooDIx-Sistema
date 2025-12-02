@@ -483,7 +483,7 @@
         }
     </style>
 </head>
-<body class="restaurante-app">
+<body class="restaurante-app" th:data-restaurante-codigo="${restaurante != null ? restaurante.codigo : ''}">
     <!-- Header -->
     <header class="restaurante-header">
         <div class="container-fluid px-4">
@@ -1290,171 +1290,202 @@
 
     <!-- Modal Nueva Promoción -->
     <div class="modal fade" id="nuevaPromoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Crear Nueva Promoción</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="border-radius: 0; border: none;">
+                <div class="modal-header" style="background-color: #c92a2a; color: white; border-bottom: none; padding: 16px 24px;">
+                    <h5 class="modal-title" style="font-size: 20px; font-weight: 600; margin: 0;">Crear Nueva Promoción</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding: 32px; background-color: white;">
                     <form id="formNuevaPromocion" th:action="@{/promociones/crear}" method="post" enctype="multipart/form-data">
-                        <div class="row">
-                            <div class="col-md-7">
-                                <!-- Título y Descripción -->
-                                <div class="mb-3">
-                                    <label class="form-label">Título de la promoción *</label>
-                                    <input type="text" class="form-control" name="titulo" 
-                                           placeholder="Ej: 2x1 en Pizzas Familiares" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Descripción</label>
-                                    <textarea class="form-control" name="descripcion" rows="2" 
-                                              placeholder="Describe los detalles de tu promoción..."></textarea>
-                                </div>
-
-                                <!-- Precios -->
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Precio Original (S/) *</label>
-                                        <input type="number" class="form-control" name="precioOriginal" 
-                                               min="0" step="0.01" value="0.00" required>
+                        <div class="row g-4">
+                            <!-- FORMULARIO -->
+                            <div class="col-lg-7">
+                                <div class="d-flex flex-column gap-3">
+                                    <!-- Título -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Título de la promoción <span style="color: #c92a2a;">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" name="titulo" 
+                                               placeholder="Ej: 2×1 en Pizzas Familiares" 
+                                               style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" 
+                                               required>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Precio Promocional (S/) *</label>
-                                        <input type="number" class="form-control" name="precioPromocional" 
-                                               min="0" step="0.01" value="0.00" required>
-                                    </div>
-                                </div>
 
-                                <!-- Tipo de Descuento -->
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Tipo de descuento *</label>
-                                        <select class="form-select" name="tipoDescuento" id="tipoDescuento" required>
-                                            <option value="">Seleccionar</option>
-                                            <option value="porcentaje">Porcentaje</option>
-                                            <option value="monto_fijo">Monto fijo</option>
+                                    <!-- Descripción -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Descripción
+                                        </label>
+                                        <textarea class="form-control" name="descripcion" rows="3" 
+                                                  placeholder="Describe los detalles de tu promoción..."
+                                                  style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; resize: vertical; min-height: 100px;"></textarea>
+                                    </div>
+
+                                    <!-- Plato -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Plato <span style="color: #c92a2a;">*</span>
+                                        </label>
+                                        <select class="form-select" id="selectPlato" name="plato"
+                                                style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; cursor: pointer;" 
+                                                required>
+                                            <option value="">Cargando platos...</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label" id="labelValorDescuento">Valor del descuento (%) *</label>
-                                        <input type="number" class="form-control" name="valorDescuento" 
-                                               id="valorDescuento" min="0" max="100" value="0" required>
-                                    </div>
-                                </div>
 
-                                <!-- Categoría y Fechas -->
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Categoría</label>
-                                        <select class="form-select" name="categoriaPromocion">
-                                            <option value="">Seleccionar</option>
-                                            <option value="pizza">Pizza</option>
-                                            <option value="hamburguesa">Hamburguesa</option>
-                                            <option value="bebida">Bebida</option>
-                                            <option value="postre">Postre</option>
-                                            <option value="combo">Combo</option>
-                                            <option value="especial">Especial del día</option>
+                                    <!-- Unidad de medida -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Unidad de medida <span style="color: #c92a2a;">*</span>
+                                        </label>
+                                        <select class="form-select" id="selectUnidad" name="unidadMedida"
+                                                style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; cursor: pointer;" 
+                                                required>
+                                            <option value="">Primero selecciona un plato</option>
+                                            <!-- Las unidades se cargarán según el plato seleccionado -->
                                         </select>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Fecha de inicio *</label>
-                                        <input type="datetime-local" class="form-control" name="fechaInicio" required>
-                                    </div>
-                                </div>
 
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Fecha de fin *</label>
-                                        <input type="datetime-local" class="form-control" name="fechaFin" required>
+                                    <!-- Cantidad y Precio Original (readonly) -->
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                                Stock disponible <span style="color: #c92a2a;">*</span>
+                                            </label>
+                                            <input type="number" class="form-control" id="inputCantidad" name="cantidad" 
+                                                   placeholder="10" step="1" min="1" value="10"
+                                                   style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" 
+                                                   required>
+                                            <small class="text-muted" style="font-size: 12px;">Cantidad de platos en promoción</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                                Precio original (S/)
+                                            </label>
+                                            <input type="number" class="form-control" id="inputPrecioOriginal" name="precioOriginal" 
+                                                   placeholder="0.00" step="0.01" min="0" value="0.00" readonly
+                                                   style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background-color: #f3f4f6; cursor: not-allowed;">
+                                            <small class="text-muted" style="font-size: 12px;">Se obtiene automáticamente del menú</small>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Imagen de la promoción -->
-                                <div class="mb-3">
-                                    <label class="form-label">Imagen de la promoción *</label>
-                                    <div class="border rounded p-3 text-center upload-area" 
-                                         style="cursor:pointer; border-style: dashed !important;" 
-                                         id="uploadArea">
-                                        <i class="fas fa-upload fa-2x mb-2 text-muted"></i><br>
-                                        <span class="text-muted">Haz clic para subir una imagen<br>
-                                        <small>PNG, JPG hasta 10MB</small></span>
-                                        <input type="file" class="d-none" name="imagen" id="imagenInput" 
-                                               accept="image/*" required>
+                                    <!-- Precio Promocional -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Precio promocional (S/) <span style="color: #c92a2a;">*</span>
+                                        </label>
+                                        <input type="number" class="form-control" id="inputPrecioPromocional" name="precioPromocional" 
+                                               placeholder="0.00" step="0.01" min="0"
+                                               style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" 
+                                               required>
+                                        <small class="text-muted" style="font-size: 12px;">Ingresa el precio con descuento</small>
                                     </div>
-                                    <div id="imagePreview" class="mt-2 text-center" style="display:none;">
-                                        <img id="previewImage" src="" class="img-fluid rounded" 
-                                             style="max-height: 150px;">
-                                        <button type="button" class="btn btn-sm btn-outline-danger mt-2" 
-                                                onclick="removeImage()">
-                                            <i class="fas fa-trash"></i> Eliminar imagen
-                                        </button>
-                                    </div>
-                                </div>
 
-                                <!-- Estado de publicación -->
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" name="publicarInmediatamente" 
-                                           id="publicarPromo">
-                                    <label class="form-check-label" for="publicarPromo">
-                                        Publicar inmediatamente <br>
-                                        <small>Si no marca, se guardará como borrador</small>
-                                    </label>
+                                    <!-- Categoría -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Categoría <span style="color: #c92a2a;">*</span>
+                                        </label>
+                                        <select class="form-select" name="categoriaPromocion"
+                                                style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; cursor: pointer;" 
+                                                required>
+                                            <option value="">Seleccionar categoría</option>
+                                            <option value="pizzas">Pizzas</option>
+                                            <option value="hamburguesas">Hamburguesas</option>
+                                            <option value="pastas">Pastas</option>
+                                            <option value="ensaladas">Ensaladas</option>
+                                            <option value="bebidas">Bebidas</option>
+                                            <option value="postres">Postres</option>
+                                            <option value="combos">Combos</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Fecha y Hora de Inicio -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Fecha y hora de inicio <span style="color: #c92a2a;">*</span>
+                                        </label>
+                                        <input type="datetime-local" class="form-control" id="inputFechaInicio" name="fechaInicio" 
+                                               style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" 
+                                               required>
+                                        <small class="text-muted" style="font-size: 12px;">Ej: Hoy a las 12:00 PM</small>
+                                    </div>
+
+                                    <!-- Fecha y Hora de Fin -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Fecha y hora de fin <span style="color: #c92a2a;">*</span>
+                                        </label>
+                                        <input type="datetime-local" class="form-control" id="inputFechaFin" name="fechaFin" 
+                                               style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" 
+                                               required>
+                                        <small class="text-muted" style="font-size: 12px;">Ej: Hoy a las 3:00 PM</small>
+                                    </div>
+                                    
+                                    <!-- Duración estimada (información visual) -->
+                                    <div id="duracionPromocion" style="display: none; padding: 12px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 6px; font-size: 13px; color: #92400e;">
+                                        <i class="fas fa-clock"></i> <strong>Duración:</strong> <span id="duracionTexto"></span>
+                                    </div>
+
+                                    <!-- Imagen -->
+                                    <div>
+                                        <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
+                                            Imagen de promoción <span style="color: #c92a2a;">*</span>
+                                        </label>
+                                        <label for="imagenInput" class="upload-area" 
+                                               style="display: block; border: 2px dashed #d1d5db; border-radius: 8px; padding: 40px 20px; text-align: center; background-color: #f9fafb; cursor: pointer; transition: border-color 0.2s;">
+                                            <div id="uploadArea">
+                                                <svg style="width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                                </svg>
+                                                <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">Haz clic para subir una imagen</div>
+                                                <div style="font-size: 12px; color: #9ca3af;">PNG, JPG hasta 10MB</div>
+                                            </div>
+                                            <input type="file" id="imagenInput" name="imagen" accept="image/*" style="display: none;" required>
+                                        </label>
+                                        <div id="imagePreview" class="mt-2" style="display: none;">
+                                            <img id="previewImage" src="" class="img-fluid rounded" style="max-height: 200px; display: block; margin: 0 auto;">
+                                            <button type="button" class="btn btn-sm btn-outline-danger mt-2 d-block mx-auto" onclick="removeImage()">
+                                                <i class="fas fa-times"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Vista previa -->
-                            <div class="col-md-5">
-                                <h6 class="fw-bold mb-2">Vista previa</h6>
-                                <div class="border rounded p-4 bg-light text-center" id="vistaPrevia">
-                                    <div class="mb-2" style="height:120px; background:#eee; border-radius:10px; 
-                                         display:flex; align-items:center; justify-content:center; color:#aaa;" 
-                                         id="previewPlaceholder">
-                                        Sin imagen
-                                    </div>
-                                    <div class="fw-bold" id="previewTitulo">Título de la promoción</div>
-                                    <div class="text-muted mb-2" id="previewDescripcion">Descripción de la promoción</div>
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <span class="text-decoration-line-through text-muted" id="previewPrecioOriginal">
-                                            S/ 0.00
-                                        </span>
-                                        <span class="fw-bold text-danger" id="previewPrecioPromocional">
-                                            S/ 0.00
-                                        </span>
-                                    </div>
-                                    <small class="text-success" id="previewDescuento"></small>
-                                </div>
-
-                                <!-- Calculadora de descuento -->
-                                <div class="mt-3 p-3 bg-light rounded">
-                                    <h6 class="fw-bold">Resumen</h6>
-                                    <div class="d-flex justify-content-between small">
-                                        <span>Precio original:</span>
-                                        <span id="resumenOriginal">S/ 0.00</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between small">
-                                        <span>Descuento:</span>
-                                        <span id="resumenDescuento">S/ 0.00 (0%)</span>
-                                    </div>
-                                    <hr class="my-1">
-                                    <div class="d-flex justify-content-between fw-bold">
-                                        <span>Precio final:</span>
-                                        <span id="resumenFinal">S/ 0.00</span>
+                            <!-- VISTA PREVIA -->
+                            <div class="col-lg-5">
+                                <div style="background-color: #f9fafb; padding: 24px; border-radius: 8px; position: sticky; top: 20px;">
+                                    <div style="font-size: 14px; font-weight: 500; color: #6b7280; margin-bottom: 16px;">Vista previa</div>
+                                    
+                                    <div class="preview-card" style="background-color: white; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                        <div id="previewPlaceholder" style="width: 100%; aspect-ratio: 16/9; background-color: #e5e7eb; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 14px; margin-bottom: 16px; background-size: cover; background-position: center;">
+                                            Sin imagen
+                                        </div>
+                                        <h3 id="previewTitulo" style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px;">Título de la promoción</h3>
+                                        <p id="previewDescripcion" style="font-size: 14px; color: #6b7280; margin-bottom: 12px;">Descripción de la promoción</p>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span id="previewPrecioOriginal" class="text-decoration-line-through" style="font-size: 14px; color: #9ca3af;">S/ 0.00</span>
+                                            <span id="previewPrecioPromocional" style="font-size: 20px; font-weight: 700; color: #c92a2a;">S/ 0.00</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-outline-dark" onclick="actualizarVistaPrevia()">
+                <div class="modal-footer" style="border-top: 1px solid #e5e7eb; padding: 20px 32px; background-color: white;">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background-color: #6b7280; color: white; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; border: none;">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn" onclick="actualizarVistaPrevia()" style="background-color: white; color: #374151; border: 1px solid #d1d5db; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500;">
                         Actualizar vista previa
                     </button>
-                    <button type="submit" class="btn btn-outline-primary" form="formNuevaPromocion">
-                        Guardar borrador
-                    </button>
-                    <button type="submit" class="btn btn-warning fw-bold" form="formNuevaPromocion" onclick="document.getElementById('publicarPromo').checked = true;">
+                    <button type="submit" class="btn" form="formNuevaPromocion" style="background-color: #fbbf24; color: #1a1a1a; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; border: none;">
                         Publicar promoción
                     </button>
                 </div>
@@ -1471,9 +1502,94 @@
     <script>
         // Variables globales
         let imagenSeleccionada = null;
+        let platosMenu = []; // Almacenar los platos del menú
+        let codigoRestaurante = null; // Se obtendrá del contexto
+
+        // Función para cargar platos del menú del restaurante
+        async function cargarPlatosMenu() {
+            try {
+                // Obtener el código del restaurante del contexto Thymeleaf
+                const restauranteElement = document.querySelector('[data-restaurante-codigo]');
+                if (!restauranteElement) {
+                    console.error('No se encontró el código del restaurante');
+                    return;
+                }
+                
+                codigoRestaurante = restauranteElement.getAttribute('data-restaurante-codigo');
+                
+                const response = await fetch(`/api/platos/restaurante/${codigoRestaurante}/para-promocion`);
+                if (!response.ok) {
+                    throw new Error('Error al cargar los platos');
+                }
+                
+                platosMenu = await response.json();
+                
+                // Llenar el select de platos
+                const selectPlato = document.getElementById('selectPlato');
+                if (selectPlato) {
+                    selectPlato.innerHTML = '<option value="">Seleccionar plato</option>';
+                    
+                    if (platosMenu.length === 0) {
+                        selectPlato.innerHTML = '<option value="">No hay platos en el menú</option>';
+                        selectPlato.disabled = true;
+                    } else {
+                        platosMenu.forEach(plato => {
+                            const option = document.createElement('option');
+                            option.value = plato.codigo;
+                            option.textContent = plato.nombre;
+                            option.setAttribute('data-plato-info', JSON.stringify(plato));
+                            selectPlato.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar platos:', error);
+                const selectPlato = document.getElementById('selectPlato');
+                if (selectPlato) {
+                    selectPlato.innerHTML = '<option value="">Error al cargar platos</option>';
+                }
+            }
+        }
+        
+        // Función para cargar unidades de medida de un plato seleccionado
+        function cargarUnidadesPlato(codigoPlato) {
+            const selectUnidad = document.getElementById('selectUnidad');
+            const inputPrecioOriginal = document.getElementById('inputPrecioOriginal');
+            const inputCantidad = document.getElementById('inputCantidad');
+            
+            if (!selectUnidad) return;
+            
+            // Limpiar select de unidades
+            selectUnidad.innerHTML = '<option value="">Seleccionar unidad</option>';
+            
+            // Buscar el plato seleccionado
+            const plato = platosMenu.find(p => p.codigo == codigoPlato);
+            
+            if (!plato || !plato.unidadesMedida || plato.unidadesMedida.length === 0) {
+                selectUnidad.innerHTML = '<option value="">Este plato no tiene unidades configuradas</option>';
+                selectUnidad.disabled = true;
+                return;
+            }
+            
+            // Habilitar el select y llenar con las unidades
+            selectUnidad.disabled = false;
+            plato.unidadesMedida.forEach(unidad => {
+                const option = document.createElement('option');
+                option.value = unidad.codigo;
+                option.textContent = `${unidad.nombreTipoUnidad} - S/ ${unidad.precioOriginal.toFixed(2)}`;
+                if (unidad.descripcion) {
+                    option.textContent += ` (${unidad.descripcion})`;
+                }
+                option.setAttribute('data-precio', unidad.precioOriginal);
+                option.setAttribute('data-unidad-info', JSON.stringify(unidad));
+                selectUnidad.appendChild(option);
+            });
+        }
 
         // Inicializar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
+            // Cargar platos del menú al inicio
+            cargarPlatosMenu();
             // ===== INICIALIZAR TABS DE BOOTSTRAP =====
             // Inicializar manualmente todos los tabs
             const triggerTabList = document.querySelectorAll('button[data-bs-toggle="tab"]');
@@ -1542,6 +1658,121 @@
                 });
             }
 
+            // Evento para cambio de plato - cargar unidades disponibles
+            const selectPlato = document.getElementById('selectPlato');
+            const selectUnidad = document.getElementById('selectUnidad');
+            const inputPrecioOriginal = document.getElementById('inputPrecioOriginal');
+            const inputCantidad = document.getElementById('inputCantidad');
+            const inputPrecioPromocional = document.getElementById('inputPrecioPromocional');
+            
+            if (selectPlato) {
+                selectPlato.addEventListener('change', function() {
+                    const codigoPlato = this.value;
+                    
+                    // Limpiar precio y unidad
+                    if (inputPrecioOriginal) inputPrecioOriginal.value = '0.00';
+                    if (inputCantidad) inputCantidad.value = '1';
+                    
+                    if (codigoPlato) {
+                        // Cargar unidades del plato seleccionado
+                        cargarUnidadesPlato(codigoPlato);
+                    } else {
+                        // Si no hay plato seleccionado, limpiar unidades
+                        if (selectUnidad) {
+                            selectUnidad.innerHTML = '<option value="">Primero selecciona un plato</option>';
+                            selectUnidad.disabled = true;
+                        }
+                    }
+                    
+                    actualizarVistaPrevia();
+                });
+            }
+            
+            // Evento para cambio de unidad - actualizar precio (SIN multiplicar por cantidad)
+            if (selectUnidad) {
+                selectUnidad.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const precio = parseFloat(selectedOption.getAttribute('data-precio')) || 0;
+                    
+                    if (inputPrecioOriginal) {
+                        inputPrecioOriginal.value = precio.toFixed(2);
+                    }
+                    
+                    actualizarVistaPrevia();
+                });
+            }
+            
+            // La cantidad representa el STOCK disponible, no afecta el precio
+            // El precio original proviene directamente de la unidad de medida seleccionada
+            
+            // Eventos para calcular duración de la promoción
+            const inputFechaInicio = document.getElementById('inputFechaInicio');
+            const inputFechaFin = document.getElementById('inputFechaFin');
+            const duracionPromocion = document.getElementById('duracionPromocion');
+            const duracionTexto = document.getElementById('duracionTexto');
+            
+            function calcularDuracion() {
+                if (!inputFechaInicio || !inputFechaFin || !duracionPromocion || !duracionTexto) return;
+                
+                const inicio = inputFechaInicio.value;
+                const fin = inputFechaFin.value;
+                
+                if (inicio && fin) {
+                    const fechaInicio = new Date(inicio);
+                    const fechaFin = new Date(fin);
+                    
+                    // Validar que la fecha de fin sea posterior a la de inicio
+                    if (fechaFin <= fechaInicio) {
+                        duracionPromocion.style.display = 'block';
+                        duracionPromocion.style.backgroundColor = '#fee2e2';
+                        duracionPromocion.style.borderLeftColor = '#dc2626';
+                        duracionPromocion.style.color = '#991b1b';
+                        duracionTexto.textContent = '⚠️ La fecha de fin debe ser posterior a la de inicio';
+                        return;
+                    }
+                    
+                    // Calcular diferencia en milisegundos
+                    const diff = fechaFin - fechaInicio;
+                    
+                    // Convertir a días, horas y minutos
+                    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    // Construir texto descriptivo
+                    let texto = '';
+                    if (dias > 0) {
+                        texto += `${dias} día${dias > 1 ? 's' : ''}`;
+                    }
+                    if (horas > 0) {
+                        if (texto) texto += ', ';
+                        texto += `${horas} hora${horas > 1 ? 's' : ''}`;
+                    }
+                    if (minutos > 0 && dias === 0) {
+                        if (texto) texto += ' y ';
+                        texto += `${minutos} minuto${minutos > 1 ? 's' : ''}`;
+                    }
+                    
+                    if (!texto) texto = 'Menos de 1 minuto';
+                    
+                    // Mostrar información
+                    duracionPromocion.style.display = 'block';
+                    duracionPromocion.style.backgroundColor = '#fef3c7';
+                    duracionPromocion.style.borderLeftColor = '#f59e0b';
+                    duracionPromocion.style.color = '#92400e';
+                    duracionTexto.textContent = texto;
+                } else {
+                    duracionPromocion.style.display = 'none';
+                }
+            }
+            
+            if (inputFechaInicio) {
+                inputFechaInicio.addEventListener('change', calcularDuracion);
+            }
+            if (inputFechaFin) {
+                inputFechaFin.addEventListener('change', calcularDuracion);
+            }
+            
             // Eventos para actualizar en tiempo real
             ['titulo', 'descripcion', 'precioOriginal', 'precioPromocional', 'valorDescuento'].forEach(field => {
                 const element = document.querySelector(`[name="${field}"]`);

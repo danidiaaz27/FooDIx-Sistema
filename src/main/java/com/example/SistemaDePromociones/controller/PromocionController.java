@@ -36,6 +36,9 @@ public class PromocionController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("titulo") String titulo,
             @RequestParam("descripcion") String descripcion,
+            @RequestParam(value = "plato", required = false) Long codigoPlato,
+            @RequestParam(value = "unidadMedida", required = false) Long codigoUnidadMedida,
+            @RequestParam(value = "cantidad", required = false, defaultValue = "1") Integer cantidad,
             @RequestParam("precioOriginal") Double precioOriginal,
             @RequestParam("precioPromocional") Double precioPromocional,
             @RequestParam(value = "categoriaPromocion", required = false) String categoriaPromocion,
@@ -59,6 +62,15 @@ public class PromocionController {
             promocion.setTitulo(titulo);
             promocion.setDescripcion(descripcion);
             promocion.setCodigoRestaurante(restaurante.getCodigo());
+            
+            // Vincular con plato y unidad de medida del menú (si se seleccionaron)
+            if (codigoPlato != null) {
+                promocion.setCodigoPlato(codigoPlato);
+            }
+            if (codigoUnidadMedida != null) {
+                promocion.setCodigoUnidadMedida(codigoUnidadMedida);
+            }
+            
             promocion.setPrecioOriginal(precioOriginal);
             promocion.setPrecioPromocional(precioPromocional);
             promocion.setCategoriaPromocion(categoriaPromocion);

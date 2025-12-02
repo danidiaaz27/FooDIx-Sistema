@@ -13,6 +13,10 @@ public class Promocion {
     private String descripcion;
     @Column(name = "codigo_restaurante")
     private Long codigoRestaurante;
+    @Column(name = "codigo_plato")
+    private Long codigoPlato;
+    @Column(name = "codigo_unidad_medida")
+    private Long codigoUnidadMedida;
     @Column(name = "precio_original")
     private Double precioOriginal;
     @Column(name = "precio_promocional")
@@ -46,6 +50,12 @@ public class Promocion {
 
     public Long getCodigoRestaurante() { return codigoRestaurante; }
     public void setCodigoRestaurante(Long codigoRestaurante) { this.codigoRestaurante = codigoRestaurante; }
+
+    public Long getCodigoPlato() { return codigoPlato; }
+    public void setCodigoPlato(Long codigoPlato) { this.codigoPlato = codigoPlato; }
+
+    public Long getCodigoUnidadMedida() { return codigoUnidadMedida; }
+    public void setCodigoUnidadMedida(Long codigoUnidadMedida) { this.codigoUnidadMedida = codigoUnidadMedida; }
 
     public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }

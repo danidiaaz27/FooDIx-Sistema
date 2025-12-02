@@ -37,6 +37,22 @@ public class PlatoMenuController {
     }
     
     /**
+     * Obtener platos con sus unidades para el formulario de promociones
+     * Endpoint específico para cargar platos en el modal de crear promoción
+     */
+    @GetMapping("/restaurante/{codigoRestaurante}/para-promocion")
+    public ResponseEntity<?> obtenerPlatosParaPromocion(@PathVariable Long codigoRestaurante) {
+        try {
+            List<PlatoMenuDTO> platos = platoMenuService.obtenerPlatosPorRestaurante(codigoRestaurante);
+            return ResponseEntity.ok(platos);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Error al obtener los platos: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    
+    /**
      * Obtener un plato por su código
      */
     @GetMapping("/{codigo}")
