@@ -79,6 +79,15 @@ function verDocumento(tipoDocumento, restauranteId) {
 // 3. UTILIDADES - FORMULARIOS CON CSRF
 // ========================================
 
+function toggleUserStatus(userId, currentStatus) {
+    const action = currentStatus ? 'desactivar' : 'activar';
+    const statusText = currentStatus ? 'desactivado' : 'activado';
+    
+    if (confirm(`¿Está seguro de ${action} este usuario?\n\nEl usuario será ${statusText} en el sistema.`)) {
+        submitFormWithCSRF(`/menuAdministrador/user/${userId}/toggle-status`);
+    }
+}
+
 function submitFormWithCSRF(action, section = null) {
     const form = document.createElement('form');
     form.method = 'POST';

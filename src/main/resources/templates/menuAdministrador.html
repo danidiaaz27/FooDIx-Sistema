@@ -269,51 +269,44 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <!-- Botón Ver Detalles -->
-                                            <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#viewClientModal"
-                                                    th:data-id="${user.codigo}"
-                                                    th:data-name="${user.nombreCompleto}"
-                                                    th:data-email="${user.correoElectronico}"
-                                                    th:data-dni="${user.numeroDocumento}"
-                                                    th:data-phone="${user.telefono}"
-                                                    th:data-address="${user.direccion}"
-                                                    title="Ver detalles">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            
-                                            <!-- Botón Modificar -->
-                                            <button type="button" class="btn btn-sm btn-info" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#editUserModal"
-                                                    th:data-id="${user.codigo}"
-                                                    th:data-name="${user.nombre}"
-                                                    th:data-lastname="${user.apellidoPaterno + ' ' + user.apellidoMaterno}"
-                                                    th:data-email="${user.correoElectronico}"
-                                                    th:data-phone="${user.telefono}"
-                                                    th:data-address="${user.direccion}"
-                                                    title="Modificar">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            
-                                            <!-- Botón Cambiar Estado -->
-                                            <form th:action="@{/menuAdministrador/user/{id}/toggle-status(id=${user.codigo})}" 
-                                                  method="post" style="display: inline;">
-                                                <button type="submit" class="btn btn-sm btn-warning" 
-                                                        th:title="${user.estado ? 'Desactivar' : 'Activar'}">
+                                            <div class="btn-group" role="group" aria-label="Acciones de usuario">
+                                                <!-- Botón Ver Detalles -->
+                                                <button type="button" class="btn btn-sm btn-primary" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#viewClientModal"
+                                                        th:data-id="${user.codigo}"
+                                                        th:data-name="${user.nombreCompleto}"
+                                                        th:data-email="${user.correoElectronico}"
+                                                        th:data-dni="${user.numeroDocumento}"
+                                                        th:data-phone="${user.telefono}"
+                                                        th:data-address="${user.direccion}"
+                                                        title="Ver detalles completos">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                
+                                                <!-- Botón Modificar -->
+                                                <button type="button" class="btn btn-sm btn-info" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editUserModal"
+                                                        th:data-id="${user.codigo}"
+                                                        th:data-name="${user.nombre}"
+                                                        th:data-lastname="${user.apellidoPaterno + ' ' + user.apellidoMaterno}"
+                                                        th:data-email="${user.correoElectronico}"
+                                                        th:data-phone="${user.telefono}"
+                                                        th:data-address="${user.direccion}"
+                                                        title="Editar información">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                
+                                                <!-- Botón Cambiar Estado -->
+                                                <button type="button" 
+                                                        class="btn btn-sm"
+                                                        th:classappend="${user.estado ? 'btn-success' : 'btn-secondary'}"
+                                                        th:onclick="'toggleUserStatus(' + ${user.codigo} + ', ' + ${user.estado} + ')'"
+                                                        th:title="${user.estado ? 'Desactivar usuario' : 'Activar usuario'}">
                                                     <i th:class="${user.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
                                                 </button>
-                                            </form>
-                                            
-                                            <!-- Botón Eliminar -->
-                                            <form th:action="@{/menuAdministrador/user/{id}/delete(id=${user.codigo})}" 
-                                                  method="post" style="display: inline;"
-                                                  onsubmit="return confirm('¿Está seguro de eliminar este cliente?');">
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -467,9 +460,9 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <div class="btn-group" role="group">
+                                            <div class="btn-group" role="group" aria-label="Acciones de restaurante">
                                                 <!-- Botón Ver Detalles -->
-                                                <button type="button" class="btn btn-sm btn-info" 
+                                                <button type="button" class="btn btn-sm btn-primary" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#viewRestaurantModal"
                                                         th:data-id="${restaurant.codigo}"
@@ -479,36 +472,29 @@
                                                         th:data-email="${restaurant.correoElectronico}"
                                                         th:data-telefono="${restaurant.telefono}"
                                                         th:data-direccion="${restaurant.direccion}"
-                                                        title="Ver Detalles">
+                                                        title="Ver detalles completos">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                                 
                                                 <!-- Botón Gestionar Menú -->
-                                                <button type="button" class="btn btn-sm btn-primary" 
+                                                <button type="button" class="btn btn-sm btn-info" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#manageMenuModal"
                                                         th:data-id="${restaurant.codigo}"
                                                         th:data-nombre="${restaurant.nombre}"
-                                                        title="Gestionar Menú">
-                                                    <i class="fas fa-utensils"></i> Menú
+                                                        title="Gestionar menú del restaurante">
+                                                    <i class="fas fa-utensils"></i>
                                                 </button>
                                                 
                                                 <!-- Botón Cambiar Estado -->
-                                                <button type="button" class="btn btn-sm btn-warning" 
+                                                <button type="button" 
+                                                        class="btn btn-sm"
+                                                        th:classappend="${restaurant.estado ? 'btn-success' : 'btn-secondary'}"
                                                         onclick="toggleEstadoRestaurante(this)"
                                                         th:data-id="${restaurant.codigo}"
                                                         th:data-estado="${restaurant.estado}"
-                                                        title="Activar/Desactivar">
-                                                    <i class="fas fa-toggle-on"></i>
-                                                </button>
-                                                
-                                                <!-- Botón Eliminar -->
-                                                <button type="button" class="btn btn-sm btn-danger" 
-                                                        onclick="eliminarRestaurante(this)"
-                                                        th:data-id="${restaurant.codigo}"
-                                                        th:data-nombre="${restaurant.nombre}"
-                                                        title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
+                                                        th:title="${restaurant.estado ? 'Desactivar restaurante' : 'Activar restaurante'}">
+                                                    <i th:class="${restaurant.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -808,6 +794,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editUserForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="editUserName" class="form-label">Nombre</label>
@@ -900,6 +887,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editDeliveryForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="editDeliveryName" class="form-label">Nombre</label>
@@ -1137,6 +1125,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="rejectRestaurantForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="modal-body">
                     <input type="hidden" name="section" value="restaurantes">
                     <p>¿Está seguro de rechazar el restaurante <strong id="rejectRestaurantNombre"></strong>?</p>
@@ -1166,6 +1155,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="rejectDeliveryForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="modal-body">
                     <input type="hidden" name="section" value="delivery">
                     <p>¿Está seguro de rechazar al repartidor <strong id="rejectDeliveryNombre"></strong>?</p>
@@ -1198,6 +1188,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editRestaurantForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="modal-body">
                     <input type="hidden" id="editRestaurantId" name="id">
                     <div class="mb-3">
