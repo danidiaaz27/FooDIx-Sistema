@@ -448,6 +448,52 @@ public class AdminController {
     }
     
     /**
+     * Actualizar información de restaurante
+     * POST /menuAdministrador/restaurant/{id}/update
+     */
+    @PostMapping("/restaurant/{id}/update")
+    public String actualizarRestaurante(
+            @PathVariable Long id,
+            @RequestParam("name") String nombre,
+            @RequestParam("lastName") String apellido,
+            @RequestParam("email") String email,
+            @RequestParam(value = "phone", required = false) String telefono,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            System.out.println("🏪 [ADMIN] Actualizando restaurante: " + id);
+            
+            Restaurante restaurante = restauranteRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+            
+            // Verificar que el email no esté en uso por otro restaurante
+            restauranteRepository.findByCorreoElectronico(email).ifPresent(existente -> {
+                if (!existente.getCodigo().equals(id)) {
+                    throw new RuntimeException("El email ya está registrado por otro restaurante");
+                }
+            });
+            
+            restaurante.setNombre(nombre);
+            restaurante.setCorreoElectronico(email);
+            restaurante.setTelefono(telefono);
+            
+            restauranteRepository.save(restaurante);
+            
+            redirectAttributes.addFlashAttribute("mensaje", "Restaurante actualizado exitosamente");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+            
+            System.out.println("✅ [ADMIN] Restaurante actualizado: " + id);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al actualizar restaurante: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "danger");
+        }
+        
+        return "redirect:/menuAdministrador";
+    }
+    
+    /**
      * Eliminar un restaurante
      * POST /menuAdministrador/restaurant/{id}/delete
      */
@@ -478,6 +524,56 @@ public class AdminController {
     // ============================================
     // CRUD DE USUARIOS DEL SISTEMA
     // ============================================
+    
+    /**
+     * Actualizar usuario cliente
+     * POST /menuAdministrador/user/{id}/update
+     */
+    @PostMapping("/user/{id}/update")
+    public String actualizarUsuario(
+            @PathVariable Long id,
+            @RequestParam("name") String nombre,
+            @RequestParam("lastName") String apellido,
+            @RequestParam("email") String email,
+            @RequestParam(value = "phone", required = false) String telefono,
+            @RequestParam(value = "address", required = false) String direccion,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            System.out.println("👤 [ADMIN] Actualizando usuario: " + id);
+            
+            Usuario usuario = usuarioRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+            // Verificar que el email no esté en uso por otro usuario
+            usuarioRepository.findByCorreoElectronico(email).ifPresent(existente -> {
+                if (!existente.getCodigo().equals(id)) {
+                    throw new RuntimeException("El email ya está registrado por otro usuario");
+                }
+            });
+            
+            usuario.setNombre(nombre);
+            usuario.setApellidoPaterno(apellido);
+            usuario.setApellidoMaterno(apellido);
+            usuario.setCorreoElectronico(email);
+            usuario.setTelefono(telefono);
+            usuario.setDireccion(direccion);
+            
+            usuarioRepository.save(usuario);
+            
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario actualizado exitosamente");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+            
+            System.out.println("✅ [ADMIN] Usuario actualizado: " + id);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al actualizar usuario: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar usuario: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "danger");
+        }
+        
+        return "redirect:/menuAdministrador";
+    }
     
     /**
      * Crear nuevo usuario del sistema (administradores, supervisores, etc.)
@@ -908,6 +1004,62 @@ public class AdminController {
         } catch (Exception e) {
             System.err.println("❌ [ADMIN] Error al cambiar estado: " + e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Error al cambiar estado: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "danger");
+        }
+        
+        return "redirect:/menuAdministrador";
+    }
+    
+    /**
+     * Actualizar información de repartidor
+     * POST /menuAdministrador/delivery/{id}/update
+     */
+    @PostMapping("/delivery/{id}/update")
+    public String actualizarRepartidor(
+            @PathVariable Long id,
+            @RequestParam("name") String nombre,
+            @RequestParam("lastName") String apellido,
+            @RequestParam("email") String email,
+            @RequestParam(value = "phone", required = false) String telefono,
+            @RequestParam(value = "address", required = false) String direccion,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            System.out.println("🚚 [ADMIN] Actualizando repartidor: " + id);
+            
+            Repartidor repartidor = repartidorRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Repartidor no encontrado"));
+            
+            if (repartidor.getUsuario() != null) {
+                Usuario usuario = repartidor.getUsuario();
+                
+                // Verificar que el email no esté en uso por otro usuario
+                usuarioRepository.findByCorreoElectronico(email).ifPresent(existente -> {
+                    if (!existente.getCodigo().equals(usuario.getCodigo())) {
+                        throw new RuntimeException("El email ya está registrado por otro usuario");
+                    }
+                });
+                
+                usuario.setNombre(nombre);
+                usuario.setApellidoPaterno(apellido);
+                usuario.setApellidoMaterno(apellido);
+                usuario.setCorreoElectronico(email);
+                usuario.setTelefono(telefono);
+                usuario.setDireccion(direccion);
+                
+                usuarioRepository.save(usuario);
+            }
+            
+            repartidorRepository.save(repartidor);
+            
+            redirectAttributes.addFlashAttribute("mensaje", "Repartidor actualizado exitosamente");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+            
+            System.out.println("✅ [ADMIN] Repartidor actualizado: " + id);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al actualizar repartidor: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipo", "danger");
         }
         
