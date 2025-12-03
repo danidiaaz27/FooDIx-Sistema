@@ -576,6 +576,40 @@ public class AdminController {
     }
     
     /**
+     * Cambiar estado de un usuario (activar/desactivar)
+     * POST /menuAdministrador/user/{id}/toggle-status
+     */
+    @PostMapping("/user/{id}/toggle-status")
+    public String cambiarEstadoUsuario(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            System.out.println("🔄 [ADMIN] Cambiando estado de usuario: " + id);
+            
+            Usuario usuario = usuarioRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+            // Cambiar el estado (si es true lo pasa a false y viceversa)
+            usuario.setEstado(!usuario.getEstado());
+            usuarioRepository.save(usuario);
+            
+            String nuevoEstado = usuario.getEstado() ? "activado" : "desactivado";
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario " + nuevoEstado + " exitosamente");
+            redirectAttributes.addFlashAttribute("tipo", "success");
+            
+            System.out.println("✅ [ADMIN] Usuario " + nuevoEstado + ": " + id);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ADMIN] Error al cambiar estado de usuario: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al cambiar estado: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "danger");
+        }
+        
+        return "redirect:/menuAdministrador";
+    }
+    
+    /**
      * Crear nuevo usuario del sistema (administradores, supervisores, etc.)
      */
     @PostMapping("/create-admin")
