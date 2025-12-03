@@ -79,13 +79,30 @@ function verDocumento(tipoDocumento, restauranteId) {
 // 3. UTILIDADES - FORMULARIOS CON CSRF
 // ========================================
 
+// Variables para el modal de cambio de estado
+let pendingUserToggle = null;
+
 function toggleUserStatus(userId, currentStatus) {
+    const modal = document.getElementById('toggleUserStatusModal');
+    const bootstrapModal = new bootstrap.Modal(modal);
+    
+    // Guardar información para usarla al confirmar
+    pendingUserToggle = { userId, currentStatus };
+    
+    // Configurar textos según el estado actual
     const action = currentStatus ? 'desactivar' : 'activar';
     const statusText = currentStatus ? 'desactivado' : 'activado';
+    const iconClass = currentStatus ? 'fa-user-slash text-danger' : 'fa-user-check text-success';
+    const actionClass = currentStatus ? 'text-danger' : 'text-success';
     
-    if (confirm(`¿Está seguro de ${action} este usuario?\n\nEl usuario será ${statusText} en el sistema.`)) {
-        submitFormWithCSRF(`/menuAdministrador/user/${userId}/toggle-status`);
-    }
+    // Actualizar contenido del modal
+    document.getElementById('statusModalIcon').className = `fas ${iconClass} fa-3x`;
+    document.getElementById('statusModalAction').textContent = action;
+    document.getElementById('statusModalAction').className = `fw-bold ${actionClass}`;
+    document.getElementById('statusModalResult').textContent = statusText;
+    
+    // Mostrar el modal
+    bootstrapModal.show();
 }
 
 function submitFormWithCSRF(action, section = null) {
@@ -132,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initValidaciones();
     initPermisos();
     initSeccionActiva();
+    initToggleUserStatusModal();
     
     console.log('=== INICIALIZACIÓN COMPLETADA ===');
 });
@@ -478,4 +496,36 @@ function initSeccionActiva() {
         firstVisibleLink.classList.add('active');
         showSection(firstSection);
     }
+}
+
+// ========================================
+// 10. MÓDULO: MODAL DE CAMBIO DE ESTADO
+// ========================================
+
+function initToggleUserStatusModal() {
+    const confirmButton = document.getElementById('confirmToggleUserStatus');
+    if (!confirmButton) return;
+    
+    confirmButton.addEventListener('click', function() {
+        if (pendingUserToggle) {
+            const { userId, currentStatus } = pendingUserToggle;
+            
+            // Cerrar el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('toggleUserStatusModal'));
+            modal.hide();
+            
+            // Ejecutar el cambio de estado
+            submitFormWithCSRF(`/menuAdministrador/user/${userId}/toggle-status`);
+            
+            // Limpiar la variable
+            pendingUserToggle = null;
+        }
+    });
+    
+    // Limpiar al cerrar el modal sin confirmar
+    document.getElementById('toggleUserStatusModal').addEventListener('hidden.bs.modal', function() {
+        pendingUserToggle = null;
+    });
+    
+    console.log('✅ Modal de cambio de estado configurado');
 }
