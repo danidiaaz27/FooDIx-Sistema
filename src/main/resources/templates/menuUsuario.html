@@ -82,6 +82,20 @@
             color: #C62828;
             font-weight: 600;
         }
+        
+        /* Estilos para items del carrito dinámicos */
+        .cart-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .cart-items {
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -252,8 +266,7 @@
                     <!-- Promociones -->
                     <div class="product-card shadow-sm" th:each="promocion : ${promociones}" 
                          style="max-width: 320px; cursor: pointer; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.08);" 
-                         data-bs-toggle="modal" data-bs-target="#promocionModal"
-                         th:onclick="|mostrarDetallePromocion(${promocion.codigo})|"
+                         th:attr="data-promocion-id=${promocion.codigo}"
                          onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';"
                          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';">
                         
@@ -277,8 +290,14 @@
                         </div>
                         
                         <div class="product-info" style="padding: 15px;">
-                            <!-- Header con fecha -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+                            <!-- Header con fecha y restaurante -->
+                            <div class="mb-2">
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="fas fa-store" style="color: #C62828; font-size: 0.75rem; margin-right: 5px;"></i>
+                                    <small class="fw-bold text-truncate" style="font-size: 0.8rem; color: #C62828;" th:text="${promocion.restaurante != null ? promocion.restaurante.nombre : 'Restaurante'}">
+                                        Restaurante
+                                    </small>
+                                </div>
                                 <small class="text-muted" style="font-size: 0.75rem;" th:if="${promocion.fechaFin != null}">
                                     <i class="fas fa-clock" style="color: #F5A623;"></i> 
                                     Hasta <span th:text="${#dates.format(promocion.fechaFin, 'dd/MM/yyyy')}">fecha</span>
@@ -334,7 +353,7 @@
                 </div>
 
                 <!-- Carrito vacío -->
-                <div th:if="${cartItems == null or cartItems.isEmpty()}" class="empty-cart text-center py-5">
+                <div class="empty-cart text-center py-5" style="display: none;">
                     <div style="background: linear-gradient(135deg, rgba(198,40,40,0.1) 0%, rgba(245,166,35,0.1) 100%); border-radius: 50%; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
                         <i class="fas fa-shopping-cart fa-4x" style="color: #C62828;"></i>
                     </div>
@@ -346,58 +365,9 @@
                 </div>
 
                 <!-- Carrito con productos -->
-                <div class="cart-content" th:if="${cartItems != null and !cartItems.isEmpty()}">
+                <div class="cart-content" style="display: none;">
                     <div class="cart-items">
-                        <div class="cart-item" th:each="item : ${cartItems}">
-                            <img th:src="${item.promocion.imagenPrincipal}" th:alt="${item.promocion.titulo}" 
-                                 class="cart-item-image" onerror="this.src='/img/default-food.jpg'">
-                            <div class="cart-item-info">
-                                <h5 th:text="${item.promocion.titulo}">Promoción</h5>
-                                <p th:text="${item.promocion.restaurante.nombre}">Restaurante</p>
-                                
-                                <!-- Opciones de entrega -->
-                                <div class="delivery-options mb-2">
-                                    <small class="text-muted">Tipo de entrega:</small>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <input type="radio" class="btn-check" name="tipoEntrega_${item.promocion.codigo}" 
-                                               th:id="delivery_${item.promocion.codigo}" value="DELIVERY" checked>
-                                        <label class="btn btn-outline-primary" th:for="delivery_${item.promocion.codigo}">
-                                            <i class="fas fa-motorcycle"></i> Delivery
-                                        </label>
-                                        
-                                        <input type="radio" class="btn-check" name="tipoEntrega_${item.promocion.codigo}" 
-                                               th:id="pickup_${item.promocion.codigo}" value="RECOGO_TIENDA">
-                                        <label class="btn btn-outline-success" th:for="pickup_${item.promocion.codigo}">
-                                            <i class="fas fa-store"></i> Recoger
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="quantity-controls">
-                                    <form method="post" th:action="@{/cart/update/{id}(id=${item.promocion.codigo})}" style="display: inline;">
-                                        <input type="hidden" name="quantity" th:value="${item.quantity - 1}">
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary" 
-                                                th:disabled="${item.quantity <= 1}">-</button>
-                                    </form>
-                                    <span class="quantity" th:text="${item.quantity}">1</span>
-                                    <form method="post" th:action="@{/cart/update/{id}(id=${item.promocion.codigo})}" style="display: inline;">
-                                        <input type="hidden" name="quantity" th:value="${item.quantity + 1}">
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="cart-item-price">
-                                <p th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">S/ 0.00</p>
-                                <small class="text-muted" th:text="'S/ ' + ${#numbers.formatDecimal(item.promocion.precioPromocional, 1, 2)} + ' c/u'">
-                                    S/ 0.00 c/u
-                                </small>
-                                <form method="post" th:action="@{/cart/remove/{id}(id=${item.promocion.codigo})}">
-                                    <button type="submit" class="btn btn-sm btn-danger mt-1">
-                                        <i class="fas fa-trash"></i> Eliminar
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+                        <!-- Los items se cargarán dinámicamente con JavaScript -->
                     </div>
 
                     <div class="cart-summary">
@@ -405,15 +375,20 @@
                         <div class="delivery-info mb-3">
                             <h6><i class="fas fa-map-marker-alt"></i> Dirección de entrega</h6>
                             <div class="mb-2">
-                                <input type="text" class="form-control" name="direccionEntrega" 
-                                       th:value="${currentUser.direccion}" 
+                                <input type="text" class="form-control" id="direccionEntrega" 
+                                       th:value="${currentUser['address']}" 
                                        placeholder="Ingresa tu dirección para delivery">
                                 <small class="form-text text-muted">
                                     <i class="fas fa-info-circle"></i> Solo para pedidos con delivery
                                 </small>
                             </div>
                             <div class="mb-2">
-                                <textarea class="form-control" name="referenciaEntrega" rows="2" 
+                                <input type="text" class="form-control" id="telefonoContacto" 
+                                       th:value="${currentUser['phone']}" 
+                                       placeholder="Teléfono de contacto">
+                            </div>
+                            <div class="mb-2">
+                                <textarea class="form-control" id="referenciaEntrega" rows="2" 
                                           placeholder="Referencias adicionales (opcional)"></textarea>
                             </div>
                         </div>
@@ -421,57 +396,58 @@
                         <div class="cart-total">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Subtotal:</span>
-                                <span th:text="'S/ ' + ${#numbers.formatDecimal(cartSubtotal, 1, 2)}">S/ 0.00</span>
+                                <span class="subtotal-value">S/ 0.00</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Costo de delivery:</span>
-                                <span th:text="'S/ ' + ${#numbers.formatDecimal(deliveryCost, 1, 2)}">S/ 0.00</span>
+                                <span class="delivery-value">S/ 0.00</span>
                             </div>
                             <hr>
                             <div class="d-flex justify-content-between">
                                 <h4>Total:</h4>
-                                <h4 class="text-primary" th:text="'S/ ' + ${#numbers.formatDecimal(cartTotal, 1, 2)}">S/ 0.00</h4>
+                                <h4 class="text-primary total-value">S/ 0.00</h4>
                             </div>
                         </div>
                         
                         <div class="payment-methods">
-                            <form method="post" action="/cart/checkout" th:action="@{/cart/checkout}" id="checkoutForm">
-                                <div class="mb-3">
-                                    <label class="form-label">Método de pago:</label>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="metodoPago" value="efectivo" id="efectivo" checked>
-                                        <label class="form-check-label" for="efectivo">
-                                            <i class="fas fa-money-bill-wave"></i> Efectivo
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="metodoPago" value="tarjeta" id="tarjeta">
-                                        <label class="form-check-label" for="tarjeta">
-                                            <i class="fas fa-credit-card"></i> Tarjeta
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="metodoPago" value="yape" id="yape">
-                                        <label class="form-check-label" for="yape">
-                                            <i class="fas fa-mobile-alt"></i> Yape
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="metodoPago" value="plin" id="plin">
-                                        <label class="form-check-label" for="plin">
-                                            <i class="fas fa-mobile-alt"></i> Plin
-                                        </label>
-                                    </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Método de pago:</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="metodoPago" value="efectivo" id="efectivo" checked>
+                                    <label class="form-check-label" for="efectivo">
+                                        <i class="fas fa-money-bill-wave"></i> Efectivo
+                                    </label>
                                 </div>
-                                
-                                <!-- Notas especiales -->
-                                <div class="mb-3">
-                                    <label for="notasEspeciales" class="form-label">Notas especiales (opcional)</label>
-                                    <textarea class="form-control" id="notasEspeciales" name="notasEspeciales" 
-                                              rows="2" placeholder="Instrucciones especiales para tu pedido..."></textarea>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="metodoPago" value="tarjeta" id="tarjeta">
+                                    <label class="form-check-label" for="tarjeta">
+                                        <i class="fas fa-credit-card"></i> Tarjeta
+                                    </label>
                                 </div>
-                                
-                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="metodoPago" value="yape" id="yape">
+                                    <label class="form-check-label" for="yape">
+                                        <i class="fas fa-mobile-alt"></i> Yape
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="metodoPago" value="plin" id="plin">
+                                    <label class="form-check-label" for="plin">
+                                        <i class="fas fa-mobile-alt"></i> Plin
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Notas especiales -->
+                            <div class="mb-3">
+                                <label for="notasEspeciales" class="form-label">Notas especiales (opcional)</label>
+                                <textarea class="form-control" id="notasEspeciales" 
+                                          rows="2" placeholder="Instrucciones especiales para tu pedido..."></textarea>
+                            </div>
+                            
+                            <button type="button" class="btn btn-success btn-lg w-100" onclick="realizarPedido()">
+                                <i class="fas fa-check-circle"></i> Confirmar Pedido
+                            </button>
                                     <i class="fas fa-credit-card"></i> Realizar Pedido
                                 </button>
                             </form>
@@ -487,62 +463,12 @@
                     <p class="text-muted">Revisa tus pedidos anteriores</p>
                 </div>
 
-                <div class="orders-list" th:if="${pedidos != null and !pedidos.isEmpty()}">
-                    <div class="order-card shadow-sm mb-3" th:each="pedido : ${pedidos}" 
-                         style="background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(0,0,0,0.08); transition: all 0.3s ease;"
-                         onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';"
-                         onmouseout="this.style.boxShadow='';">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <h5 class="mb-1" style="color: #C62828; font-weight: 600;" th:text="${pedido.numeroPedido}">Número de pedido</h5>
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar-alt"></i> 
-                                    <span th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">Fecha</span>
-                                </small>
-                            </div>
-                            <span class="badge px-3 py-2" style="font-size: 0.85rem; border-radius: 20px;"
-                                  th:classappend="${pedido.estadoPedido.nombre == 'ENTREGADO'} ? 'bg-success' : 
-                                                 (${pedido.estadoPedido.nombre == 'EN_CAMINO'} ? 'bg-primary' :
-                                                 (${pedido.estadoPedido.nombre == 'EN_PREPARACION'} ? 'bg-warning' :
-                                                 (${pedido.estadoPedido.nombre == 'PENDIENTE'} ? 'bg-secondary' : 'bg-danger')))"
-                                  th:text="${pedido.estadoPedido.nombre}">Estado</span>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <p class="mb-2"><i class="fas fa-store" style="color: #F5A623; width: 20px;"></i> <strong>Restaurante:</strong> <span th:text="${pedido.restaurante.nombre}">Restaurante</span></p>
-                                <p class="mb-2"><i class="fas fa-credit-card" style="color: #17a2b8; width: 20px;"></i> <strong>Pago:</strong> <span th:text="${pedido.metodoPago}">Método</span></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="mb-2"><i class="fas fa-shipping-fast" style="color: #28a745; width: 20px;"></i> <strong>Entrega:</strong> 
-                                    <span th:text="${pedido.tipoEntrega.nombre}">Tipo</span>
-                                    <span th:if="${pedido.tipoEntrega.nombre == 'DELIVERY' && pedido.repartidor}" 
-                                          class="text-muted" style="font-size: 0.85rem;">• <span th:text="${pedido.repartidor.usuario.nombre}"></span></span>
-                                </p>
-                                <p class="mb-2"><i class="fas fa-dollar-sign" style="color: #C62828; width: 20px;"></i> <strong>Total:</strong> 
-                                    <span style="color: #C62828; font-size: 1.2rem; font-weight: 700;" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 0.00</span>
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <!-- Detalles de los productos -->
-                        <div class="order-products mt-3 p-3" style="background: rgba(198,40,40,0.03); border-radius: 8px; border-left: 3px solid #F5A623;">
-                            <h6 class="mb-2" style="color: #C62828;"><i class="fas fa-utensils"></i> Productos:</h6>
-                            <div th:each="detalle : ${pedido.detalles}" class="mb-1">
-                                <small th:text="${detalle.cantidad} + 'x ' + ${detalle.promocion.titulo} + ' - S/ ' + ${#numbers.formatDecimal(detalle.subtotal, 1, 2)}" style="color: #555;"></small>
-                            </div>
-                        </div>
-                        
-                        <!-- Acciones según estado -->
-                        <div class="order-actions mt-3 text-end" th:if="${pedido.estadoPedido.nombre == 'ENTREGADO'}">
-                            <button class="btn btn-sm" style="background: linear-gradient(135deg, #F5A623 0%, #F7C56F 100%); color: white; border: none; padding: 8px 20px; border-radius: 20px;" 
-                                    th:onclick="|calificarPedido(${pedido.codigo})|">
-                                <i class="fas fa-star"></i> Calificar Pedido
-                            </button>
-                        </div>
-                    </div>
+                <!-- Lista de pedidos que se carga dinámicamente -->
+                <div id="pedidos-lista" class="orders-list">
+                    <!-- Se llenará con JavaScript -->
                 </div>
 
-                <div th:if="${pedidos == null or pedidos.isEmpty()}" class="empty-history text-center py-5">
+                <div id="pedidos-vacio" class="empty-history text-center py-5" style="display: none;">
                     <div style="background: linear-gradient(135deg, rgba(198,40,40,0.1) 0%, rgba(245,166,35,0.1) 100%); border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
                         <i class="fas fa-history fa-3x" style="color: #C62828;"></i>
                     </div>
@@ -794,6 +720,17 @@
                             <span class="badge bg-success ms-1" id="modalEstado">Estado</span>
                         </div>
                         
+                        <!-- Nombre del restaurante -->
+                        <div class="alert alert-light border-0 py-2 px-3 mb-3" style="background: rgba(198,40,40,0.05);">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-store" style="color: #C62828; font-size: 1.2rem; margin-right: 10px;"></i>
+                                <div>
+                                    <div class="fw-bold" style="color: #C62828; font-size: 1rem;" id="modalNombreRestaurante">Restaurante</div>
+                                    <small class="text-muted" id="modalDireccionRestaurante" style="font-size: 0.8rem;"></small>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <h3 class="fw-bold mb-3" id="modalTitulo">Título de la Promoción</h3>
                         
                         <p class="text-muted mb-3" id="modalDescripcion">
@@ -915,6 +852,21 @@ document.addEventListener('DOMContentLoaded', function() {
             showMenuSection(section);
         });
     });
+    
+    // Event listener para las tarjetas de promoción
+    document.addEventListener('click', function(e) {
+        const card = e.target.closest('.product-card[data-promocion-id]');
+        if (card) {
+            const codigoPromocion = card.getAttribute('data-promocion-id');
+            mostrarDetallePromocion(codigoPromocion);
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('promocionModal'));
+            modal.show();
+        }
+    });
+    
+    // Cargar carrito al iniciar
+    cargarCarrito();
 });
 
 function showMenuSection(sectionName) {
@@ -1010,13 +962,41 @@ function calificarPedido(pedidoId) {
 
 // Función para mostrar detalles de promoción en modal
 function mostrarDetallePromocion(codigoPromocion) {
-    // Buscar la promoción en el array de promociones del modelo Thymeleaf
-    const promociones = /*[[${promociones}]]*/ [];
-    const promocion = promociones.find(p => p.codigo === codigoPromocion);
-    
+    // Hacer una petición al servidor para obtener los detalles de la promoción
+    fetch(`/promociones/api/promociones/${codigoPromocion}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al obtener la promoción');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.promocion) {
+                mostrarDatosPromocionEnModal(data.promocion, codigoPromocion);
+            } else {
+                throw new Error(data.error || 'Promoción no encontrada');
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar promoción:', error);
+            alert('Error al cargar los detalles de la promoción');
+        });
+}
+
+function mostrarDatosPromocionEnModal(promocion, codigoPromocion) {
     if (!promocion) {
         console.error('Promoción no encontrada');
         return;
+    }
+    
+    // Información del restaurante
+    document.getElementById('modalNombreRestaurante').textContent = promocion.nombreRestaurante || 'Restaurante';
+    const direccionElement = document.getElementById('modalDireccionRestaurante');
+    if (promocion.direccionRestaurante) {
+        direccionElement.textContent = promocion.direccionRestaurante;
+        direccionElement.style.display = 'block';
+    } else {
+        direccionElement.style.display = 'none';
     }
     
     // Calcular descuento
@@ -1064,7 +1044,7 @@ function mostrarDetallePromocion(codigoPromocion) {
     // Métricas
     document.getElementById('modalVistas').textContent = promocion.contadorVistas || 0;
     document.getElementById('modalPedidos').textContent = promocion.contadorPedidos || 0;
-    document.getElementById('modalCanjeos').textContent = promocion.contadorCanjeos || 0;
+    document.getElementById('modalCanjeos').textContent = 0; // Por ahora siempre 0
     
     // Estado y botón
     const estadoElement = document.getElementById('modalEstado');
@@ -1087,12 +1067,471 @@ function mostrarDetallePromocion(codigoPromocion) {
 // Función para agregar promoción al carrito desde el modal
 function agregarPromocionAlCarrito() {
     const codigo = document.getElementById('btnAgregarPromocion').getAttribute('data-promocion-codigo');
-    // Aquí implementarías la lógica para agregar al carrito
-    alert('Función de agregar al carrito en desarrollo para promoción: ' + codigo);
-    // Cerrar modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('promocionModal'));
-    modal.hide();
+    const btnAgregar = document.getElementById('btnAgregarPromocion');
+    
+    // Deshabilitar botón mientras se procesa
+    btnAgregar.disabled = true;
+    btnAgregar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Agregando...';
+    
+    fetch('/api/carrito/agregar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `codigoPromocion=${codigo}&cantidad=1`
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('✅ Respuesta agregar:', data);
+        if (data.success) {
+            // Mostrar mensaje de éxito
+            mostrarNotificacion('✅ Promoción agregada al carrito', 'success');
+            
+            // Recargar el carrito
+            cargarCarrito();
+            
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('promocionModal'));
+            if (modal) modal.hide();
+            
+            // Cambiar a la sección del carrito si el usuario lo desea
+            setTimeout(() => {
+                if (confirm('¿Deseas ver tu carrito ahora?')) {
+                    showMenuSection('carrito');
+                }
+            }, 500);
+        } else {
+            mostrarNotificacion('❌ ' + (data.message || 'Error al agregar al carrito'), 'error');
+            btnAgregar.disabled = false;
+            btnAgregar.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al Carrito';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('❌ Error al agregar al carrito', 'error');
+        btnAgregar.disabled = false;
+        btnAgregar.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al Carrito';
+    });
 }
+
+// Función para mostrar notificaciones
+function mostrarNotificacion(mensaje, tipo) {
+    // Crear notificación temporal
+    const notif = document.createElement('div');
+    notif.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} position-fixed`;
+    notif.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notif.innerHTML = mensaje;
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.remove();
+    }, 3000);
+}
+
+// Función para actualizar contador del carrito
+function actualizarContadorCarrito(count) {
+    const contador = document.querySelector('#carrito-content .nav-link .badge');
+    if (contador) {
+        contador.textContent = count;
+    }
+    const floatingCount = document.getElementById('floatingCartCount');
+    if (floatingCount) {
+        floatingCount.textContent = count;
+    }
+}
+
+// Función para cargar el carrito
+function cargarCarrito() {
+    console.log('🛒 Cargando carrito...');
+    fetch('/api/carrito/resumen')
+        .then(response => {
+            console.log('📦 Respuesta:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ Datos:', data);
+            if (data.success) {
+                console.log('📋 Items:', data.items.length);
+                renderizarCarrito(data.items, data.totales);
+                actualizarContadorCarrito(data.items.length);
+            }
+        })
+        .catch(error => console.error('❌ Error:', error));
+}
+
+// Función para renderizar el carrito
+function renderizarCarrito(items, totales) {
+    console.log('🎨 Renderizando carrito con', items.length, 'items');
+    
+    const carritoContainer = document.querySelector('#carrito-content .cart-items');
+    const emptyCart = document.querySelector('#carrito-content .empty-cart');
+    const cartContent = document.querySelector('#carrito-content .cart-content');
+    
+    console.log('📍 Elementos encontrados:', {
+        carritoContainer: !!carritoContainer,
+        emptyCart: !!emptyCart,
+        cartContent: !!cartContent
+    });
+    
+    if (!carritoContainer) {
+        console.warn('⚠️ No se encontró .cart-items');
+        return;
+    }
+    
+    if (items.length === 0) {
+        console.log('📭 Carrito vacío');
+        if (emptyCart) emptyCart.style.display = 'block';
+        if (cartContent) cartContent.style.display = 'none';
+    } else {
+        console.log('📦 Mostrando', items.length, 'items');
+        if (emptyCart) emptyCart.style.display = 'none';
+        if (cartContent) cartContent.style.display = 'block';
+        
+        carritoContainer.innerHTML = items.map(item => `
+            <div class="cart-item" data-promocion="${item.codigoPromocion}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${item.tituloPromocion}</h6>
+                        <small class="text-muted"><i class="fas fa-store"></i> ${item.nombreRestaurante}</small>
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="eliminarDelCarrito(${item.codigoPromocion})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="input-group" style="width: 120px;">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="cambiarCantidad(${item.codigoPromocion}, ${item.cantidad - 1})">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" class="form-control form-control-sm text-center" value="${item.cantidad}" readonly>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="cambiarCantidad(${item.codigoPromocion}, ${item.cantidad + 1})">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-muted" style="font-size: 0.8rem;">S/ ${item.precioUnitario.toFixed(2)} c/u</div>
+                        <div class="fw-bold" style="color: #C62828;">S/ ${item.subtotal.toFixed(2)}</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        // Actualizar totales
+        document.querySelector('.cart-summary .subtotal-value').textContent = 'S/ ' + totales.subtotal.toFixed(2);
+        document.querySelector('.cart-summary .delivery-value').textContent = 'S/ ' + totales.costoDelivery.toFixed(2);
+        document.querySelector('.cart-summary .total-value').textContent = 'S/ ' + totales.total.toFixed(2);
+        
+        // Actualizar contador
+        actualizarContadorCarrito(totales.itemCount);
+    }
+}
+
+// Función para cambiar cantidad
+function cambiarCantidad(codigoPromocion, nuevaCantidad) {
+    if (nuevaCantidad < 1) return;
+    
+    fetch(`/api/carrito/actualizar/${codigoPromocion}?cantidad=${nuevaCantidad}`, {
+        method: 'PUT'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cargarCarrito();
+        } else {
+            mostrarNotificacion('❌ ' + (data.message || 'Error al actualizar cantidad'), 'error');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Función para eliminar del carrito
+function eliminarDelCarrito(codigoPromocion) {
+    if (!confirm('¿Eliminar este item del carrito?')) return;
+    
+    fetch(`/api/carrito/eliminar/${codigoPromocion}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarNotificacion('✅ Item eliminado', 'success');
+            cargarCarrito();
+        } else {
+            mostrarNotificacion('❌ Error al eliminar', 'error');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Función para realizar el pedido
+function realizarPedido() {
+    const direccion = document.getElementById('direccionEntrega').value.trim();
+    const telefono = document.getElementById('telefonoContacto').value.trim();
+    const referencia = document.getElementById('referenciaEntrega').value.trim();
+    const metodoPago = document.querySelector('input[name="metodoPago"]:checked').value;
+    const notas = document.getElementById('notasEspeciales').value.trim();
+    
+    // Validar campos requeridos
+    if (!direccion) {
+        mostrarNotificacion('❌ Ingresa una dirección de entrega', 'error');
+        document.getElementById('direccionEntrega').focus();
+        return;
+    }
+    
+    if (!telefono) {
+        mostrarNotificacion('❌ Ingresa un teléfono de contacto', 'error');
+        document.getElementById('telefonoContacto').focus();
+        return;
+    }
+    
+    // Crear objeto de pedido
+    const pedidoData = {
+        direccionEntrega: direccion + (referencia ? ' - ' + referencia : ''),
+        telefono: telefono,
+        metodoPago: metodoPago,
+        notas: notas || ''
+    };
+    
+    // Botón
+    const btn = event.target;
+    const textoOriginal = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+    
+    // Enviar pedido
+    fetch('/api/carrito/crear-pedido', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pedidoData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = textoOriginal;
+        
+        if (data.success) {
+            // Limpiar campos
+            document.getElementById('direccionEntrega').value = '';
+            document.getElementById('telefonoContacto').value = '';
+            document.getElementById('referenciaEntrega').value = '';
+            document.getElementById('notasEspeciales').value = '';
+            
+            // Mostrar modal de confirmación
+            mostrarModalPedido(data.numeroPedido, data.codigoVerificacion);
+            
+            // Recargar carrito (debería estar vacío)
+            cargarCarrito();
+            actualizarContadorCarrito(0);
+            
+            // Recargar historial para que aparezca el nuevo pedido
+            cargarHistorial();
+        } else {
+            mostrarNotificacion('❌ ' + (data.message || 'Error al crear el pedido'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        btn.disabled = false;
+        btn.innerHTML = textoOriginal;
+        mostrarNotificacion('❌ Error de conexión', 'error');
+    });
+}
+
+// Función para mostrar modal con código de verificación
+function mostrarModalPedido(numeroPedido, codigoVerificacion) {
+    const modalHTML = `
+        <div class="modal fade" id="modalPedidoExitoso" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-check-circle"></i> ¡Pedido Realizado!
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-receipt fa-3x text-success mb-3"></i>
+                            <h4>Tu pedido ha sido confirmado</h4>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <p class="mb-2"><strong>Número de Pedido:</strong></p>
+                            <h3 class="text-primary mb-0">#${numeroPedido}</h3>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <p class="mb-2"><strong>Código de Verificación:</strong></p>
+                            <h2 class="mb-0" style="font-size: 3rem; letter-spacing: 0.5rem; font-weight: bold;">
+                                ${codigoVerificacion}
+                            </h2>
+                            <p class="mt-2 mb-0 text-muted">
+                                <small><i class="fas fa-info-circle"></i> Proporciona este código de 4 dígitos al delivery para confirmar la entrega</small>
+                            </p>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <p class="text-muted">
+                                <i class="fas fa-clock"></i> Tu pedido llegará en aproximadamente 30-45 minutos
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                            <i class="fas fa-check"></i> Entendido
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Eliminar modal anterior si existe
+    const modalAnterior = document.getElementById('modalPedidoExitoso');
+    if (modalAnterior) {
+        modalAnterior.remove();
+    }
+    
+    // Agregar nuevo modal
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('modalPedidoExitoso'));
+    modal.show();
+    
+    // Limpiar modal del DOM al cerrarlo
+    document.getElementById('modalPedidoExitoso').addEventListener('hidden.bs.modal', function () {
+        this.remove();
+    });
+}
+
+/**
+ * Cargar historial de pedidos
+ */
+async function cargarHistorial() {
+    try {
+        const response = await fetch('/api/carrito/historial');
+        if (!response.ok) {
+            throw new Error('Error al cargar historial');
+        }
+        
+        const pedidos = await response.json();
+        renderizarHistorial(pedidos);
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensajeError('No se pudo cargar el historial de pedidos');
+    }
+}
+
+/**
+ * Renderizar historial de pedidos
+ */
+function renderizarHistorial(pedidos) {
+    const lista = document.getElementById('pedidos-lista');
+    const vacio = document.getElementById('pedidos-vacio');
+    
+    if (!pedidos || pedidos.length === 0) {
+        lista.innerHTML = '';
+        vacio.style.display = 'block';
+        return;
+    }
+    
+    vacio.style.display = 'none';
+    
+    lista.innerHTML = pedidos.map(pedido => {
+        const fecha = new Date(pedido.fechaPedido).toLocaleString('es-PE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const estadoBadge = pedido.estado ? 
+            '<span class="badge bg-success px-3 py-2" style="font-size: 0.85rem; border-radius: 20px;">Activo</span>' :
+            '<span class="badge bg-secondary px-3 py-2" style="font-size: 0.85rem; border-radius: 20px;">Completado</span>';
+        
+        const verificadoBadge = pedido.verificado ?
+            '<i class="fas fa-check-circle text-success"></i> Verificado' :
+            '<i class="fas fa-clock text-warning"></i> Pendiente de verificación';
+        
+        const itemsHTML = pedido.items.map(item => `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>${item.cantidad}x ${item.nombrePromocion || 'Producto'}</span>
+                <span class="text-muted">S/ ${item.precioTotal.toFixed(2)}</span>
+            </div>
+        `).join('');
+        
+        return `
+            <div class="order-card shadow-sm mb-3" 
+                 style="background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(0,0,0,0.08); transition: all 0.3s ease;"
+                 onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';"
+                 onmouseout="this.style.boxShadow='';">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="mb-1" style="color: #C62828; font-weight: 600;">Pedido #${pedido.codigo}</h5>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt"></i> ${fecha}
+                        </small>
+                    </div>
+                    ${estadoBadge}
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <i class="fas fa-barcode" style="color: #F5A623; width: 20px;"></i> 
+                            <strong>Código Verificación:</strong> 
+                            <span class="badge bg-dark" style="font-size: 1.2rem; letter-spacing: 0.2rem;">${pedido.codigoVerificacion}</span>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-shield-alt" style="color: #17a2b8; width: 20px;"></i> 
+                            <strong>Estado:</strong> ${verificadoBadge}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <i class="fas fa-map-marker-alt" style="color: #28a745; width: 20px;"></i> 
+                            <strong>Dirección:</strong> ${pedido.direccionEntrega || 'No especificada'}
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-phone" style="color: #6c757d; width: 20px;"></i> 
+                            <strong>Teléfono:</strong> ${pedido.telefonoContacto || 'No especificado'}
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Detalles de los productos -->
+                <div class="order-products mt-3 p-3" style="background: rgba(198,40,40,0.03); border-radius: 8px; border-left: 3px solid #F5A623;">
+                    <h6 class="mb-3" style="color: #C62828;">
+                        <i class="fas fa-utensils"></i> Productos (${pedido.items.length})
+                    </h6>
+                    ${itemsHTML}
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong style="color: #C62828; font-size: 1.1rem;">Total:</strong>
+                        <strong style="color: #C62828; font-size: 1.3rem;">S/ ${pedido.total.toFixed(2)}</strong>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Escuchar cambio de sección para cargar historial
+document.addEventListener('DOMContentLoaded', function() {
+    // Interceptar clics en navegación
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const section = this.getAttribute('data-section');
+            if (section === 'historial') {
+                cargarHistorial();
+            }
+        });
+    });
+});
 </script>
 </body>
 </html>

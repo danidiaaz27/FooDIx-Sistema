@@ -39,10 +39,18 @@ public class Promocion {
     private Integer contadorPedidos;
     @Column(name = "ingresos_totales")
     private Double ingresosTotales;
+    @Column(name = "cantidad_disponible")
+    private Integer cantidadDisponible;
+    @Column(name = "cantidad_vendida")
+    private Integer cantidadVendida;
     @Column(name = "fecha_creacion")
     private java.sql.Timestamp fechaCreacion;
     @Column(name = "fecha_modificacion")
     private java.sql.Timestamp fechaModificacion;
+    
+    // Campo transient para pasar información del restaurante a la vista
+    @Transient
+    private Restaurante restaurante;
 
     // Getters y setters
     public Long getCodigo() { return codigo; }
@@ -101,4 +109,13 @@ public class Promocion {
 
     public java.sql.Timestamp getFechaModificacion() { return fechaModificacion; }
     public void setFechaModificacion(java.sql.Timestamp fechaModificacion) { this.fechaModificacion = fechaModificacion; }
+    
+    public Integer getCantidadDisponible() { return cantidadDisponible; }
+    public void setCantidadDisponible(Integer cantidadDisponible) { this.cantidadDisponible = cantidadDisponible; }
+    
+    public Integer getCantidadVendida() { return cantidadVendida; }
+    public void setCantidadVendida(Integer cantidadVendida) { this.cantidadVendida = cantidadVendida; }
+    
+    public Restaurante getRestaurante() { return restaurante; }
+    public void setRestaurante(Restaurante restaurante) { this.restaurante = restaurante; }
 }

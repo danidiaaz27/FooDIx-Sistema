@@ -4,6 +4,7 @@ import com.example.SistemaDePromociones.model.Promocion;
 import com.example.SistemaDePromociones.model.Usuario;
 import com.example.SistemaDePromociones.repository.PromocionRepository;
 import com.example.SistemaDePromociones.repository.UsuarioRepository;
+import com.example.SistemaDePromociones.repository.RestauranteRepository;
 import com.example.SistemaDePromociones.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,6 +27,9 @@ public class UsuarioController {
     
     @Autowired
     private PromocionRepository promocionRepository;
+    
+    @Autowired
+    private RestauranteRepository restauranteRepository;
     
     /**
      * Mostrar menú principal del usuario
@@ -57,6 +61,15 @@ public class UsuarioController {
             
             // Cargar promociones activas y vigentes
             List<Promocion> promocionesActivas = promocionRepository.findPromocionesActivasVigentes();
+            
+            // Cargar información del restaurante para cada promoción
+            for (Promocion promocion : promocionesActivas) {
+                if (promocion.getCodigoRestaurante() != null) {
+                    restauranteRepository.findById(promocion.getCodigoRestaurante())
+                        .ifPresent(promocion::setRestaurante);
+                }
+            }
+            
             model.addAttribute("promociones", promocionesActivas);
             
             System.out.println("🎉 [PROMOCIONES] Se encontraron " + promocionesActivas.size() + " promociones activas");

@@ -2,8 +2,10 @@ package com.example.SistemaDePromociones.controller;
 
 import com.example.SistemaDePromociones.model.Restaurante;
 import com.example.SistemaDePromociones.model.Promocion;
+import com.example.SistemaDePromociones.model.Categoria;
 import com.example.SistemaDePromociones.repository.RestauranteRepository;
 import com.example.SistemaDePromociones.repository.PromocionRepository;
+import com.example.SistemaDePromociones.repository.CategoriaRepository;
 import com.example.SistemaDePromociones.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +25,8 @@ public class MenuRestauranteController {
     private RestauranteRepository restauranteRepository;
     @Autowired
     private PromocionRepository promocionRepository;
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     /**
      * Mostrar menú principal del restaurante
@@ -149,6 +153,10 @@ public class MenuRestauranteController {
         model.addAttribute("promocionesActivas", promocionesActivas != null ? promocionesActivas : new java.util.ArrayList<>());
         model.addAttribute("promocionesBorrador", promocionesBorrador != null ? promocionesBorrador : new java.util.ArrayList<>());
 
+        // Cargar categorías activas desde la base de datos
+        java.util.List<Categoria> categorias = categoriaRepository.findByEstadoTrue();
+        model.addAttribute("categorias", categorias != null ? categorias : new java.util.ArrayList<>());
+
         // Estadísticas temporales como Map
         java.util.Map<String, Object> estadisticas = new java.util.HashMap<>();
         estadisticas.put("ingresosTotales", 1250.75);
@@ -164,6 +172,7 @@ public class MenuRestauranteController {
         System.out.println("   - Restaurante: " + (restaurante != null ? restaurante.getNombre() : "NULL"));
         System.out.println("   - Promociones activas: " + (promocionesActivas != null ? promocionesActivas.size() : 0));
         System.out.println("   - Promociones borrador: " + (promocionesBorrador != null ? promocionesBorrador.size() : 0));
+        System.out.println("   - Categorías: " + (categorias != null ? categorias.size() : 0));
         System.out.println("   - Estadísticas: " + (model.getAttribute("estadisticas") != null ? "CARGADAS" : "NULL"));
     }
 }

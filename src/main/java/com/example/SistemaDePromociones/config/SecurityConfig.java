@@ -68,6 +68,8 @@ public class SecurityConfig {
                 .requestMatchers("/menuRestaurante/**").hasRole("RESTAURANT")
                 .requestMatchers("/menuDelivery/**").hasRole("DELIVERY")
                 .requestMatchers("/menuUsuario/**").hasRole("CUSTOMER")
+                .requestMatchers("/promociones/api/**").authenticated() // ✅ API de promociones para usuarios autenticados
+                .requestMatchers("/api/carrito/**").authenticated() // ✅ API del carrito y pedidos
                 
                 // ========================================
                 // FALLBACK - Cualquier otra ruta requiere autenticación

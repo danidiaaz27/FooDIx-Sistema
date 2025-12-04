@@ -1392,13 +1392,9 @@
                                                 style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; cursor: pointer;" 
                                                 required>
                                             <option value="">Seleccionar categoría</option>
-                                            <option value="pizzas">Pizzas</option>
-                                            <option value="hamburguesas">Hamburguesas</option>
-                                            <option value="pastas">Pastas</option>
-                                            <option value="ensaladas">Ensaladas</option>
-                                            <option value="bebidas">Bebidas</option>
-                                            <option value="postres">Postres</option>
-                                            <option value="combos">Combos</option>
+                                            <option th:each="categoria : ${categorias}" 
+                                                    th:value="${categoria.nombre}" 
+                                                    th:text="${categoria.nombre}"></option>
                                         </select>
                                     </div>
 

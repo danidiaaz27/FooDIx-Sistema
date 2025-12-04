@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>FooDix Delivery</title>
     
     <!-- Bootstrap CSS -->
@@ -587,48 +589,45 @@
                 
                 <!-- Pedidos Disponibles -->
                 <div class="order-card available-order" th:each="pedido : ${pedidosDisponibles}" 
-                     th:attr="data-order-id=${pedido.numeroPedido}">
+                     th:attr="data-order-id=${pedido.codigo}">
                     <div class="order-header">
                         <div class="restaurant-info">
-                            <h5 class="restaurant-name" th:text="${pedido.restaurante.nombre}">Restaurante</h5>
-                            <span class="order-id" th:text="'#' + ${pedido.numeroPedido}">#FOD-000000</span>
+                            <h5 class="restaurant-name" th:text="${pedido.codigoRestaurante != null ? 'Pedido #' + pedido.codigo : 'Restaurante'}">Restaurante</h5>
+                            <span class="order-id" th:text="'Pedido #' + ${pedido.codigo}">#FOD-000000</span>
                             <span class="priority-badge normal">Normal</span>
                         </div>
                         <div class="order-earnings">
-                            <div class="earning-amount" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.gananciaRepartidor, 1, 2)}">S/ 0.00</div>
+                            <div class="earning-amount" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 0.00</div>
                         </div>
                     </div>
                     <div class="order-details">
                         <div class="location-time">
                             <div class="location">
                                 <i class="fas fa-map-marker-alt text-danger"></i>
-                                <span th:text="${pedido.restaurante.distrito.nombre}">Distrito</span>
+                                <span th:text="${pedido.direccionEntrega}">Dirección</span>
                             </div>
                             <div class="estimated-time">
-                                <i class="fas fa-clock text-warning"></i>
-                                <span>0 min</span>
+                                <i class="fas fa-phone text-warning"></i>
+                                <span th:text="${pedido.telefonoContacto}">Teléfono</span>
                             </div>
                         </div>
                         <div class="order-value">
                             <i class="fas fa-shopping-bag"></i>
-                            <span>1 producto</span>
-                            <span class="total-value" th:text="${pedido.metodoPago} + ' (S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)} + ')'">
-                                Efectivo (S/ 0.00)
-                            </span>
+                            <span class="total-value">Total: S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span></span>
                         </div>
                     </div>
                     
                     <!-- Botones de acción -->
                     <div class="action-buttons mt-3">
-                        <button class="btn btn-success btn-sm accept-order me-2" 
+                        <button type="button" class="btn btn-success btn-sm accept-order me-2" 
                                 th:attr="data-order-id=${pedido.codigo}">
                             <i class="fas fa-check"></i> Aceptar Entrega
                         </button>
-                        <button class="btn btn-outline-danger btn-sm reject-order" 
+                        <button type="button" class="btn btn-outline-danger btn-sm reject-order" 
                                 th:attr="data-order-id=${pedido.codigo}">
                             <i class="fas fa-times"></i> Rechazar
                         </button>
-                        <button class="btn btn-outline-info btn-sm view-details" 
+                        <button type="button" class="btn btn-outline-info btn-sm view-details" 
                                 th:attr="data-order-id=${pedido.codigo}">
                             <i class="fas fa-info-circle"></i> Detalles
                         </button>
@@ -651,63 +650,54 @@
                 
                 <!-- Entregas en Progreso -->
                 <div class="order-card my-delivery" th:each="pedido : ${misEntregas}" 
-                     th:classappend="${pedido.estadoPedido.nombre == 'EN_CAMINO'} ? 'accepted' : ''">
+                     th:classappend="${pedido.estado == true} ? 'in-transit' : ''">
                     <div class="order-header">
                         <div class="restaurant-info">
-                            <h5 class="restaurant-name" th:text="${pedido.restaurante.nombre}">Restaurante</h5>
-                            <span class="order-id" th:text="'#' + ${pedido.numeroPedido}">#FOD-000000</span>
-                            <span class="status-badge" 
-                                  th:classappend="${pedido.estadoPedido.nombre == 'EN_CAMINO'} ? 'accepted' : 'warning'"
-                                  th:text="${pedido.estadoPedido.nombre}">Estado</span>
+                            <h5 class="restaurant-name">Pedido <span th:text="'#' + ${pedido.codigo}">#000</span></h5>
+                            <span class="order-id" th:text="'Código: ' + ${pedido.codigoVerificacion}">Código</span>
+                            <span class="status-badge accepted" th:text="${pedido.estado ? 'Activo' : 'Completado'}">Estado</span>
                         </div>
                         <div class="order-earnings">
-                            <div class="earning-amount" th:text="'+S/ ' + ${#numbers.formatDecimal(pedido.gananciaRepartidor, 1, 2)}">+S/ 0.00</div>
-                            <!-- distancia eliminada -->
+                            <div class="earning-amount" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">+S/ 0.00</div>
                         </div>
                     </div>
                     
                     <div class="delivery-addresses">
                         <div class="address-section">
-                            <h6>Recoger en:</h6>
-                            <p class="address" th:text="${pedido.restaurante.direccion}">Dirección restaurante</p>
-                            <p class="phone"><i class="fas fa-phone"></i> <span th:text="${pedido.restaurante.telefono}">Teléfono</span></p>
-                        </div>
-                        <div class="address-section">
                             <h6>Entregar a:</h6>
-                            <p class="customer-name" th:text="${pedido.usuario.nombre + ' ' + pedido.usuario.apellidoPaterno}">Cliente</p>
                             <p class="address" th:text="${pedido.direccionEntrega}">Dirección entrega</p>
                             <p class="phone"><i class="fas fa-phone"></i> <span th:text="${pedido.telefonoContacto}">Teléfono</span></p>
                         </div>
-                    </div>
-                    
-                    <div class="special-notes" th:if="${pedido.notasEspeciales}">
-                        <div class="note-item">
-                            <span class="note-label">Notas:</span>
-                            <span class="note-text" th:text="${pedido.notasEspeciales}">Notas especiales</span>
+                        <div class="address-section">
+                            <h6>Código de Verificación:</h6>
+                            <p class="customer-name" style="font-size: 2rem; color: #2ecc71; font-weight: bold; letter-spacing: 0.5rem;" th:text="${pedido.codigoVerificacion}">0000</p>
+                            <p class="text-muted"><small>El cliente debe proporcionar este código</small></p>
                         </div>
                     </div>
                     
-                    <div class="special-notes" th:if="${pedido.referenciaEntrega}">
+                    <div class="special-notes" th:if="${pedido.notas != null and !pedido.notas.isEmpty()}">
+                        <div class="note-item">
+                            <span class="note-label">Notas:</span>
+                            <span class="note-text" th:text="${pedido.notas}">Notas especiales</span>
+                        </div>
+                    </div>
+                    
+                    <div class="special-notes" th:if="${pedido.referenciaDireccion != null and !pedido.referenciaDireccion.isEmpty()}">
                         <div class="note-item">
                             <span class="note-label">Referencia:</span>
-                            <span class="note-text" th:text="${pedido.referenciaEntrega}">Referencia</span>
+                            <span class="note-text" th:text="${pedido.referenciaDireccion}">Referencia</span>
                         </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-warning btn-sm mark-picked-up me-2" 
+                        <button type="button" class="btn btn-success btn-sm mark-delivered me-2" 
                                 th:attr="data-order-id=${pedido.codigo}"
-                                th:if="${pedido.estadoPedido.nombre == 'LISTO'}">
-                            <i class="fas fa-box"></i> Marcar como Recogido
-                        </button>
-                        <button class="btn btn-success btn-sm mark-delivered me-2" 
-                                th:attr="data-order-id=${pedido.codigo}"
-                                th:if="${pedido.estadoPedido.nombre == 'EN_CAMINO'}">
+                                th:if="${pedido.estado == true and !pedido.verificado}">
                             <i class="fas fa-check-circle"></i> Marcar como Entregado
                         </button>
-                        <button class="btn btn-outline-secondary btn-navigate">
-                            <i class="fas fa-directions"></i> Navegar
-                        </button>
+                        <span class="badge bg-success" th:if="${pedido.verificado}">
+                            <i class="fas fa-check-circle"></i> Verificado y Entregado
+                        </span>
                     </div>
                 </div>
                 
@@ -727,7 +717,7 @@
                             </div>
                             <div class="stats-info">
                                 <h6>Ganancias Hoy</h6>
-                                <h3 th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas.gananciasHoy, 1, 2)}">S/ 0.00</h3>
+                                <h3 th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas['gananciasHoy'], 1, 2)}">S/ 0.00</h3>
                             </div>
                         </div>
                     </div>
@@ -738,7 +728,7 @@
                             </div>
                             <div class="stats-info">
                                 <h6>Entregas Hoy</h6>
-                                <h3 th:text="${estadisticas.entregasHoy}">0</h3>
+                                <h3 th:text="${estadisticas['entregasHoy']}">0</h3>
                             </div>
                         </div>
                     </div>
@@ -749,7 +739,7 @@
                             </div>
                             <div class="stats-info">
                                 <h6>Calificación</h6>
-                                <h3 th:text="${estadisticas.calificacionPromedio} + ' ⭐'">0 ⭐</h3>
+                                <h3 th:text="${estadisticas['calificacionPromedio']} + ' ⭐'">0 ⭐</h3>
                             </div>
                         </div>
                     </div>
@@ -760,7 +750,7 @@
                             </div>
                             <div class="stats-info">
                                 <h6>Tasa de Éxito</h6>
-                                <h3 th:text="${estadisticas.tasaExito} + '%'">0%</h3>
+                                <h3 th:text="${estadisticas['tasaExito']} + '%'">0%</h3>
                             </div>
                         </div>
                     </div>
@@ -771,13 +761,13 @@
                     <h5>Progreso Semanal</h5>
                     <div class="progress-info">
                         <span>Ganancias esta semana</span>
-                        <span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas.gananciasSemana, 1, 2)}">S/ 0.00</span>
+                        <span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas['gananciasSemana'], 1, 2)}">S/ 0.00</span>
                     </div>
                     <div class="progress mb-2">
                         <div class="progress-bar bg-success" role="progressbar" 
-                             th:attr="style='width: ' + ${estadisticas.progresoSemanal} + '%'"></div>
+                             th:attr="style='width: ' + ${estadisticas['progresoSemanal']} + '%'"></div>
                     </div>
-                    <small class="text-muted" th:text="${estadisticas.progresoSemanal} + '% de tu meta semanal (S/ ' + ${#numbers.formatDecimal(estadisticas.metaSemanal, 1, 2)} + ')'">
+                    <small class="text-muted" th:text="${estadisticas['progresoSemanal']} + '% de tu meta semanal (S/ ' + ${#numbers.formatDecimal(estadisticas['metaSemanal'], 1, 2)} + ')'">                        0% de tu meta semanal
                         0% de tu meta semanal
                     </small>
                 </div>
@@ -789,19 +779,19 @@
                         <div class="col-md-4">
                             <div class="summary-item">
                                 <span class="summary-label">Total de entregas</span>
-                                <span class="summary-value" th:text="${estadisticas.totalEntregas}">0</span>
+                                <span class="summary-value" th:text="${estadisticas['totalEntregas']}">0</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="summary-item">
                                 <span class="summary-label">Promedio por entrega</span>
-                                <span class="summary-value" th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas.promedioEntrega, 1, 2)}">S/ 0.00</span>
+                                <span class="summary-value" th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas['promedioEntrega'], 1, 2)}">S/ 0.00</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="summary-item">
                                 <span class="summary-label">Tiempo promedio</span>
-                                <span class="summary-value" th:text="${estadisticas.tiempoPromedio} + ' min'">0 min</span>
+                                <span class="summary-value" th:text="${estadisticas['tiempoPromedio']} + ' min'">0 min</span>
                             </div>
                         </div>
                     </div>
@@ -835,20 +825,69 @@
         </div>
     </div>
 
+    <!-- Modal Verificar Código -->
+    <div class="modal fade" id="verifyCodeModal" tabindex="-1" aria-labelledby="verifyCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="verifyCodeModalLabel">
+                        <i class="fas fa-check-circle"></i> Verificar Entrega
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-4">
+                        <i class="fas fa-shield-alt fa-4x text-success mb-3"></i>
+                        <h5>Solicita el código de verificación al cliente</h5>
+                        <p class="text-muted">El cliente tiene un código de 4 dígitos</p>
+                    </div>
+                    
+                    <div class="verification-code-input mb-3">
+                        <label for="verificationCode" class="form-label fw-bold">Ingresa el código:</label>
+                        <input type="text" 
+                               class="form-control form-control-lg text-center" 
+                               id="verificationCode" 
+                               placeholder="••••" 
+                               maxlength="4"
+                               pattern="[0-9]{4}"
+                               style="font-size: 2rem; letter-spacing: 1rem; font-weight: bold;"
+                               required>
+                        <div class="invalid-feedback">
+                            El código debe tener 4 dígitos
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <small>Verifica que el código sea correcto antes de confirmar la entrega</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success" id="confirmDeliveryBtn">
+                        <i class="fas fa-check-circle"></i> Confirmar Entrega
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/theme-toggle.js}"></script>
-    <!-- Custom JS -->
-    <script th:src="@{/js/main.js}"></script>
     
     <script>
         // Variables globales
         let currentOrderId = null;
+        let currentDeliveryOrderId = null;
         
         document.addEventListener('DOMContentLoaded', function() {
             // Event listeners para los pedidos disponibles
             document.querySelectorAll('.accept-order').forEach(btn => {
                 btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     e.stopPropagation();
                     const orderId = this.getAttribute('data-order-id');
                     acceptOrder(orderId);
@@ -857,6 +896,7 @@
             
             document.querySelectorAll('.reject-order').forEach(btn => {
                 btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     e.stopPropagation();
                     const orderId = this.getAttribute('data-order-id');
                     rejectOrder(orderId);
@@ -865,6 +905,7 @@
             
             document.querySelectorAll('.view-details').forEach(btn => {
                 btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     e.stopPropagation();
                     const orderId = this.getAttribute('data-order-id');
                     showOrderDetails(orderId);
@@ -881,7 +922,7 @@
             document.querySelectorAll('.mark-delivered').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const orderId = this.getAttribute('data-order-id');
-                    markAsDelivered(orderId);
+                    showVerificationModal(orderId);
                 });
             });
             
@@ -891,10 +932,96 @@
                     acceptOrder(currentOrderId);
                 }
             });
+            
+            // Evento para confirmar entrega con código
+            document.getElementById('confirmDeliveryBtn').addEventListener('click', function() {
+                confirmDeliveryWithCode();
+            });
+            
+            // Validar solo números en el input del código
+            document.getElementById('verificationCode').addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+            
+            // Limpiar código al cerrar modal
+            document.getElementById('verifyCodeModal').addEventListener('hidden.bs.modal', function() {
+                document.getElementById('verificationCode').value = '';
+                document.getElementById('verificationCode').classList.remove('is-invalid');
+            });
         });
         
+        function showVerificationModal(orderId) {
+            currentDeliveryOrderId = orderId;
+            const modal = new bootstrap.Modal(document.getElementById('verifyCodeModal'));
+            modal.show();
+            
+            // Focus en el input
+            setTimeout(() => {
+                document.getElementById('verificationCode').focus();
+            }, 500);
+        }
+        
+        function confirmDeliveryWithCode() {
+            const code = document.getElementById('verificationCode').value.trim();
+            const codeInput = document.getElementById('verificationCode');
+            
+            // Validar que tenga 4 dígitos
+            if (code.length !== 4 || !/^\d{4}$/.test(code)) {
+                codeInput.classList.add('is-invalid');
+                return;
+            }
+            
+            codeInput.classList.remove('is-invalid');
+            
+            // Deshabilitar botón mientras procesa
+            const btn = document.getElementById('confirmDeliveryBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            
+            // Enviar verificación al servidor
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch(`/menuDelivery/delivery/pedidos/${currentDeliveryOrderId}/verificar-entrega`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token
+                },
+                body: JSON.stringify({ codigoVerificacion: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                
+                if (data.success) {
+                    // Cerrar modal
+                    bootstrap.Modal.getInstance(document.getElementById('verifyCodeModal')).hide();
+                    
+                    // Mostrar mensaje de éxito
+                    alert('✅ ¡Entrega verificada correctamente!\n\n' + 
+                          'Has ganado S/ ' + data.ganancia.toFixed(2));
+                    
+                    // Recargar página
+                    location.reload();
+                } else {
+                    // Mostrar error
+                    codeInput.classList.add('is-invalid');
+                    alert('❌ Código incorrecto\n\n' + (data.message || 'Verifica el código con el cliente'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                alert('Error al verificar la entrega. Intenta nuevamente.');
+            });
+        }
+        
         function showOrderDetails(orderId) {
-            fetch(`/delivery/pedidos/${orderId}/detalles`)
+            fetch(`/menuDelivery/delivery/pedidos/${orderId}/detalles`)
                 .then(response => response.json())
                 .then(pedido => {
                     currentOrderId = orderId;
@@ -963,11 +1090,14 @@
                 return;
             }
             
-            fetch(`/delivery/pedidos/${orderId}/aceptar`, {
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch(`/menuDelivery/delivery/pedidos/${orderId}/aceptar`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('[name="_csrf"]').value
+                    [header]: token
                 }
             })
             .then(response => {
@@ -987,11 +1117,14 @@
         function rejectOrder(orderId) {
             const motivo = prompt('¿Por qué rechazas este pedido? (opcional)');
             
-            fetch(`/delivery/pedidos/${orderId}/rechazar`, {
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch(`/menuDelivery/delivery/pedidos/${orderId}/rechazar`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('[name="_csrf"]').value
+                    [header]: token
                 },
                 body: JSON.stringify({
                     motivo: motivo || ''
@@ -1012,11 +1145,14 @@
         }
         
         function markAsPickedUp(orderId) {
-            fetch(`/delivery/pedidos/${orderId}/recogido`, {
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch(`/menuDelivery/delivery/pedidos/${orderId}/recogido`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('[name="_csrf"]').value
+                    [header]: token
                 }
             })
             .then(response => {
@@ -1034,25 +1170,9 @@
         }
         
         function markAsDelivered(orderId) {
-            fetch(`/delivery/pedidos/${orderId}/entregado`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('[name="_csrf"]').value
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('¡Pedido marcado como entregado!');
-                    location.reload();
-                } else {
-                    alert('Error al actualizar el estado');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al actualizar el estado');
-            });
+            // Esta función ya no se usa directamente
+            // Se reemplazó por showVerificationModal
+            showVerificationModal(orderId);
         }
     </script>
 </body>

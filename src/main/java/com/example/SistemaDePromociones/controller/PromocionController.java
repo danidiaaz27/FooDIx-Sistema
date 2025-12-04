@@ -316,4 +316,54 @@ public class PromocionController {
         
         return "redirect:/menuRestaurante";
     }
+    
+    /**
+     * API REST: Obtener detalles de una promoción por código
+     * GET /api/promociones/{codigo}
+     */
+    @GetMapping("/api/promociones/{codigo}")
+    @ResponseBody
+    public java.util.Map<String, Object> obtenerPromocionPorCodigo(@PathVariable Long codigo) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        
+        try {
+            Promocion promocion = promocionRepository.findById(codigo)
+                    .orElseThrow(() -> new RuntimeException("Promoción no encontrada"));
+            
+            // Crear objeto con los datos necesarios para el frontend
+            java.util.Map<String, Object> promocionData = new java.util.HashMap<>();
+            promocionData.put("codigo", promocion.getCodigo());
+            promocionData.put("titulo", promocion.getTitulo());
+            promocionData.put("descripcion", promocion.getDescripcion());
+            promocionData.put("categoriaPromocion", promocion.getCategoriaPromocion());
+            promocionData.put("precioOriginal", promocion.getPrecioOriginal());
+            promocionData.put("precioPromocional", promocion.getPrecioPromocional());
+            promocionData.put("fechaInicio", promocion.getFechaInicio());
+            promocionData.put("fechaFin", promocion.getFechaFin());
+            promocionData.put("estado", promocion.getEstado());
+            promocionData.put("contadorVistas", promocion.getContadorVistas());
+            promocionData.put("contadorPedidos", promocion.getContadorPedidos());
+            
+            // Obtener información del restaurante
+            if (promocion.getCodigoRestaurante() != null) {
+                restauranteRepository.findById(promocion.getCodigoRestaurante()).ifPresent(restaurante -> {
+                    promocionData.put("nombreRestaurante", restaurante.getNombre());
+                    promocionData.put("direccionRestaurante", restaurante.getDireccion());
+                    promocionData.put("telefonoRestaurante", restaurante.getTelefono());
+                });
+            }
+            
+            response.put("success", true);
+            response.put("promocion", promocionData);
+            
+            System.out.println("✅ [API] Promoción " + codigo + " recuperada exitosamente");
+            
+        } catch (Exception e) {
+            System.err.println("❌ [API] Error al obtener promoción: " + e.getMessage());
+            response.put("success", false);
+            response.put("error", e.getMessage());
+        }
+        
+        return response;
+    }
 }
