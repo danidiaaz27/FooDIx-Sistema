@@ -78,6 +78,73 @@
             border-radius: 20px;
             box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
         }
+
+        /* Estilos para botón toggle con transición suave tipo switch */
+        .btn-toggle {
+            min-width: 48px !important;
+            width: 48px;
+            height: 31px;
+            padding: 0 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-toggle i {
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-toggle.btn-success {
+            background: linear-gradient(135deg, #198754 0%, #157347 100%);
+        }
+
+        .btn-toggle.btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5c636a 100%);
+        }
+
+        /* Animación al cambiar estado */
+        @keyframes toggleSwitch {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .btn-toggle.switching i {
+            animation: toggleSwitch 0.5s ease-in-out;
+        }
+
+        /* Animaciones para toast notifications */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
     </style>
     <script>
     // Funcion GLOBAL para cambiar secciones - DEFINIDA ANTES DE CARGAR EL BODY
@@ -271,7 +338,7 @@
                                         <td>
                                             <div class="btn-group" role="group" aria-label="Acciones de usuario">
                                                 <!-- Botón Ver Detalles -->
-                                                <button type="button" class="btn btn-sm btn-primary" 
+                                                <button type="button" class="btn btn-sm btn-primary btn-toggle" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#viewClientModal"
                                                         th:data-id="${user.codigo}"
@@ -285,7 +352,7 @@
                                                 </button>
                                                 
                                                 <!-- Botón Modificar -->
-                                                <button type="button" class="btn btn-sm btn-info" 
+                                                <button type="button" class="btn btn-sm btn-info btn-toggle" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#editUserModal"
                                                         th:data-id="${user.codigo}"
@@ -300,9 +367,9 @@
                                                 
                                                 <!-- Botón Cambiar Estado -->
                                                 <button type="button" 
-                                                        class="btn btn-sm"
+                                                        class="btn btn-toggle"
                                                         th:classappend="${user.estado ? 'btn-success' : 'btn-secondary'}"
-                                                        th:onclick="'toggleUserStatus(' + ${user.codigo} + ', ' + ${user.estado} + ')'"
+                                                        th:onclick="'toggleUserStatus(' + ${user.codigo} + ', ' + ${user.estado} + ', this)'"
                                                         th:title="${user.estado ? 'Desactivar usuario' : 'Activar usuario'}">
                                                     <i th:class="${user.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
                                                 </button>
@@ -364,9 +431,10 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th style="width: 5%;">ID</th>
-                                        <th style="width: 25%;">Nombre Comercial</th>
-                                        <th style="width: 15%;">RUC</th>
-                                        <th style="width: 20%;">Email</th>
+                                        <th style="width: 20%;">Nombre Comercial</th>
+                                        <th style="width: 12%;">RUC</th>
+                                        <th style="width: 18%;">Email</th>
+                                        <th style="width: 10%;" class="text-center">Estado Aprobación</th>
                                         <th style="width: 10%;" class="text-center">Estado</th>
                                         <th style="width: 25%;" class="text-center">Acciones</th>
                                     </tr>
@@ -375,7 +443,7 @@
                                     <!-- Restaurantes Pendientes -->
                                     <tr th:if="${pendingRestaurants != null and !pendingRestaurants.isEmpty()}" 
                                         class="table-warning">
-                                        <td colspan="6" class="text-center fw-bold py-3">
+                                        <td colspan="7" class="text-center fw-bold py-3">
                                             <i class="fas fa-clock fa-lg"></i> RESTAURANTES PENDIENTES DE APROBACIÃ“N
                                         </td>
                                     </tr>
@@ -394,6 +462,12 @@
                                         <td class="text-center">
                                             <span class="badge bg-warning text-dark px-3 py-2">
                                                 <i class="fas fa-clock"></i> Pendiente
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span th:class="${restaurant.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${restaurant.estado ? 'Activo' : 'Inactivo'}">
+                                                Activo
                                             </span>
                                         </td>
                                         <td class="text-center">
@@ -438,7 +512,7 @@
                                     <!-- Restaurantes Aprobados -->
                                     <tr th:if="${approvedRestaurants != null and !approvedRestaurants.isEmpty()}" 
                                         class="table-success">
-                                        <td colspan="6" class="text-center fw-bold py-3">
+                                        <td colspan="7" class="text-center fw-bold py-3">
                                             <i class="fas fa-check-circle fa-lg"></i> RESTAURANTES APROBADOS
                                         </td>
                                     </tr>
@@ -460,9 +534,15 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
+                                            <span th:class="${restaurant.estado ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${restaurant.estado ? 'Activo' : 'Inactivo'}">
+                                                Activo
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
                                             <div class="btn-group" role="group" aria-label="Acciones de restaurante">
                                                 <!-- Botón Ver Detalles -->
-                                                <button type="button" class="btn btn-sm btn-primary" 
+                                                <button type="button" class="btn btn-sm btn-primary btn-toggle" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#viewRestaurantModal"
                                                         th:data-id="${restaurant.codigo}"
@@ -477,7 +557,7 @@
                                                 </button>
                                                 
                                                 <!-- Botón Gestionar Menú -->
-                                                <button type="button" class="btn btn-sm btn-info" 
+                                                <button type="button" class="btn btn-sm btn-info btn-toggle" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#manageMenuModal"
                                                         th:data-id="${restaurant.codigo}"
@@ -488,11 +568,9 @@
                                                 
                                                 <!-- Botón Cambiar Estado -->
                                                 <button type="button" 
-                                                        class="btn btn-sm"
+                                                        class="btn btn-toggle"
                                                         th:classappend="${restaurant.estado ? 'btn-success' : 'btn-secondary'}"
-                                                        onclick="toggleEstadoRestaurante(this)"
-                                                        th:data-id="${restaurant.codigo}"
-                                                        th:data-estado="${restaurant.estado}"
+                                                        th:onclick="'toggleRestaurantStatus(' + ${restaurant.codigo} + ', ' + ${restaurant.estado} + ', this)'"
                                                         th:title="${restaurant.estado ? 'Desactivar restaurante' : 'Activar restaurante'}">
                                                     <i th:class="${restaurant.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
                                                 </button>
@@ -502,7 +580,7 @@
                                     
                                     <!-- Mensaje si no hay restaurantes -->
                                     <tr th:if="${(pendingRestaurants == null or pendingRestaurants.isEmpty()) and (approvedRestaurants == null or approvedRestaurants.isEmpty())}">
-                                        <td colspan="6" class="text-center text-muted">
+                                        <td colspan="7" class="text-center text-muted">
                                             <i class="fas fa-info-circle"></i> No hay restaurantes registrados
                                         </td>
                                     </tr>
@@ -1221,26 +1299,55 @@
 <div class="modal fade" id="toggleUserStatusModal" tabindex="-1" aria-labelledby="toggleUserStatusModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header border-0">
+            <div class="modal-header">
                 <h5 class="modal-title" id="toggleUserStatusModalLabel">
-                    <i class="fas fa-exclamation-circle text-warning"></i> Confirmar Cambio de Estado
+                    <i class="fas fa-toggle-on" id="toggleUserStatusIcon"></i>
+                    <span id="toggleUserStatusTitle">Cambiar Estado del Usuario</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center py-4">
-                <div class="mb-3">
-                    <i id="statusModalIcon" class="fas fa-user-slash fa-3x text-secondary"></i>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="toggleUserStatusMessage">¿Está seguro de cambiar el estado de este usuario?</span>
                 </div>
-                <h6 class="mb-3">¿Está seguro de <span id="statusModalAction" class="fw-bold text-danger">desactivar</span> este usuario?</h6>
-                <p class="text-muted mb-0">
-                    El usuario será <span id="statusModalResult" class="fw-bold">desactivado</span> en el sistema.
-                </p>
+                <p class="mb-0"><strong>Usuario:</strong> <span id="toggleUserStatusName">-</span></p>
             </div>
-            <div class="modal-footer border-0 justify-content-center">
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Cancelar
                 </button>
-                <button type="button" class="btn btn-primary px-4" id="confirmToggleUserStatus">
+                <button type="button" class="btn btn-primary" id="confirmToggleUserStatus">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cambiar estado de restaurante -->
+<div class="modal fade" id="toggleRestaurantStatusModal" tabindex="-1" aria-labelledby="toggleRestaurantStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="toggleRestaurantStatusModalLabel">
+                    <i class="fas fa-store" id="toggleRestaurantStatusIcon"></i>
+                    <span id="toggleRestaurantStatusTitle">Cambiar Estado del Restaurante</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="toggleRestaurantStatusMessage">¿Está seguro de cambiar el estado de este restaurante?</span>
+                </div>
+                <p class="mb-0"><strong>Restaurante ID:</strong> <span id="toggleRestaurantStatusId">-</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmToggleRestaurantStatus">
                     <i class="fas fa-check"></i> Confirmar
                 </button>
             </div>

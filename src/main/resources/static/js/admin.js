@@ -51,16 +51,6 @@ function aprobarRestaurante(button) {
     }
 }
 
-function toggleEstadoRestaurante(button) {
-    const id = button.dataset.id;
-    const estadoActual = button.dataset.estado === 'true';
-    const nuevoEstado = estadoActual ? 'desactivar' : 'activar';
-    
-    if (confirm(`¿Está seguro de ${nuevoEstado} este restaurante?`)) {
-        submitFormWithCSRF(`/menuAdministrador/restaurant/${id}/toggle-status`);
-    }
-}
-
 function eliminarRestaurante(button) {
     const id = button.dataset.id;
     const nombre = button.dataset.nombre;
@@ -81,25 +71,178 @@ function verDocumento(tipoDocumento, restauranteId) {
 
 // Variables para el modal de cambio de estado
 let pendingUserToggle = null;
+let pendingRestaurantToggle = null;
 
-function toggleUserStatus(userId, currentStatus) {
+/**
+ * Cambia el estado de un usuario o restaurante mediante AJAX sin recargar la página
+ */
+function toggleStatusViaAjax(url, buttonElement, currentStatus) {
+    // Obtener CSRF token
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    
+    // Agregar animación de loading al botón
+    buttonElement.classList.add('switching');
+    buttonElement.disabled = true;
+    
+    // Realizar petición AJAX
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            [csrfHeader]: csrfToken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Invertir el estado
+            const newStatus = !currentStatus;
+            
+            // Actualizar el botón
+            updateToggleButton(buttonElement, newStatus);
+            
+            // Actualizar el badge de estado en la misma fila
+            updateStatusBadge(buttonElement, newStatus);
+            
+            // Mostrar mensaje de éxito
+            showToast('success', `Estado cambiado exitosamente a ${newStatus ? 'Activo' : 'Inactivo'}`);
+        } else {
+            throw new Error('Error al cambiar el estado');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', 'Error al cambiar el estado. Por favor, intente nuevamente.');
+    })
+    .finally(() => {
+        // Quitar animación y re-habilitar botón
+        buttonElement.classList.remove('switching');
+        buttonElement.disabled = false;
+        
+        // Mantener el foco en el botón
+        buttonElement.focus();
+    });
+}
+
+/**
+ * Actualiza visualmente el botón de toggle
+ */
+function updateToggleButton(button, newStatus) {
+    const icon = button.querySelector('i');
+    
+    if (newStatus) {
+        // Estado Activo
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-success');
+        button.title = button.title.includes('usuario') ? 'Desactivar usuario' : 'Desactivar restaurante';
+        
+        icon.classList.remove('fa-toggle-off');
+        icon.classList.add('fa-toggle-on');
+    } else {
+        // Estado Inactivo
+        button.classList.remove('btn-success');
+        button.classList.add('btn-secondary');
+        button.title = button.title.includes('usuario') ? 'Activar usuario' : 'Activar restaurante';
+        
+        icon.classList.remove('fa-toggle-on');
+        icon.classList.add('fa-toggle-off');
+    }
+    
+    // Actualizar el onclick para reflejar el nuevo estado
+    const onclickAttr = button.getAttribute('onclick');
+    if (onclickAttr) {
+        const updatedOnclick = onclickAttr.replace(
+            /, (true|false),/,
+            `, ${newStatus},`
+        );
+        button.setAttribute('onclick', updatedOnclick);
+    }
+}
+
+/**
+ * Actualiza el badge de estado en la tabla
+ */
+function updateStatusBadge(button, newStatus) {
+    // Encontrar la fila del botón
+    const row = button.closest('tr');
+    if (!row) return;
+    
+    // Buscar el badge de estado en la columna "Estado" (no "Estado Aprobación")
+    const cells = row.querySelectorAll('td');
+    cells.forEach(cell => {
+        const badge = cell.querySelector('.badge');
+        if (badge && (badge.textContent.trim() === 'Activo' || badge.textContent.trim() === 'Inactivo')) {
+            if (newStatus) {
+                badge.classList.remove('bg-danger');
+                badge.classList.add('bg-success');
+                badge.textContent = 'Activo';
+            } else {
+                badge.classList.remove('bg-success');
+                badge.classList.add('bg-danger');
+                badge.textContent = 'Inactivo';
+            }
+        }
+    });
+}
+
+/**
+ * Muestra un mensaje toast temporal
+ */
+function showToast(type, message) {
+    // Crear elemento toast
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; animation: slideInRight 0.3s ease-out;';
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        ${message}
+    `;
+    
+    // Agregar al body
+    document.body.appendChild(toast);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function toggleUserStatus(userId, currentStatus, buttonElement) {
     const modal = document.getElementById('toggleUserStatusModal');
     const bootstrapModal = new bootstrap.Modal(modal);
     
     // Guardar información para usarla al confirmar
-    pendingUserToggle = { userId, currentStatus };
+    pendingUserToggle = { userId, currentStatus, buttonElement };
     
     // Configurar textos según el estado actual
     const action = currentStatus ? 'desactivar' : 'activar';
     const statusText = currentStatus ? 'desactivado' : 'activado';
-    const iconClass = currentStatus ? 'fa-user-slash text-danger' : 'fa-user-check text-success';
-    const actionClass = currentStatus ? 'text-danger' : 'text-success';
     
     // Actualizar contenido del modal
-    document.getElementById('statusModalIcon').className = `fas ${iconClass} fa-3x`;
-    document.getElementById('statusModalAction').textContent = action;
-    document.getElementById('statusModalAction').className = `fw-bold ${actionClass}`;
-    document.getElementById('statusModalResult').textContent = statusText;
+    document.getElementById('toggleUserStatusMessage').textContent = 
+        `¿Está seguro de ${action} este usuario? El usuario será ${statusText} en el sistema.`;
+    document.getElementById('toggleUserStatusName').textContent = `ID: ${userId}`;
+    
+    // Mostrar el modal
+    bootstrapModal.show();
+}
+
+function toggleRestaurantStatus(restaurantId, currentStatus, buttonElement) {
+    const modal = document.getElementById('toggleRestaurantStatusModal');
+    const bootstrapModal = new bootstrap.Modal(modal);
+    
+    // Guardar información para usarla al confirmar
+    pendingRestaurantToggle = { restaurantId, currentStatus, buttonElement };
+    
+    // Configurar textos según el estado actual
+    const action = currentStatus ? 'desactivar' : 'activar';
+    const statusText = currentStatus ? 'desactivado' : 'activado';
+    
+    // Actualizar contenido del modal
+    document.getElementById('toggleRestaurantStatusMessage').textContent = 
+        `¿Está seguro de ${action} este restaurante? El restaurante será ${statusText} en el sistema.`;
+    document.getElementById('toggleRestaurantStatusId').textContent = restaurantId;
     
     // Mostrar el modal
     bootstrapModal.show();
@@ -150,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initPermisos();
     initSeccionActiva();
     initToggleUserStatusModal();
+    initToggleRestaurantStatusModal();
     
     console.log('=== INICIALIZACIÓN COMPLETADA ===');
 });
@@ -508,14 +652,14 @@ function initToggleUserStatusModal() {
     
     confirmButton.addEventListener('click', function() {
         if (pendingUserToggle) {
-            const { userId, currentStatus } = pendingUserToggle;
+            const { userId, currentStatus, buttonElement } = pendingUserToggle;
             
             // Cerrar el modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('toggleUserStatusModal'));
             modal.hide();
             
-            // Ejecutar el cambio de estado
-            submitFormWithCSRF(`/menuAdministrador/user/${userId}/toggle-status`);
+            // Ejecutar el cambio de estado mediante AJAX
+            toggleStatusViaAjax(`/menuAdministrador/user/${userId}/toggle-status`, buttonElement, currentStatus);
             
             // Limpiar la variable
             pendingUserToggle = null;
@@ -527,5 +671,33 @@ function initToggleUserStatusModal() {
         pendingUserToggle = null;
     });
     
-    console.log('✅ Modal de cambio de estado configurado');
+    console.log('✅ Modal de cambio de estado de usuario configurado');
+}
+
+function initToggleRestaurantStatusModal() {
+    const confirmButton = document.getElementById('confirmToggleRestaurantStatus');
+    if (!confirmButton) return;
+    
+    confirmButton.addEventListener('click', function() {
+        if (pendingRestaurantToggle) {
+            const { restaurantId, currentStatus, buttonElement } = pendingRestaurantToggle;
+            
+            // Cerrar el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('toggleRestaurantStatusModal'));
+            modal.hide();
+            
+            // Ejecutar el cambio de estado mediante AJAX
+            toggleStatusViaAjax(`/menuAdministrador/restaurant/${restaurantId}/toggle-status`, buttonElement, currentStatus);
+            
+            // Limpiar la variable
+            pendingRestaurantToggle = null;
+        }
+    });
+    
+    // Limpiar al cerrar el modal sin confirmar
+    document.getElementById('toggleRestaurantStatusModal').addEventListener('hidden.bs.modal', function() {
+        pendingRestaurantToggle = null;
+    });
+    
+    console.log('✅ Modal de cambio de estado de restaurante configurado');
 }
