@@ -787,4 +787,76 @@ CREATE TABLE `detalle_pedido` (
   CONSTRAINT `FK_detalle_pedido_promocion` FOREIGN KEY (`codigo_promocion`) REFERENCES `promocion` (`codigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- =====================================================
+-- ACTUALIZACIÓN: SISTEMA DE CARRITO Y PEDIDOS
+-- Campos para stock y verificación de entregas
+-- =====================================================
+
+-- Agregar campos de stock a la tabla promocion
+ALTER TABLE promocion 
+ADD COLUMN IF NOT EXISTS cantidad_disponible INT DEFAULT NULL COMMENT 'Stock disponible de la promoción',
+ADD COLUMN IF NOT EXISTS cantidad_vendida INT DEFAULT 0 COMMENT 'Cantidad vendida de la promoción';
+
+-- Agregar campos de verificación a la tabla pedido
+ALTER TABLE pedido 
+ADD COLUMN IF NOT EXISTS codigo_verificacion VARCHAR(4) DEFAULT NULL COMMENT 'Código de 4 dígitos para verificar entrega',
+ADD COLUMN IF NOT EXISTS verificado BOOLEAN DEFAULT FALSE COMMENT 'Indica si el pedido fue verificado con el código';
+
+-- Actualizar promociones existentes con stock inicial (ejemplo: 100 unidades)
+UPDATE promocion 
+SET cantidad_disponible = 100, 
+    cantidad_vendida = 0 
+WHERE cantidad_disponible IS NULL;
+
+-- Crear índice para búsqueda rápida por código de verificación
+CREATE INDEX IF NOT EXISTS idx_pedido_codigo_verificacion ON pedido(codigo_verificacion);
+
+-- =====================================================
+-- INSERTAR PEDIDOS DE PRUEBA
+-- =====================================================
+-- Pedido 1: Usuario cliente para delivery
+INSERT INTO `pedido` (
+  `codigo_usuario`, `codigo_restaurante`, `total`, `descuento`, 
+  `direccion_entrega`, `telefono_contacto`, `notas`, `referencia_direccion`,
+  `codigo_verificacion`, `verificado`, `estado`, `fecha_pedido`
+) VALUES (
+  (SELECT codigo FROM usuario WHERE correo_electronico = 'nanisss27@gmail.com' LIMIT 1),
+  (SELECT codigo FROM restaurante WHERE nombre = 'Restaurante Daniela' LIMIT 1),
+  35.90,
+  0.00,
+  'Avenida zarumilla - ninguna',
+  '975184139',
+  NULL,
+  NULL,
+  '1234', -- Código de verificación
+  FALSE,
+  TRUE, -- Pedido activo/pendiente
+  NOW()
+);
+
+-- Pedido 2: Otro pedido de prueba
+INSERT INTO `pedido` (
+  `codigo_usuario`, `codigo_restaurante`, `total`, `descuento`, 
+  `direccion_entrega`, `telefono_contacto`, `notas`, `referencia_direccion`,
+  `codigo_verificacion`, `verificado`, `estado`, `fecha_pedido`
+) VALUES (
+  (SELECT codigo FROM usuario WHERE correo_electronico = 'DanielAnteroJunior@gmail.com' LIMIT 1),
+  (SELECT codigo FROM restaurante WHERE nombre = 'Restaurante Daniela' LIMIT 1),
+  35.90,
+  0.00,
+  'Avenida zarumilla - ningun',
+  '975184139',
+  NULL,
+  NULL,
+  '5678', -- Código de verificación
+  FALSE,
+  TRUE, -- Pedido activo/pendiente
+  NOW()
+);
+
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- =====================================================
+-- FIN DEL SCRIPT DE INICIALIZACIÓN
+-- ✅ Base de datos FooDix configurada completamente
+-- =====================================================
