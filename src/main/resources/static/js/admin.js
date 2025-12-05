@@ -72,6 +72,10 @@ function verDocumento(tipoDocumento, restauranteId) {
 // Variables para el modal de cambio de estado
 let pendingUserToggle = null;
 let pendingRestaurantToggle = null;
+let pendingDeliveryAvailabilityToggle = null;
+let pendingDeliveryStatusToggle = null;
+let pendingCategoryToggle = null;
+let pendingCategoryDelete = null;
 
 /**
  * Cambia el estado de un usuario o restaurante mediante AJAX sin recargar la página
@@ -130,22 +134,60 @@ function toggleStatusViaAjax(url, buttonElement, currentStatus) {
 function updateToggleButton(button, newStatus) {
     const icon = button.querySelector('i');
     
-    if (newStatus) {
-        // Estado Activo
-        button.classList.remove('btn-secondary');
-        button.classList.add('btn-success');
-        button.title = button.title.includes('usuario') ? 'Desactivar usuario' : 'Desactivar restaurante';
-        
-        icon.classList.remove('fa-toggle-off');
-        icon.classList.add('fa-toggle-on');
-    } else {
-        // Estado Inactivo
-        button.classList.remove('btn-success');
-        button.classList.add('btn-secondary');
-        button.title = button.title.includes('usuario') ? 'Activar usuario' : 'Activar restaurante';
-        
-        icon.classList.remove('fa-toggle-on');
-        icon.classList.add('fa-toggle-off');
+    // Detectar tipo de botón por el icono actual
+    const isAvailabilityToggle = icon.classList.contains('fa-user-check') || icon.classList.contains('fa-user-times');
+    const isStatusToggle = icon.classList.contains('fa-toggle-on') || icon.classList.contains('fa-toggle-off');
+    
+    if (isAvailabilityToggle) {
+        // Botón de disponibilidad (repartidor)
+        if (newStatus) {
+            button.classList.remove('btn-secondary');
+            button.classList.add('btn-info');
+            button.title = 'Marcar no disponible';
+            
+            icon.classList.remove('fa-user-times');
+            icon.classList.add('fa-user-check');
+        } else {
+            button.classList.remove('btn-info');
+            button.classList.add('btn-secondary');
+            button.title = 'Marcar disponible';
+            
+            icon.classList.remove('fa-user-check');
+            icon.classList.add('fa-user-times');
+        }
+    } else if (isStatusToggle) {
+        // Botón de estado (activar/desactivar)
+        if (newStatus) {
+            button.classList.remove('btn-secondary');
+            button.classList.add('btn-success');
+            
+            // Determinar el tipo de entidad
+            if (button.title.includes('usuario') || button.getAttribute('onclick')?.includes('toggleUserStatus')) {
+                button.title = 'Desactivar usuario';
+            } else if (button.title.includes('restaurante') || button.getAttribute('onclick')?.includes('toggleRestaurantStatus')) {
+                button.title = 'Desactivar restaurante';
+            } else {
+                button.title = 'Desactivar';
+            }
+            
+            icon.classList.remove('fa-toggle-off');
+            icon.classList.add('fa-toggle-on');
+        } else {
+            button.classList.remove('btn-success');
+            button.classList.add('btn-secondary');
+            
+            // Determinar el tipo de entidad
+            if (button.title.includes('usuario') || button.getAttribute('onclick')?.includes('toggleUserStatus')) {
+                button.title = 'Activar usuario';
+            } else if (button.title.includes('restaurante') || button.getAttribute('onclick')?.includes('toggleRestaurantStatus')) {
+                button.title = 'Activar restaurante';
+            } else {
+                button.title = 'Activar';
+            }
+            
+            icon.classList.remove('fa-toggle-on');
+            icon.classList.add('fa-toggle-off');
+        }
     }
     
     // Actualizar el onclick para reflejar el nuevo estado
@@ -167,11 +209,33 @@ function updateStatusBadge(button, newStatus) {
     const row = button.closest('tr');
     if (!row) return;
     
-    // Buscar el badge de estado en la columna "Estado" (no "Estado Aprobación")
+    // Determinar qué tipo de badge actualizar según el icono del botón
+    const icon = button.querySelector('i');
+    const isAvailabilityToggle = icon && (icon.classList.contains('fa-user-check') || icon.classList.contains('fa-user-times'));
+    const isStatusToggle = icon && (icon.classList.contains('fa-toggle-on') || icon.classList.contains('fa-toggle-off'));
+    
+    // Buscar el badge correcto según el tipo de toggle
     const cells = row.querySelectorAll('td');
     cells.forEach(cell => {
         const badge = cell.querySelector('.badge');
-        if (badge && (badge.textContent.trim() === 'Activo' || badge.textContent.trim() === 'Inactivo')) {
+        if (!badge) return;
+        
+        const badgeText = badge.textContent.trim();
+        
+        // Si es toggle de disponibilidad, actualizar badge de Disponible/No disponible
+        if (isAvailabilityToggle && (badgeText === 'Disponible' || badgeText === 'No disponible')) {
+            if (newStatus) {
+                badge.classList.remove('bg-secondary');
+                badge.classList.add('bg-success');
+                badge.textContent = 'Disponible';
+            } else {
+                badge.classList.remove('bg-success');
+                badge.classList.add('bg-secondary');
+                badge.textContent = 'No disponible';
+            }
+        }
+        // Si es toggle de estado, actualizar badge de Activo/Inactivo
+        else if (isStatusToggle && (badgeText === 'Activo' || badgeText === 'Inactivo')) {
             if (newStatus) {
                 badge.classList.remove('bg-danger');
                 badge.classList.add('bg-success');
@@ -248,6 +312,83 @@ function toggleRestaurantStatus(restaurantId, currentStatus, buttonElement) {
     bootstrapModal.show();
 }
 
+function toggleDeliveryAvailability(deliveryId, currentStatus, buttonElement) {
+    const modal = document.getElementById('toggleDeliveryAvailabilityModal');
+    const bootstrapModal = new bootstrap.Modal(modal);
+    
+    // Guardar información para usarla al confirmar
+    pendingDeliveryAvailabilityToggle = { deliveryId, currentStatus, buttonElement };
+    
+    // Configurar textos según el estado actual
+    const action = currentStatus ? 'marcar como NO disponible' : 'marcar como disponible';
+    const statusText = currentStatus ? 'NO estará disponible' : 'estará disponible';
+    
+    // Actualizar contenido del modal
+    document.getElementById('toggleDeliveryAvailabilityMessage').textContent = 
+        `¿Está seguro de ${action} a este repartidor? El repartidor ${statusText} para entregas.`;
+    document.getElementById('toggleDeliveryAvailabilityId').textContent = deliveryId;
+    
+    // Mostrar el modal
+    bootstrapModal.show();
+}
+
+function toggleDeliveryStatus(deliveryId, currentStatus, buttonElement) {
+    const modal = document.getElementById('toggleDeliveryStatusModal');
+    const bootstrapModal = new bootstrap.Modal(modal);
+    
+    // Guardar información para usarla al confirmar
+    pendingDeliveryStatusToggle = { deliveryId, currentStatus, buttonElement };
+    
+    // Configurar textos según el estado actual
+    const action = currentStatus ? 'desactivar' : 'activar';
+    const statusText = currentStatus ? 'desactivado' : 'activado';
+    
+    // Actualizar contenido del modal
+    document.getElementById('toggleDeliveryStatusMessage').textContent = 
+        `¿Está seguro de ${action} a este repartidor? El repartidor será ${statusText} en el sistema.`;
+    document.getElementById('toggleDeliveryStatusId').textContent = deliveryId;
+    
+    // Mostrar el modal
+    bootstrapModal.show();
+}
+
+function toggleCategoryStatus(categoryId, currentStatus, buttonElement) {
+    const modal = document.getElementById('toggleCategoryStatusModal');
+    const bootstrapModal = new bootstrap.Modal(modal);
+    
+    // Guardar información para usarla al confirmar
+    pendingCategoryToggle = { categoryId, currentStatus, buttonElement };
+    
+    // Configurar textos según el estado actual
+    const action = currentStatus ? 'desactivar' : 'activar';
+    const statusText = currentStatus ? 'desactivada' : 'activada';
+    
+    // Actualizar contenido del modal
+    document.getElementById('toggleCategoryStatusMessage').textContent = 
+        `¿Está seguro de ${action} esta categoría? La categoría será ${statusText} en el sistema.`;
+    document.getElementById('toggleCategoryStatusId').textContent = categoryId;
+    
+    // Mostrar el modal
+    bootstrapModal.show();
+}
+
+function deleteCategoryConfirm(categoryId, categoryName) {
+    const modal = document.getElementById('deleteCategoryModal');
+    const bootstrapModal = new bootstrap.Modal(modal);
+    
+    // Guardar información para usarla al confirmar
+    pendingCategoryDelete = { categoryId, categoryName };
+    
+    // Actualizar contenido del modal
+    document.getElementById('deleteCategoryMessage').textContent = 
+        `¿Está seguro de eliminar esta categoría? Esta acción no se puede deshacer.`;
+    document.getElementById('deleteCategoryName').textContent = categoryName;
+    document.getElementById('deleteCategoryId').textContent = categoryId;
+    
+    // Mostrar el modal
+    bootstrapModal.show();
+}
+
 function submitFormWithCSRF(action, section = null) {
     const form = document.createElement('form');
     form.method = 'POST';
@@ -294,6 +435,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initSeccionActiva();
     initToggleUserStatusModal();
     initToggleRestaurantStatusModal();
+    initToggleDeliveryAvailabilityModal();
+    initToggleDeliveryStatusModal();
+    initToggleCategoryStatusModal();
+    initDeleteCategoryModal();
     
     console.log('=== INICIALIZACIÓN COMPLETADA ===');
 });
@@ -701,3 +846,116 @@ function initToggleRestaurantStatusModal() {
     
     console.log('✅ Modal de cambio de estado de restaurante configurado');
 }
+
+function initToggleDeliveryAvailabilityModal() {
+    const confirmButton = document.getElementById('confirmToggleDeliveryAvailability');
+    if (!confirmButton) return;
+    
+    confirmButton.addEventListener('click', function() {
+        if (pendingDeliveryAvailabilityToggle) {
+            const { deliveryId, currentStatus, buttonElement } = pendingDeliveryAvailabilityToggle;
+            
+            // Cerrar el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('toggleDeliveryAvailabilityModal'));
+            modal.hide();
+            
+            // Ejecutar el cambio de estado mediante AJAX
+            toggleStatusViaAjax(`/menuAdministrador/repartidor/${deliveryId}/toggle-disponibilidad`, buttonElement, currentStatus);
+            
+            // Limpiar la variable
+            pendingDeliveryAvailabilityToggle = null;
+        }
+    });
+    
+    // Limpiar al cerrar el modal sin confirmar
+    document.getElementById('toggleDeliveryAvailabilityModal').addEventListener('hidden.bs.modal', function() {
+        pendingDeliveryAvailabilityToggle = null;
+    });
+    
+    console.log('✅ Modal de cambio de disponibilidad de repartidor configurado');
+}
+
+function initToggleDeliveryStatusModal() {
+    const confirmButton = document.getElementById('confirmToggleDeliveryStatus');
+    if (!confirmButton) return;
+    
+    confirmButton.addEventListener('click', function() {
+        if (pendingDeliveryStatusToggle) {
+            const { deliveryId, currentStatus, buttonElement } = pendingDeliveryStatusToggle;
+            
+            // Cerrar el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('toggleDeliveryStatusModal'));
+            modal.hide();
+            
+            // Ejecutar el cambio de estado mediante AJAX
+            toggleStatusViaAjax(`/menuAdministrador/repartidor/${deliveryId}/toggle-status`, buttonElement, currentStatus);
+            
+            // Limpiar la variable
+            pendingDeliveryStatusToggle = null;
+        }
+    });
+    
+    // Limpiar al cerrar el modal sin confirmar
+    document.getElementById('toggleDeliveryStatusModal').addEventListener('hidden.bs.modal', function() {
+        pendingDeliveryStatusToggle = null;
+    });
+    
+    console.log('✅ Modal de cambio de estado de repartidor configurado');
+}
+
+function initToggleCategoryStatusModal() {
+    const confirmButton = document.getElementById('confirmToggleCategoryStatus');
+    if (!confirmButton) return;
+    
+    confirmButton.addEventListener('click', function() {
+        if (pendingCategoryToggle) {
+            const { categoryId, currentStatus, buttonElement } = pendingCategoryToggle;
+            
+            // Cerrar el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('toggleCategoryStatusModal'));
+            modal.hide();
+            
+            // Ejecutar el cambio de estado mediante AJAX
+            toggleStatusViaAjax(`/menuAdministrador/category/${categoryId}/toggle-status`, buttonElement, currentStatus);
+            
+            // Limpiar la variable
+            pendingCategoryToggle = null;
+        }
+    });
+    
+    // Limpiar al cerrar el modal sin confirmar
+    document.getElementById('toggleCategoryStatusModal').addEventListener('hidden.bs.modal', function() {
+        pendingCategoryToggle = null;
+    });
+    
+    console.log('✅ Modal de cambio de estado de categoría configurado');
+}
+
+function initDeleteCategoryModal() {
+    const confirmButton = document.getElementById('confirmDeleteCategory');
+    if (!confirmButton) return;
+    
+    confirmButton.addEventListener('click', function() {
+        if (pendingCategoryDelete) {
+            const { categoryId } = pendingCategoryDelete;
+            
+            // Cerrar el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCategoryModal'));
+            modal.hide();
+            
+            // Ejecutar eliminación mediante POST con formulario
+            submitFormWithCSRF(`/menuAdministrador/category/${categoryId}/delete`, 'configuracion');
+            
+            // Limpiar la variable
+            pendingCategoryDelete = null;
+        }
+    });
+    
+    // Limpiar al cerrar el modal sin confirmar
+    document.getElementById('deleteCategoryModal').addEventListener('hidden.bs.modal', function() {
+        pendingCategoryDelete = null;
+    });
+    
+    console.log('✅ Modal de eliminación de categoría configurado');
+}
+
