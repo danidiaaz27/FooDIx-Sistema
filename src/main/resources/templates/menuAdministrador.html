@@ -729,21 +729,25 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <form th:action="@{/menuAdministrador/repartidor/{id}/toggle-disponibilidad(id=${delivery.codigo})}" 
-                                                  method="post" style="display: inline;">
-                                                <button type="submit" class="btn btn-sm btn-info" 
+                                            <div class="btn-group" role="group" aria-label="Acciones de repartidor">
+                                                <!-- Botón Cambiar Disponibilidad -->
+                                                <button type="button" 
+                                                        class="btn btn-toggle"
+                                                        th:classappend="${delivery.disponible ? 'btn-info' : 'btn-secondary'}"
+                                                        th:onclick="'toggleDeliveryAvailability(' + ${delivery.codigo} + ', ' + ${delivery.disponible} + ', this)'"
                                                         th:title="${delivery.disponible ? 'Marcar no disponible' : 'Marcar disponible'}">
                                                     <i th:class="${delivery.disponible ? 'fas fa-user-check' : 'fas fa-user-times'}"></i>
                                                 </button>
-                                            </form>
-                                            
-                                            <form th:action="@{/menuAdministrador/repartidor/{id}/toggle-status(id=${delivery.codigo})}" 
-                                                  method="post" style="display: inline;">
-                                                <button type="submit" class="btn btn-sm btn-warning" 
+                                                
+                                                <!-- Botón Cambiar Estado -->
+                                                <button type="button" 
+                                                        class="btn btn-toggle"
+                                                        th:classappend="${delivery.estado ? 'btn-success' : 'btn-secondary'}"
+                                                        th:onclick="'toggleDeliveryStatus(' + ${delivery.codigo} + ', ' + ${delivery.estado} + ', this)'"
                                                         th:title="${delivery.estado ? 'Desactivar' : 'Activar'}">
                                                     <i th:class="${delivery.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
                                                 </button>
-                                            </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -1325,6 +1329,66 @@
     </div>
 </div>
 
+<!-- Modal para cambiar disponibilidad de repartidor -->
+<div class="modal fade" id="toggleDeliveryAvailabilityModal" tabindex="-1" aria-labelledby="toggleDeliveryAvailabilityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="toggleDeliveryAvailabilityModalLabel">
+                    <i class="fas fa-motorcycle"></i>
+                    <span>Cambiar Disponibilidad del Repartidor</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="toggleDeliveryAvailabilityMessage">¿Está seguro de cambiar la disponibilidad de este repartidor?</span>
+                </div>
+                <p class="mb-0"><strong>Repartidor ID:</strong> <span id="toggleDeliveryAvailabilityId">-</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmToggleDeliveryAvailability">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cambiar estado de repartidor -->
+<div class="modal fade" id="toggleDeliveryStatusModal" tabindex="-1" aria-labelledby="toggleDeliveryStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="toggleDeliveryStatusModalLabel">
+                    <i class="fas fa-motorcycle"></i>
+                    <span>Cambiar Estado del Repartidor</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="toggleDeliveryStatusMessage">¿Está seguro de cambiar el estado de este repartidor?</span>
+                </div>
+                <p class="mb-0"><strong>Repartidor ID:</strong> <span id="toggleDeliveryStatusId">-</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmToggleDeliveryStatus">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal para cambiar estado de restaurante -->
 <div class="modal fade" id="toggleRestaurantStatusModal" tabindex="-1" aria-labelledby="toggleRestaurantStatusModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1416,19 +1480,26 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <form th:action="@{/menuAdministrador/category/{id}/toggle-status(id=${category.codigo})}" 
-                                                  method="post" style="display: inline;">
-                                                <button type="submit" class="btn btn-sm btn-warning" title="Cambiar Estado">
-                                                    <i class="fas fa-toggle-on"></i>
+                                            <div class="btn-group" role="group" aria-label="Acciones de categoría">
+                                                <!-- Botón Cambiar Estado -->
+                                                <button type="button" 
+                                                        class="btn btn-toggle"
+                                                        th:classappend="${category.estado ? 'btn-success' : 'btn-secondary'}"
+                                                        th:onclick="|toggleCategoryStatus(${category.codigo}, ${category.estado}, this)|"
+                                                        th:title="${category.estado ? 'Desactivar categoría' : 'Activar categoría'}">
+                                                    <i th:class="${category.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
                                                 </button>
-                                            </form>
-                                            <form th:action="@{/menuAdministrador/category/{id}/delete(id=${category.codigo})}" 
-                                                  method="post" style="display: inline;"
-                                                  onsubmit="return confirm('¿Está seguro de eliminar esta categoría?');">
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                
+                                                <!-- Botón Eliminar -->
+                                                <button type="button" 
+                                                        class="btn btn-toggle btn-danger"
+                                                        th:data-id="${category.codigo}"
+                                                        th:data-name="${category.nombre}"
+                                                        onclick="deleteCategoryConfirm(this.getAttribute('data-id'), this.getAttribute('data-name'))"
+                                                        title="Eliminar categoría">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
-                                            </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -1440,6 +1511,67 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cambiar estado de categoría -->
+<div class="modal fade" id="toggleCategoryStatusModal" tabindex="-1" aria-labelledby="toggleCategoryStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="toggleCategoryStatusModalLabel">
+                    <i class="fas fa-tags"></i>
+                    <span>Cambiar Estado de la Categoría</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="toggleCategoryStatusMessage">¿Está seguro de cambiar el estado de esta categoría?</span>
+                </div>
+                <p class="mb-0"><strong>Categoría ID:</strong> <span id="toggleCategoryStatusId">-</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmToggleCategoryStatus">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para eliminar categoría -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteCategoryModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Eliminar Categoría</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger mb-3">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="deleteCategoryMessage">¿Está seguro de eliminar esta categoría? Esta acción no se puede deshacer.</span>
+                </div>
+                <p class="mb-2"><strong>Categoría:</strong> <span id="deleteCategoryName">-</span></p>
+                <p class="mb-0"><strong>ID:</strong> <span id="deleteCategoryId">-</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteCategory">
+                    <i class="fas fa-trash"></i> Eliminar
                 </button>
             </div>
         </div>
