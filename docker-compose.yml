@@ -8,9 +8,10 @@ services:
     networks:
       - app-network
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/db_foodix?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/db_foodix?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE=America/Lima
       - APP_UPLOAD_DIR=uploads
       # Configuración de correo (GMAIL)
       - SPRING_MAIL_HOST=smtp.gmail.com
@@ -45,6 +46,8 @@ services:
     environment:
       - MYSQL_DATABASE=db_foodix
       - MYSQL_ROOT_PASSWORD=root
+      - TZ=America/Lima
+    command: --default-time-zone='-05:00'
     ports:
       - "3306:3306"
     volumes:

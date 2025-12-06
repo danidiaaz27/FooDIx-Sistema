@@ -578,94 +578,106 @@
                 <!-- Mostrar solo promociones activas en el menú -->
                 <div class="row g-4" th:if="${promocionesActivas != null and !promocionesActivas.isEmpty()}">
                     <div class="col-md-6 col-lg-4" th:each="promocion : ${promocionesActivas}">
-                        <div class="card h-100" style="border: 2px solid rgba(198,40,40,0.1); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; position: relative;"
-                             onmouseover="this.style.transform='translateY(-10px) scale(1.02)'; this.style.boxShadow='0 12px 30px rgba(198,40,40,0.25)'; this.style.borderColor='#C62828';"
-                             onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'; this.style.borderColor='rgba(198,40,40,0.1)';">
+                        <div class="card h-100" style="border: 2px solid rgba(198,40,40,0.1); border-radius: 20px; overflow: hidden; transition: all 0.3s ease; position: relative; background: white;"
+                             onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 40px rgba(198,40,40,0.2)'; this.style.borderColor='#C62828';"
+                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'; this.style.borderColor='rgba(198,40,40,0.1)';">
                             
                             <!-- Badge de estado flotante -->
-                            <div style="position: absolute; top: 12px; right: 12px; z-index: 10;">
-                                <span class="badge" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; font-size: 0.75rem; padding: 0.5rem 0.9rem; border-radius: 20px; box-shadow: 0 4px 12px rgba(40,167,69,0.3);">
-                                    <i class="fas fa-check-circle"></i> Activa
+                            <div style="position: absolute; top: 15px; right: 15px; z-index: 10;">
+                                <span class="badge" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; font-size: 0.7rem; padding: 0.5rem 0.9rem; border-radius: 25px; box-shadow: 0 4px 15px rgba(40,167,69,0.4); font-weight: 600;">
+                                    <i class="fas fa-check-circle"></i> ACTIVA
+                                </span>
+                            </div>
+                            
+                            <!-- Badge de descuento flotante izquierdo -->
+                            <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
+                                <span class="badge" style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); color: white; font-size: 0.95rem; padding: 0.6rem 1rem; border-radius: 25px; box-shadow: 0 4px 15px rgba(220,38,38,0.4); font-weight: 700;">
+                                    <i class="fas fa-percent"></i> <span th:text="${#numbers.formatDecimal(promocion.descuento, 1, 0)}">0</span>% OFF
                                 </span>
                             </div>
                             
                             <!-- Imagen mejorada con gradiente -->
-                            <div style="background: linear-gradient(135deg, #C62828 0%, #F5A623 100%); height: 200px; display: flex; align-items: center; justify-content: center; color: white; font-size: 3.5rem; position: relative;">
-                                <i class="fas fa-utensils"></i>
-                                <!-- Overlay con efecto -->
-                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); padding: 20px 15px 10px;">
-                                    <div class="d-flex justify-content-between align-items-end">
-                                        <span style="font-size: 0.75rem; color: white; opacity: 0.9;">
-                                            <i class="fas fa-clock"></i> Disponible ahora
+                            <div style="background: linear-gradient(135deg, #C62828 0%, #F5A623 100%); height: 220px; display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; position: relative;">
+                                <i class="fas fa-utensils" style="opacity: 0.9;"></i>
+                                <!-- Overlay inferior con info rápida -->
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 25px 20px 15px;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span style="font-size: 0.85rem; color: white; font-weight: 600;">
+                                            <i class="fas fa-clock"></i> Disponible Ahora
+                                        </span>
+                                        <span style="font-size: 0.85rem; color: white; font-weight: 600;" th:text="'Stock: ' + ${promocion.cantidadDisponible}">
+                                            <i class="fas fa-boxes"></i> Stock: 0
                                         </span>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="card-body" style="padding: 1.5rem;">
-                                <!-- Título y descripción -->
-                                <h5 class="card-title mb-2" style="color: #C62828; font-weight: 700; font-size: 1.2rem; line-height: 1.3;" th:text="${promocion.titulo}">Título promoción</h5>
-                                <p class="card-text text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6; height: 3rem; overflow: hidden;" th:text="${promocion.descripcion}">Descripción promoción</p>
+                            <div class="card-body" style="padding: 1.75rem;">
+                                <!-- Título -->
+                                <h5 class="card-title mb-3" style="color: #1a1a1a; font-weight: 700; font-size: 1.3rem; line-height: 1.3; min-height: 2.6rem;" th:text="${promocion.titulo}">Título promoción</h5>
                                 
-                                <!-- Métricas en grid -->
-                                <div class="row g-2 mb-4">
-                                    <div class="col-4">
-                                        <div class="text-center p-2" style="background: linear-gradient(135deg, rgba(23,162,184,0.1) 0%, rgba(17,122,139,0.05) 100%); border-radius: 10px; border: 1px solid rgba(23,162,184,0.2);">
-                                            <i class="fas fa-eye mb-1" style="color: #17a2b8; font-size: 1.2rem;"></i>
-                                            <div class="fw-bold" style="font-size: 1.3rem; color: #17a2b8;" th:text="${promocion.contadorVistas}">0</div>
-                                            <small class="text-muted" style="font-size: 0.7rem; font-weight: 600;">VISTAS</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="text-center p-2" style="background: linear-gradient(135deg, rgba(245,166,35,0.1) 0%, rgba(247,197,111,0.05) 100%); border-radius: 10px; border: 1px solid rgba(245,166,35,0.2);">
-                                            <i class="fas fa-shopping-bag mb-1" style="color: #F5A623; font-size: 1.2rem;"></i>
-                                            <div class="fw-bold" style="font-size: 1.3rem; color: #F5A623;" th:text="${promocion.contadorPedidos}">0</div>
-                                            <small class="text-muted" style="font-size: 0.7rem; font-weight: 600;">PEDIDOS</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="text-center p-2" style="background: linear-gradient(135deg, rgba(40,167,69,0.1) 0%, rgba(32,201,151,0.05) 100%); border-radius: 10px; border: 1px solid rgba(40,167,69,0.2);">
-                                            <i class="fas fa-dollar-sign mb-1" style="color: #28a745; font-size: 1.2rem;"></i>
-                                            <div class="fw-bold" style="font-size: 1.1rem; color: #28a745;" th:text="'S/ ' + ${#numbers.formatDecimal(promocion.ingresosTotales, 1, 0)}">S/ 0</div>
-                                            <small class="text-muted" style="font-size: 0.7rem; font-weight: 600;">INGRESOS</small>
-                                        </div>
-                                    </div>
-                                </div>
+                                <!-- Descripción -->
+                                <p class="card-text text-muted mb-4" style="font-size: 0.95rem; line-height: 1.6; height: 3rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" th:text="${promocion.descripcion}">Descripción promoción</p>
                                 
-                                <!-- Indicador de rendimiento -->
-                                <div class="mb-3 p-2" style="background: rgba(198,40,40,0.05); border-radius: 8px; border-left: 3px solid #F5A623;">
+                                <!-- Sección de Precios Destacada -->
+                                <div class="mb-4 p-3" style="background: linear-gradient(135deg, rgba(198,40,40,0.08) 0%, rgba(245,166,35,0.08) 100%); border-radius: 15px; border: 2px solid rgba(198,40,40,0.15);">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted" style="font-weight: 600;">
-                                            <i class="fas fa-chart-line" style="color: #F5A623;"></i> Rendimiento
-                                        </small>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <span style="font-size: 0.75rem;">
-                                                <i class="fas fa-fire" style="color: #F5A623;"></i>
-                                                <strong th:text="${promocion.contadorVistas > 50 ? 'Popular' : (promocion.contadorVistas > 20 ? 'Bueno' : 'Regular')}">Regular</strong>
-                                            </span>
+                                        <div>
+                                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Precio Normal</small>
+                                            <span class="text-decoration-line-through" style="color: #9ca3af; font-size: 1.2rem; font-weight: 600;" th:text="'S/ ' + ${#numbers.formatDecimal(promocion.precioOriginal, 1, 2)}">S/ 0.00</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted d-block mb-1" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Precio Promocional</small>
+                                            <span style="color: #C62828; font-size: 2rem; font-weight: 800; line-height: 1;" th:text="'S/ ' + ${#numbers.formatDecimal(promocion.precioPromocional, 1, 2)}">S/ 0.00</span>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Información adicional -->
-                                <div class="d-flex justify-content-between align-items-center text-muted" style="font-size: 0.8rem;">
-                                    <span><i class="fas fa-clock" style="color: #F5A623;"></i> Publicado</span>
-                                    <span><i class="fas fa-users" style="color: #C62828;"></i> Visible para todos</span>
+                                <!-- Stock y Unidad de Medida -->
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <div class="p-3 text-center" style="background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.05) 100%); border-radius: 12px; border: 1px solid rgba(59,130,246,0.2); transition: all 0.3s ease;"
+                                             onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(59,130,246,0.2)';"
+                                             onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                                            <i class="fas fa-boxes mb-2" style="color: #3b82f6; font-size: 1.5rem;"></i>
+                                            <div class="fw-bold" style="font-size: 1.8rem; color: #3b82f6; line-height: 1;" th:text="${promocion.cantidadDisponible}">0</div>
+                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Stock Disponible</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 text-center" style="background: linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(139,92,246,0.05) 100%); border-radius: 12px; border: 1px solid rgba(139,92,246,0.2); transition: all 0.3s ease;"
+                                             onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(139,92,246,0.2)';"
+                                             onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                                            <i class="fas fa-balance-scale mb-2" style="color: #8b5cf6; font-size: 1.5rem;"></i>
+                                            <div class="fw-bold text-capitalize" style="font-size: 1.3rem; color: #8b5cf6; line-height: 1.2;" th:text="${promocion.unidadMedida != null and promocion.unidadMedida.tipoUnidad != null ? promocion.unidadMedida.tipoUnidad.nombre : 'N/A'}">Unidad</div>
+                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Unidad de Medida</small>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Footer con sombra superior -->
-                            <div class="card-footer bg-white" style="border-top: 1px solid rgba(0,0,0,0.05); padding: 1rem 1.5rem;">
-                                <div class="d-flex gap-2 align-items-center">
-                                    <span class="text-muted flex-grow-1" style="font-size: 0.8rem;">
-                                        <i class="fas fa-info-circle" style="color: #17a2b8;"></i> Los clientes ven esta promoción
-                                    </span>
-                                    <button class="btn btn-sm" style="background: rgba(198,40,40,0.1); color: #C62828; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 600; transition: all 0.3s ease;"
-                                            onmouseover="this.style.background='#C62828'; this.style.color='white';"
-                                            onmouseout="this.style.background='rgba(198,40,40,0.1)'; this.style.color='#C62828';"
-                                            onclick="alert('Vista detallada en desarrollo')">
-                                        <i class="fas fa-chart-bar"></i> Ver Detalle
-                                    </button>
+                                
+                                <!-- Estadísticas Compactas -->
+                                <div class="row g-2">
+                                    <div class="col-4 text-center">
+                                        <div class="p-2" style="background: rgba(23,162,184,0.08); border-radius: 10px;">
+                                            <i class="fas fa-eye" style="color: #17a2b8; font-size: 1rem;"></i>
+                                            <div class="fw-bold" style="font-size: 1.2rem; color: #17a2b8;" th:text="${promocion.contadorVistas}">0</div>
+                                            <small class="text-muted" style="font-size: 0.65rem;">Vistas</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <div class="p-2" style="background: rgba(245,166,35,0.08); border-radius: 10px;">
+                                            <i class="fas fa-shopping-bag" style="color: #F5A623; font-size: 1rem;"></i>
+                                            <div class="fw-bold" style="font-size: 1.2rem; color: #F5A623;" th:text="${promocion.contadorPedidos}">0</div>
+                                            <small class="text-muted" style="font-size: 0.65rem;">Pedidos</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <div class="p-2" style="background: rgba(40,167,69,0.08); border-radius: 10px;">
+                                            <i class="fas fa-dollar-sign" style="color: #28a745; font-size: 1rem;"></i>
+                                            <div class="fw-bold" style="font-size: 1rem; color: #28a745;" th:text="'S/ ' + ${#numbers.formatDecimal(promocion.ingresosTotales, 1, 0)}">S/ 0</div>
+                                            <small class="text-muted" style="font-size: 0.65rem;">Ingresos</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -749,22 +761,14 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="d-flex gap-2 mt-3">
-                                        <form th:action="@{/promociones/{id}/despublicar(id=${promocion.codigo})}" method="post" style="flex: 1;">
-                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                                            <button type="submit" class="btn btn-sm w-100" style="background: rgba(198,40,40,0.1); color: #C62828; border: 1px solid #C62828;" title="Despublicar">
-                                                <i class="fas fa-eye-slash"></i> Despublicar
-                                            </button>
-                                        </form>
-                                        <button class="btn btn-outline-primary btn-sm" onclick="alert('Función de edición en desarrollo')" title="Editar">
-                                            <i class="fas fa-edit"></i>
+                                    <!-- Solo botón Despublicar para promociones activas -->
+                                    <div class="mt-3">
+                                        <button type="button" class="btn btn-sm w-100" 
+                                                style="background: rgba(198,40,40,0.1); color: #C62828; border: 1px solid #C62828;" 
+                                                title="Despublicar"
+                                                th:onclick="'despublicarPromocion(' + ${promocion.codigo} + ')'">
+                                            <i class="fas fa-eye-slash"></i> Despublicar
                                         </button>
-                                        <form th:action="@{/promociones/{id}/eliminar(id=${promocion.codigo})}" method="post" style="display: inline;" onsubmit="return confirm('¿Estás seguro de eliminar esta promoción?');">
-                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -789,22 +793,26 @@
                                     <span class="badge bg-secondary">Borrador</span>
                                 </div>
                                 <p class="card-text text-muted mb-3" style="font-size: 0.9rem;" th:text="${promocion.descripcion}">Descripción promoción</p>
+                                <!-- 3 botones para promociones borradores -->
                                 <div class="d-flex gap-2">
-                                    <form th:action="@{/promociones/{id}/publicar(id=${promocion.codigo})}" method="post" style="flex: 1;" onsubmit="return confirm('¿Publicar esta promoción? Será visible para todos los usuarios.');">
-                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                                        <button type="submit" class="btn btn-sm w-100" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none;">
-                                            <i class="fas fa-check"></i> Publicar
-                                        </button>
-                                    </form>
-                                    <button class="btn btn-outline-primary btn-sm" onclick="alert('Función de edición en desarrollo')">
+                                    <!-- Botón Publicar -->
+                                    <button type="button" class="btn btn-sm" 
+                                            style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; flex: 1;" 
+                                            th:onclick="'showConfirmModal(\'📢 Publicar Promoción\', \'¿Publicar esta promoción? Será visible para todos los clientes en la plataforma.\', function() { publicarPromocion(' + ${promocion.codigo} + '); })'">
+                                        <i class="fas fa-check"></i> Publicar
+                                    </button>
+                                    <!-- Botón Editar -->
+                                    <button type="button" class="btn btn-outline-primary btn-sm" 
+                                            title="Editar promoción"
+                                            th:onclick="'editarPromocion(' + ${promocion.codigo} + ')'">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form th:action="@{/promociones/{id}/eliminar(id=${promocion.codigo})}" method="post" style="display: inline;" onsubmit="return confirm('¿Estás seguro de eliminar esta promoción?');">
-                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    <!-- Botón Eliminar -->
+                                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                                            title="Eliminar borrador"
+                                            th:onclick="'showConfirmModal(\'⚠️ Eliminar Borrador\', \'¿Estás seguro de eliminar este borrador? Esta acción no se puede deshacer.\', function() { eliminarPromocionConJWT(' + ${promocion.codigo} + ', \'borrador\'); })'">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1285,6 +1293,113 @@
         </div>
     </div>
 
+    <!-- ========== MODALES DE NOTIFICACIÓN UX ========== -->
+    
+    <!-- Modal de Éxito -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(40,167,69,0.3);">
+                            <i class="fas fa-check" style="color: white; font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3" style="color: #28a745; font-weight: 700;" id="successModalTitle">¡Éxito!</h4>
+                    <p class="text-muted mb-4" id="successModalMessage">Operación completada exitosamente</p>
+                    <button type="button" class="btn btn-success px-5 py-2" data-bs-dismiss="modal" style="border-radius: 25px; font-weight: 600;">
+                        <i class="fas fa-check me-2"></i>Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Error -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220,53,69,0.3);">
+                            <i class="fas fa-times" style="color: white; font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3" style="color: #dc3545; font-weight: 700;" id="errorModalTitle">Error</h4>
+                    <p class="text-muted mb-4" id="errorModalMessage">Ha ocurrido un error inesperado</p>
+                    <button type="button" class="btn btn-danger px-5 py-2" data-bs-dismiss="modal" style="border-radius: 25px; font-weight: 600;">
+                        <i class="fas fa-times me-2"></i>Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Advertencia -->
+    <div class="modal fade" id="warningModal" tabindex="9999" aria-hidden="true" style="z-index: 9999;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255,193,7,0.3);">
+                            <i class="fas fa-exclamation-triangle" style="color: white; font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3" style="color: #ffc107; font-weight: 700;" id="warningModalTitle">Atención</h4>
+                    <p class="text-muted mb-4" id="warningModalMessage">Se requiere tu atención</p>
+                    <button type="button" class="btn btn-warning px-5 py-2" data-bs-dismiss="modal" style="border-radius: 25px; font-weight: 600; color: #1a1a1a;">
+                        <i class="fas fa-check me-2"></i>Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(23,162,184,0.3);">
+                            <i class="fas fa-question" style="color: white; font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3" style="color: #17a2b8; font-weight: 700;" id="confirmModalTitle">Confirmar acción</h4>
+                    <p class="text-muted mb-4" id="confirmModalMessage">¿Estás seguro de continuar?</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <button type="button" class="btn btn-secondary px-4 py-2" data-bs-dismiss="modal" style="border-radius: 25px; font-weight: 600;">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </button>
+                        <button type="button" class="btn btn-info px-4 py-2" id="confirmModalBtn" style="border-radius: 25px; font-weight: 600; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border: none; color: white;">
+                            <i class="fas fa-check me-2"></i>Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Información -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #C62828 0%, #F5A623 100%); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(198,40,40,0.3);">
+                            <i class="fas fa-info" style="color: white; font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3" style="color: #C62828; font-weight: 700;" id="infoModalTitle">Información</h4>
+                    <p class="text-muted mb-4" id="infoModalMessage">Vista detallada en desarrollo</p>
+                    <button type="button" class="btn px-5 py-2" data-bs-dismiss="modal" style="background: linear-gradient(135deg, #C62828 0%, #F5A623 100%); border: none; color: white; border-radius: 25px; font-weight: 600;">
+                        <i class="fas fa-check me-2"></i>Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Nueva Promoción -->
     <div class="modal fade" id="nuevaPromoModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -1294,7 +1409,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" style="padding: 32px; background-color: white;">
-                    <form id="formNuevaPromocion" th:action="@{/promociones/crear}" method="post" enctype="multipart/form-data">
+                    <form id="formNuevaPromocion" method="post" enctype="multipart/form-data">
                         <div class="row g-4">
                             <!-- FORMULARIO -->
                             <div class="col-lg-7">
@@ -1377,7 +1492,7 @@
                                                placeholder="0.00" step="0.01" min="0"
                                                style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" 
                                                required>
-                                        <small class="text-muted" style="font-size: 12px;">Ingresa el precio con descuento</small>
+                                        <small id="rangoPrecios" class="text-muted" style="font-size: 12px;">Ingresa el precio con descuento</small>
                                     </div>
 
                                     <!-- Categoría -->
@@ -1478,8 +1593,109 @@
                     <button type="button" class="btn" onclick="actualizarVistaPrevia()" style="background-color: white; color: #374151; border: 1px solid #d1d5db; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500;">
                         Actualizar vista previa
                     </button>
-                    <button type="submit" class="btn" form="formNuevaPromocion" style="background-color: #fbbf24; color: #1a1a1a; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; border: none;">
+                    <button type="button" class="btn" onclick="submitPromocionForm()" style="background-color: #fbbf24; color: #1a1a1a; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; border: none;">
                         Publicar promoción
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Promoción -->
+    <div class="modal fade" id="editarPromoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: 15px; border: none;">
+                <div class="modal-header" style="background-color: #c92a2a; color: white; border-bottom: none; padding: 16px 24px;">
+                    <h5 class="modal-title" style="font-size: 20px; font-weight: 600; margin: 0;">
+                        <i class="fas fa-edit"></i> Editar Promoción
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 32px; background-color: white;">
+                    <form id="formEditarPromocion">
+                        <input type="hidden" id="editPromocionId">
+                        
+                        <!-- Título -->
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a;">
+                                Título de la promoción <span style="color: #c92a2a;">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="editTitulo" required
+                                   style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a;">
+                                Descripción
+                            </label>
+                            <textarea class="form-control" id="editDescripcion" rows="3"
+                                      style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; resize: vertical;"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <!-- Precio Original -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a;">
+                                    Precio original (S/) <span style="color: #c92a2a;">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="editPrecioOriginal" step="0.01" min="0" required readonly
+                                       style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background-color: #f3f4f6;">
+                            </div>
+
+                            <!-- Precio Promocional -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a;">
+                                    Precio promocional (S/) <span style="color: #c92a2a;">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="editPrecioPromocional" step="0.01" min="0" required
+                                       style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                                <small id="editRangoPrecios" class="text-muted" style="font-size: 12px;">Ingresa el precio con descuento</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Fecha Inicio -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a;">
+                                    Fecha y hora de inicio <span style="color: #c92a2a;">*</span>
+                                </label>
+                                <input type="datetime-local" class="form-control" id="editFechaInicio" required
+                                       style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                            </div>
+
+                            <!-- Fecha Fin -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a;">
+                                    Fecha y hora de fin <span style="color: #c92a2a;">*</span>
+                                </label>
+                                <input type="datetime-local" class="form-control" id="editFechaFin" required
+                                       style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Categoría -->
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a;">
+                                Categoría <span style="color: #c92a2a;">*</span>
+                            </label>
+                            <select class="form-select" id="editCategoria" required
+                                    style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                                <option value="">Seleccionar categoría</option>
+                                <option th:each="categoria : ${categorias}" 
+                                        th:value="${categoria.nombre}" 
+                                        th:text="${categoria.nombre}"></option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #e5e7eb; padding: 20px 32px; background-color: white;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn" onclick="guardarEdicionPromocion()" 
+                            style="background-color: #fbbf24; color: #1a1a1a; border: none;">
+                        <i class="fas fa-save"></i> Guardar Cambios
                     </button>
                 </div>
             </div>
@@ -1497,6 +1713,61 @@
         let imagenSeleccionada = null;
         let platosMenu = []; // Almacenar los platos del menú
         let codigoRestaurante = null; // Se obtendrá del contexto
+
+        // ========== FUNCIONES HELPER PARA MODALES UX ==========
+        
+        // Mostrar modal de éxito
+        function showSuccessModal(title, message) {
+            document.getElementById('successModalTitle').textContent = title;
+            document.getElementById('successModalMessage').textContent = message;
+            const modal = new bootstrap.Modal(document.getElementById('successModal'));
+            modal.show();
+        }
+
+        // Mostrar modal de error
+        function showErrorModal(title, message) {
+            document.getElementById('errorModalTitle').textContent = title;
+            document.getElementById('errorModalMessage').textContent = message;
+            const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+            modal.show();
+        }
+
+        // Mostrar modal de advertencia
+        function showWarningModal(title, message) {
+            document.getElementById('warningModalTitle').textContent = title;
+            document.getElementById('warningModalMessage').textContent = message;
+            const modal = new bootstrap.Modal(document.getElementById('warningModal'));
+            modal.show();
+        }
+
+        // Mostrar modal de información
+        function showInfoModal(title, message) {
+            document.getElementById('infoModalTitle').textContent = title;
+            document.getElementById('infoModalMessage').textContent = message;
+            const modal = new bootstrap.Modal(document.getElementById('infoModal'));
+            modal.show();
+        }
+
+        // Mostrar modal de confirmación con callback
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalMessage').textContent = message;
+            
+            const confirmBtn = document.getElementById('confirmModalBtn');
+            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            
+            // Remover listeners anteriores clonando el botón
+            const newBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+            
+            // Agregar nuevo listener
+            newBtn.addEventListener('click', function() {
+                modal.hide();
+                if (onConfirm) onConfirm();
+            });
+            
+            modal.show();
+        }
 
         // Función para cargar platos del menú del restaurante
         async function cargarPlatosMenu() {
@@ -1657,6 +1928,59 @@
             const inputPrecioOriginal = document.getElementById('inputPrecioOriginal');
             const inputCantidad = document.getElementById('inputCantidad');
             const inputPrecioPromocional = document.getElementById('inputPrecioPromocional');
+            const rangoPrecios = document.getElementById('rangoPrecios');
+            
+            // Función para actualizar el rango de precios permitidos
+            function actualizarRangoPrecios() {
+                const precioOriginal = parseFloat(inputPrecioOriginal.value) || 0;
+                if (precioOriginal > 0) {
+                    const precioMin = (precioOriginal * 0.50).toFixed(2);
+                    const precioMax = (precioOriginal * 0.90).toFixed(2);
+                    rangoPrecios.innerHTML = `Rango permitido: <strong style="color: #059669;">S/ ${precioMin}</strong> - <strong style="color: #059669;">S/ ${precioMax}</strong> (10% - 50% de descuento)`;
+                } else {
+                    rangoPrecios.textContent = 'Ingresa el precio con descuento';
+                }
+            }
+            
+            // Función para validar precio promocional
+            function validarPrecioPromocional() {
+                const precioOriginal = parseFloat(inputPrecioOriginal.value) || 0;
+                const precioPromocional = parseFloat(inputPrecioPromocional.value) || 0;
+                
+                if (precioOriginal > 0 && precioPromocional > 0) {
+                    const precioMin = precioOriginal * 0.50;
+                    const precioMax = precioOriginal * 0.90;
+                    
+                    if (precioPromocional < precioMin || precioPromocional > precioMax) {
+                        showWarningModal(
+                            '⚠️ Precio Fuera de Rango',
+                            `El precio promocional debe estar entre S/ ${precioMin.toFixed(2)} y S/ ${precioMax.toFixed(2)} (10% - 50% de descuento del precio original).`
+                        );
+                        inputPrecioPromocional.style.borderColor = '#dc2626';
+                        return false;
+                    } else {
+                        inputPrecioPromocional.style.borderColor = '#d1d5db';
+                        return true;
+                    }
+                }
+                return true;
+            }
+            
+            // Evento cuando cambia el precio promocional
+            if (inputPrecioPromocional) {
+                inputPrecioPromocional.addEventListener('blur', validarPrecioPromocional);
+                inputPrecioPromocional.addEventListener('input', function() {
+                    inputPrecioPromocional.style.borderColor = '#d1d5db';
+                });
+            }
+            
+            // Evento cuando cambia el precio original
+            if (inputPrecioOriginal) {
+                const observer = new MutationObserver(actualizarRangoPrecios);
+                observer.observe(inputPrecioOriginal, { attributes: true, attributeFilter: ['value'] });
+                inputPrecioOriginal.addEventListener('change', actualizarRangoPrecios);
+                inputPrecioOriginal.addEventListener('input', actualizarRangoPrecios);
+            }
             
             if (selectPlato) {
                 selectPlato.addEventListener('change', function() {
@@ -1665,6 +1989,7 @@
                     // Limpiar precio y unidad
                     if (inputPrecioOriginal) inputPrecioOriginal.value = '0.00';
                     if (inputCantidad) inputCantidad.value = '1';
+                    actualizarRangoPrecios();
                     
                     if (codigoPlato) {
                         // Cargar unidades del plato seleccionado
@@ -1872,15 +2197,15 @@
             })
             .then(response => {
                 if (response.ok) {
-                    alert('Información actualizada correctamente');
-                    location.reload();
+                    showSuccessModal('✅ Información Actualizada', 'Los datos de tu restaurante se han actualizado correctamente.');
+                    setTimeout(() => location.reload(), 2000);
                 } else {
-                    alert('Error al actualizar la información');
+                    showErrorModal('❌ Error al Actualizar', 'No se pudo actualizar la información. Por favor, intenta de nuevo.');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al actualizar la información');
+                showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor. Verifica tu conexión e intenta nuevamente.');
             });
         }
 
@@ -1930,16 +2255,16 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        alert('✓ Tu solicitud ha sido enviada correctamente. Te responderemos a la brevedad.');
+                        showSuccessModal('✅ Solicitud Enviada', 'Tu consulta ha sido enviada correctamente. Te responderemos a la brevedad en tu correo electrónico.');
                         this.reset();
                         removeArchivoSoporte();
                     } else {
-                        alert('Error al enviar la solicitud. Por favor intenta nuevamente.');
+                        showErrorModal('❌ Error al Enviar', 'No se pudo enviar la solicitud. Por favor, inténtalo nuevamente.');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error al enviar la solicitud. Por favor intenta nuevamente.');
+                    showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor. Verifica tu conexión e intenta nuevamente.');
                 })
                 .finally(() => {
                     btnSubmit.innerHTML = textoOriginal;
@@ -1965,20 +2290,337 @@
             })
             .then(response => {
                 if (response.ok) {
-                    alert('Documento subido correctamente');
-                    location.reload();
+                    showSuccessModal('✅ Documento Subido', 'El documento se ha subido correctamente y está siendo procesado.');
+                    setTimeout(() => location.reload(), 2000);
                 } else {
-                    alert('Error al subir el documento');
+                    showErrorModal('❌ Error al Subir', 'No se pudo subir el documento. Verifica el formato y tamaño del archivo.');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al subir el documento');
+                showErrorModal('❌ Error de Conexión', 'Hubo un problema al subir el archivo. Verifica tu conexión e intenta nuevamente.');
             });
+        }
+
+        // ===== FUNCIÓN PARA ENVIAR FORMULARIO CON JWT =====
+        async function submitPromocionForm() {
+            const form = document.getElementById('formNuevaPromocion');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Validar rango de precio promocional antes de enviar
+            if (!validarPrecioPromocional()) {
+                return;
+            }
+
+            const jwtToken = localStorage.getItem('jwt_token');
+            if (!jwtToken) {
+                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente para continuar.');
+                setTimeout(() => { window.location.href = '/login'; }, 2500);
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/promociones/crear', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Cerrar modal y recargar página
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('nuevaPromoModal'));
+                    if (modal) modal.hide();
+                    
+                    showSuccessModal('✅ Promoción Creada', 'Tu promoción ha sido creada exitosamente y ya está visible para los clientes.');
+                    setTimeout(() => window.location.reload(), 2000);
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error del servidor:', errorText);
+                    showErrorModal('❌ Error al Crear', 'No se pudo crear la promoción. Por favor, verifica los datos e inténtalo de nuevo.');
+                }
+            } catch (error) {
+                console.error('Error al enviar formulario:', error);
+                showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.');
+            }
+        }
+
+        // ===== FUNCIONES PARA GESTIÓN DE PROMOCIONES CON JWT =====
+        
+        /**
+         * Publicar promoción (borrador → activa)
+         */
+        async function publicarPromocion(codigoPromocion) {
+            const jwtToken = localStorage.getItem('jwt_token');
+            if (!jwtToken) {
+                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/promociones/${codigoPromocion}/publicar`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    showSuccessModal('✅ Promoción Publicada', 'La promoción ahora es visible para todos los clientes.');
+                    
+                    // Recargar la página después de 1 segundo para actualizar las secciones
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showErrorModal('❌ Error al Publicar', 'No se pudo publicar la promoción. Inténtalo de nuevo.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor.');
+            }
+        }
+
+        /**
+         * Despublicar promoción (activa → borrador)
+         */
+        async function despublicarPromocion(codigoPromocion) {
+            const jwtToken = localStorage.getItem('jwt_token');
+            if (!jwtToken) {
+                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/promociones/${codigoPromocion}/despublicar`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    showSuccessModal('✅ Promoción Despublicada', 'La promoción ha sido guardada como borrador.');
+                    
+                    // Recargar la página después de 1 segundo para actualizar las secciones
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showErrorModal('❌ Error al Despublicar', 'No se pudo despublicar la promoción. Inténtalo de nuevo.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor.');
+            }
+        }
+
+        /**
+         * Eliminar promoción (activa o borrador)
+         */
+        async function eliminarPromocionConJWT(codigoPromocion, tipo) {
+            const jwtToken = localStorage.getItem('jwt_token');
+            if (!jwtToken) {
+                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/promociones/${codigoPromocion}/eliminar`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const mensaje = tipo === 'borrador' 
+                        ? 'El borrador ha sido eliminado.' 
+                        : 'La promoción ha sido eliminada.';
+                    showSuccessModal('✅ Eliminado', mensaje);
+                    
+                    // Recargar la página después de 1 segundo para actualizar las secciones
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showErrorModal('❌ Error al Eliminar', 'No se pudo eliminar. Inténtalo de nuevo.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor.');
+            }
+        }
+
+        /**
+         * Editar promoción - Cargar datos en modal
+         */
+        async function editarPromocion(codigoPromocion) {
+            const jwtToken = localStorage.getItem('jwt_token');
+            if (!jwtToken) {
+                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+
+            try {
+                // Obtener datos de la promoción
+                const response = await fetch(`/promociones/api/promociones/${codigoPromocion}`, {
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const promo = data.promocion;
+                    
+                    // Llenar el formulario con los datos
+                    document.getElementById('editPromocionId').value = promo.codigo;
+                    document.getElementById('editTitulo').value = promo.titulo || '';
+                    document.getElementById('editDescripcion').value = promo.descripcion || '';
+                    document.getElementById('editPrecioOriginal').value = promo.precioOriginal || 0;
+                    document.getElementById('editPrecioPromocional').value = promo.precioPromocional || 0;
+                    document.getElementById('editCategoria').value = promo.categoriaPromocion || '';
+                    
+                    // Convertir timestamps a formato datetime-local
+                    if (promo.fechaInicio) {
+                        const fechaInicio = new Date(promo.fechaInicio);
+                        document.getElementById('editFechaInicio').value = fechaInicio.toISOString().slice(0, 16);
+                    }
+                    if (promo.fechaFin) {
+                        const fechaFin = new Date(promo.fechaFin);
+                        document.getElementById('editFechaFin').value = fechaFin.toISOString().slice(0, 16);
+                    }
+                    
+                    // Actualizar rango de precios permitidos
+                    const precioOriginal = parseFloat(promo.precioOriginal) || 0;
+                    const editRangoPrecios = document.getElementById('editRangoPrecios');
+                    if (precioOriginal > 0) {
+                        const precioMin = (precioOriginal * 0.50).toFixed(2);
+                        const precioMax = (precioOriginal * 0.90).toFixed(2);
+                        editRangoPrecios.innerHTML = `Rango permitido: <strong style="color: #059669;">S/ ${precioMin}</strong> - <strong style="color: #059669;">S/ ${precioMax}</strong> (10% - 50% de descuento)`;
+                    }
+                    
+                    // Agregar validación en tiempo real al campo
+                    const editPrecioPromocional = document.getElementById('editPrecioPromocional');
+                    editPrecioPromocional.addEventListener('blur', function() {
+                        const precioPromo = parseFloat(this.value) || 0;
+                        if (precioOriginal > 0 && precioPromo > 0) {
+                            const precioMin = precioOriginal * 0.50;
+                            const precioMax = precioOriginal * 0.90;
+                            if (precioPromo < precioMin || precioPromo > precioMax) {
+                                this.style.borderColor = '#dc2626';
+                            } else {
+                                this.style.borderColor = '#d1d5db';
+                            }
+                        }
+                    });
+                    
+                    editPrecioPromocional.addEventListener('input', function() {
+                        this.style.borderColor = '#d1d5db';
+                    });
+                    
+                    // Mostrar modal
+                    const modal = new bootstrap.Modal(document.getElementById('editarPromoModal'));
+                    modal.show();
+                } else {
+                    showErrorModal('❌ Error', 'No se pudo cargar la información de la promoción.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorModal('❌ Error de Conexión', 'Hubo un problema al cargar la promoción.');
+            }
+        }
+
+        /**
+         * Guardar cambios de edición de promoción
+         */
+        async function guardarEdicionPromocion() {
+            const jwtToken = localStorage.getItem('jwt_token');
+            if (!jwtToken) {
+                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+
+            const form = document.getElementById('formEditarPromocion');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Validar rango de precio promocional
+            const precioOriginal = parseFloat(document.getElementById('editPrecioOriginal').value) || 0;
+            const precioPromocional = parseFloat(document.getElementById('editPrecioPromocional').value) || 0;
+            
+            if (precioOriginal > 0 && precioPromocional > 0) {
+                const precioMin = precioOriginal * 0.50;
+                const precioMax = precioOriginal * 0.90;
+                
+                if (precioPromocional < precioMin || precioPromocional > precioMax) {
+                    showWarningModal(
+                        '⚠️ Precio Fuera de Rango',
+                        `El precio promocional debe estar entre S/ ${precioMin.toFixed(2)} y S/ ${precioMax.toFixed(2)} (10% - 50% de descuento del precio original).`
+                    );
+                    document.getElementById('editPrecioPromocional').style.borderColor = '#dc2626';
+                    return;
+                }
+            }
+
+            const codigoPromocion = document.getElementById('editPromocionId').value;
+            const formData = new FormData();
+            formData.append('titulo', document.getElementById('editTitulo').value);
+            formData.append('descripcion', document.getElementById('editDescripcion').value);
+            formData.append('precioOriginal', document.getElementById('editPrecioOriginal').value);
+            formData.append('precioPromocional', document.getElementById('editPrecioPromocional').value);
+            formData.append('categoriaPromocion', document.getElementById('editCategoria').value);
+            formData.append('fechaInicio', document.getElementById('editFechaInicio').value);
+            formData.append('fechaFin', document.getElementById('editFechaFin').value);
+
+            try {
+                const response = await fetch(`/promociones/${codigoPromocion}/editar`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editarPromoModal'));
+                    if (modal) modal.hide();
+                    
+                    showSuccessModal('✅ Promoción Actualizada', 'Los cambios se han guardado correctamente.');
+                    
+                    // Recargar la página después de 1 segundo para reflejar los cambios
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showErrorModal('❌ Error al Guardar', 'No se pudieron guardar los cambios. Inténtalo de nuevo.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorModal('❌ Error de Conexión', 'Hubo un problema al guardar los cambios.');
+            }
         }
     </script>
     
     <!-- JWT Helper para cerrar sesión -->
     <script src="/js/jwt-helper.js"></script>
+
 </body>
 </html>

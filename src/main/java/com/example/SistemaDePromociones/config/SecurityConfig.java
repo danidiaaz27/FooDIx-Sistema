@@ -101,8 +101,11 @@ public class SecurityConfig {
                     "/auth/verify-code",
                     "/auth/recovery/**",
                     "/api/**",
-                    "/menuAdministrador/restaurant/*/upload-documents",  // ✅ Subida de documentos
-                    "/menuAdministrador/restaurant/*/documents"          // ✅ Consulta de documentos
+                    "/menuAdministrador/**",    // ✅ TODAS las acciones del administrador
+                    "/menuRestaurante/**",      // ✅ Acciones de restaurante
+                    "/menuDelivery/**",         // ✅ Acciones de delivery
+                    "/menuUsuario/**",          // ✅ Acciones de usuario
+                    "/promociones/**"            // ✅ Gestión de promociones con JWT
                 )
             )
             // Agregar filtro JWT antes del filtro de autenticación estándar

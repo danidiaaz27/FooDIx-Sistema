@@ -25,6 +25,12 @@ public interface PromocionRepository extends JpaRepository<Promocion, Long> {
     List<Promocion> findPromocionesActivasVigentes();
     
     /**
+     * Obtener TODAS las promociones activas (sin filtro de fecha) - Para debugging
+     */
+    @Query("SELECT p FROM Promocion p WHERE p.estado = 'activa' ORDER BY p.fechaCreacion DESC")
+    List<Promocion> findAllPromocionesActivas();
+    
+    /**
      * Obtener promociones por restaurante
      */
     List<Promocion> findByCodigoRestauranteOrderByFechaCreacionDesc(Long codigoRestaurante);
