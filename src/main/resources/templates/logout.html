@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerrando Sesión - FoodIx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .logout-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+        }
+        h1 {
+            color: #667eea;
+            margin-top: 20px;
+            font-size: 1.8rem;
+        }
+        p {
+            color: #6c757d;
+            margin-top: 15px;
+        }
+        .logout-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            console.log('🚪 [LOGOUT] Iniciando proceso de cierre de sesión');
+            
+            // Eliminar token de localStorage
+            if (localStorage.getItem('jwt_token')) {
+                localStorage.removeItem('jwt_token');
+                console.log('✅ [LOGOUT] Token eliminado de localStorage');
+            }
+            
+            // Eliminar cookie estableciendo fecha de expiración en el pasado
+            document.cookie = 'jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+            console.log('✅ [LOGOUT] Cookie de token eliminada');
+            
+            // Limpiar cualquier otro dato de sesión en localStorage
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.includes('user') || key.includes('auth') || key.includes('session'))) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            
+            console.log('🔄 [LOGOUT] Redirigiendo a página principal en 2 segundos...');
+            
+            // Redirigir a index.html después de 2 segundos
+            setTimeout(function() {
+                window.location.href = '/?logout=true';
+            }, 2000);
+        };
+    </script>
+</head>
+<body>
+    <div class="logout-container">
+        <div class="logout-icon">
+            👋
+        </div>
+        <h1>¡Hasta pronto!</h1>
+        <p>Cerrando tu sesión de forma segura...</p>
+        <div class="spinner-border text-primary mt-3" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+</body>
+</html>

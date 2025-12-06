@@ -202,11 +202,9 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li>
-                                <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
-                                    <button type="submit" class="dropdown-item" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
-                                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesion
-                                    </button>
-                                </form>
+                                <button type="button" class="dropdown-item" onclick="cerrarSesion()" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </button>
                             </li>
                         </ul>
                     </div>
@@ -2884,6 +2882,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- JWT Helper para cerrar sesión -->
+<script src="/js/jwt-helper.js"></script>
 
 </body>
 </html>

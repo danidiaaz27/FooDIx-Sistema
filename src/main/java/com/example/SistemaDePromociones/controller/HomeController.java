@@ -7,7 +7,12 @@ import com.example.SistemaDePromociones.model.Usuario;
 import com.example.SistemaDePromociones.repository.jdbc.DepartamentoJdbcRepository;
 import com.example.SistemaDePromociones.repository.TipoVehiculoRepository;
 import com.example.SistemaDePromociones.service.UsuarioService;
+import com.example.SistemaDePromociones.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +44,12 @@ public class HomeController {
     @Autowired
     private PasswordEncoder passwordEncoder;
     
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
+    
     /**
      * Página principal / inicio
      */
@@ -53,6 +64,58 @@ public class HomeController {
     @GetMapping("/login")
     public String login() {
         return "login";
+    }
+    
+    /**
+     * Procesar login y generar token JWT
+     * POST /login
+     */
+    @PostMapping("/login")
+    public String login(
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            Model model
+    ) {
+        try {
+            System.out.println("🔐 [LOGIN] Intentando autenticar: " + email);
+            
+            // Autenticar usuario
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+            );
+            
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            
+            // Generar token JWT
+            String token = jwtUtil.generateToken(userDetails);
+            
+            // Extraer el rol del token
+            String rol = jwtUtil.extractRole(token);
+            
+            System.out.println("✅ [LOGIN] Autenticación exitosa - Usuario: " + email + " - Rol: " + rol);
+            
+            // Pasar token y rol a la vista dashboard
+            model.addAttribute("token", token);
+            model.addAttribute("rol", rol);
+            
+            // Retornar vista que guardará el token y redirigirá
+            return "dashboard";
+            
+        } catch (Exception e) {
+            System.err.println("❌ [LOGIN] Error de autenticación: " + e.getMessage());
+            model.addAttribute("error", "Credenciales inválidas. Por favor, verifica tu correo y contraseña.");
+            return "login";
+        }
+    }
+    
+    /**
+     * Logout - Limpiar token JWT del cliente
+     * GET /logout
+     */
+    @GetMapping("/logout")
+    public String logout() {
+        System.out.println("🚪 [LOGOUT] Procesando cierre de sesión");
+        return "logout";
     }
     
     /**
