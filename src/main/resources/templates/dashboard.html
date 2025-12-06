@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido - FoodIx</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animación de fondo con círculos */
+        .background-circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        .circle:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .circle:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            left: 80%;
+            animation-delay: 2s;
+        }
+        
+        .circle:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            top: 40%;
+            left: 70%;
+            animation-delay: 4s;
+        }
+        
+        .circle:nth-child(4) {
+            width: 120px;
+            height: 120px;
+            top: 70%;
+            left: 20%;
+            animation-delay: 1s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translateY(-30px) scale(1.1);
+                opacity: 0.8;
+            }
+        }
+        
+        /* Contenedor principal */
+        .dashboard-container {
+            background: white;
+            border-radius: 25px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            z-index: 2;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Logo animado */
+        .logo-container {
+            margin-bottom: 25px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        .logo-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 8px 25px rgba(198, 40, 40, 0.4);
+        }
+        
+        .logo-icon i {
+            font-size: 2.5rem;
+            color: white;
+            animation: rotate 3s linear infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Título */
+        h1 {
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-top: 20px;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        /* Mensaje de bienvenida */
+        .welcome-message {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        /* Barra de progreso personalizada */
+        .progress-container {
+            margin-top: 30px;
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background: #f0f0f0;
+            overflow: visible;
+            position: relative;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #C62828 0%, #F5A623 100%);
+            border-radius: 10px;
+            animation: progressAnimation 1.5s ease-in-out infinite;
+            box-shadow: 0 2px 10px rgba(198, 40, 40, 0.4);
+        }
+        
+        @keyframes progressAnimation {
+            0% {
+                width: 0%;
+            }
+            50% {
+                width: 70%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+        
+        /* Puntos de carga */
+        .loading-dots {
+            display: inline-block;
+            margin-top: 15px;
+        }
+        
+        .loading-dots span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #C62828 0%, #F5A623 100%);
+            border-radius: 50%;
+            margin: 0 4px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .loading-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .loading-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Texto descriptivo */
+        .loading-text {
+            color: #999;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            font-weight: 400;
+        }
+        
+        /* Icono de check animado (aparecerá al finalizar) */
+        .success-icon {
+            display: none;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            position: relative;
+            animation: scaleIn 0.5s ease-out;
+        }
+        
+        .success-icon i {
+            color: white;
+            font-size: 2.5rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 40px 25px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .welcome-message {
+                font-size: 1rem;
+            }
+            
+            .logo-icon {
+                width: 75px;
+                height: 75px;
+            }
+            
+            .logo-icon i {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <script th:inline="javascript">
+        window.onload = function () {
+            const token = /*[[${token}]]*/ '';
+            const rol = /*[[${rol}]]*/ '';
+            
+            console.log('🔐 [DASHBOARD] Token recibido:', token ? 'Sí' : 'No');
+            console.log('👤 [DASHBOARD] Rol:', rol);
+            
+            if (token && token !== '') {
+                // Guardar token en localStorage
+                localStorage.setItem("jwt_token", token);
+                console.log('✅ [DASHBOARD] Token guardado en localStorage');
+                
+                // También guardar en cookie para las peticiones del servidor
+                // max-age=3600 = 1 hora (igual que el token)
+                document.cookie = "jwt_token=" + token + "; path=/; max-age=3600; SameSite=Lax";
+                console.log('✅ [DASHBOARD] Token guardado en cookie');
+                
+                // Redirigir según el rol después de 1.8 segundos (para que se vea la animación)
+                setTimeout(function() {
+                    if (rol.includes('ROLE_ADMIN')) {
+                        console.log('➡️ [DASHBOARD] Redirigiendo a panel de administrador');
+                        window.location.href = '/menuAdministrador';
+                    } else if (rol.includes('ROLE_RESTAURANT')) {
+                        console.log('➡️ [DASHBOARD] Redirigiendo a panel de restaurante');
+                        window.location.href = '/menuRestaurante';
+                    } else if (rol.includes('ROLE_DELIVERY')) {
+                        console.log('➡️ [DASHBOARD] Redirigiendo a panel de delivery');
+                        window.location.href = '/menuDelivery';
+                    } else if (rol.includes('ROLE_CUSTOMER')) {
+                        console.log('➡️ [DASHBOARD] Redirigiendo a panel de usuario');
+                        window.location.href = '/menuUsuario';
+                    } else {
+                        console.log('⚠️ [DASHBOARD] Rol no reconocido, redirigiendo a inicio');
+                        window.location.href = '/';
+                    }
+                }, 1800); // Delay para mostrar la animación completa
+            } else {
+                console.error('❌ [DASHBOARD] No se recibió token válido');
+                alert('Error: No se pudo generar el token de autenticación');
+                window.location.href = '/login';
+            }
+        };
+    </script>
+</head>
+<body>
+    <!-- Círculos decorativos de fondo -->
+    <div class="background-circles">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+    
+    <!-- Contenedor principal -->
+    <div class="dashboard-container">
+        <!-- Logo animado -->
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="fas fa-utensils"></i>
+            </div>
+        </div>
+        
+        <!-- Título -->
+        <h1>¡Bienvenido a FoodIx!</h1>
+        
+        <!-- Mensaje -->
+        <p class="welcome-message">Estamos preparando tu panel personalizado</p>
+        
+        <!-- Barra de progreso -->
+        <div class="progress-container">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar"></div>
+            </div>
+        </div>
+        
+        <!-- Puntos de carga -->
+        <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        
+        <!-- Texto descriptivo -->
+        <p class="loading-text">Configurando tu experiencia...</p>
+    </div>
+</body>
+</html>

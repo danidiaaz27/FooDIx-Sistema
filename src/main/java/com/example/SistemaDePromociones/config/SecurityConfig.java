@@ -1,17 +1,26 @@
 package com.example.SistemaDePromociones.config;
 
 import com.example.SistemaDePromociones.security.RoleBasedAuthenticationSuccessHandler;
+import com.example.SistemaDePromociones.util.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Configuración de seguridad de Spring Security
+ * Configuración de seguridad de Spring Security con JWT
  */
 @Configuration
 @EnableWebSecurity
@@ -20,9 +29,16 @@ public class SecurityConfig {
     @Autowired
     private RoleBasedAuthenticationSuccessHandler successHandler;
     
+    @Autowired
+    private JwtFilter jwtFilter;
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // Configurar para JWT: sesiones stateless
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .authorizeHttpRequests(auth -> auth
                 // ========================================
                 // RUTAS PÚBLICAS - Sin autenticación
@@ -30,6 +46,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/",                        // Página principal
                     "/login",                   // Login
+                    "/logout",                  // Logout (renderiza vista que limpia JWT)
+                    "/dashboard",               // Dashboard (renderiza vista que guarda JWT)
                     "/registro",                // Registro de usuarios (legacy)
                     "/registroUsuario",         // Registro de usuario/cliente
                     // "/registroNegocio",      // ❌ DEPRECADO - Ya no se usa
@@ -76,24 +94,9 @@ public class SecurityConfig {
                 // ========================================
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .successHandler(successHandler)
-                .failureUrl("/login?error=true")
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/?logout=true")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-            )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
+                    "/login",                   // ✅ Login con JWT
                     "/auth/send-code",
                     "/auth/verify-code",
                     "/auth/recovery/**",
@@ -102,12 +105,27 @@ public class SecurityConfig {
                     "/menuAdministrador/restaurant/*/documents"          // ✅ Consulta de documentos
                 )
             )
-            .sessionManagement(session -> session
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-            );
+            // Agregar filtro JWT antes del filtro de autenticación estándar
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
+    }
+    
+    /**
+     * AuthenticationManager bean para autenticación manual en el login
+     * Usa el CustomUserDetailsService existente para cargar usuarios
+     */
+    @Bean
+    public AuthenticationManager authManager(
+            @Qualifier("customUserDetailsService") UserDetailsService userDetailsService, 
+            PasswordEncoder passwordEncoder) {
+        return authentication -> {
+            UserDetails user = userDetailsService.loadUserByUsername(authentication.getName());
+            if (!passwordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())) {
+                throw new BadCredentialsException("Credenciales inválidas");
+            }
+            return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        };
     }
     
     @Bean

@@ -1,5 +1,6 @@
 package com.example.SistemaDePromociones.service;
 
+import com.example.SistemaDePromociones.model.Usuario;
 import com.example.SistemaDePromociones.repository.jdbc.UsuarioJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
