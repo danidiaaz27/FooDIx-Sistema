@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test JWT Token</title>
+</head>
+<body>
+    <h1>Test JWT Token Status</h1>
+    <button onclick="checkToken()">Verificar Token JWT</button>
+    <pre id="result"></pre>
+
+    <script>
+        function checkToken() {
+            const token = localStorage.getItem('jwt_token');
+            const resultDiv = document.getElementById('result');
+            
+            if (!token) {
+                resultDiv.textContent = '❌ No hay token JWT en localStorage\n\nNecesitas iniciar sesión en: http://localhost:8080/login';
+                return;
+            }
+            
+            resultDiv.textContent = '✅ Token encontrado:\n\n' + token.substring(0, 50) + '...\n\nAhora prueba acceder a: http://localhost:8080/menuRestaurante';
+            
+            // Test del token con un request
+            fetch('http://localhost:8080/menuRestaurante', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                resultDiv.textContent += '\n\n📡 Status Code: ' + response.status;
+                if (response.status === 200) {
+                    resultDiv.textContent += '\n✅ Token válido - Acceso autorizado';
+                } else if (response.status === 401 || response.status === 403) {
+                    resultDiv.textContent += '\n❌ Token inválido o expirado - Inicia sesión nuevamente';
+                }
+            })
+            .catch(error => {
+                resultDiv.textContent += '\n\n❌ Error: ' + error.message;
+            });
+        }
+    </script>
+</body>
+</html>

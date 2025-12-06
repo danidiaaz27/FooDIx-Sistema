@@ -47,7 +47,7 @@ function aprobarRestaurante(button) {
     const nombre = button.dataset.nombre;
     
     if (confirm(`¿Está seguro de aprobar el restaurante "${nombre}"?\n\nEsto permitirá que puedan acceder al sistema.`)) {
-        submitFormWithCSRF(`/menuAdministrador/restaurant/${id}/approve`, 'restaurantes');
+        submitFormWithJWT(`/menuAdministrador/restaurant/${id}/approve`, 'restaurantes');
     }
 }
 
@@ -56,7 +56,7 @@ function eliminarRestaurante(button) {
     const nombre = button.dataset.nombre;
     
     if (confirm(`⚠️ ADVERTENCIA ⚠️\n\n¿Está seguro de ELIMINAR el restaurante "${nombre}"?\n\nEsta acción NO se puede deshacer.`)) {
-        submitFormWithCSRF(`/menuAdministrador/restaurant/${id}/delete`);
+        submitFormWithJWT(`/menuAdministrador/restaurant/${id}/delete`);
     }
 }
 
@@ -81,19 +81,18 @@ let pendingCategoryDelete = null;
  * Cambia el estado de un usuario o restaurante mediante AJAX sin recargar la página
  */
 function toggleStatusViaAjax(url, buttonElement, currentStatus) {
-    // Obtener CSRF token
-    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    // Obtener JWT token del localStorage
+    const jwtToken = localStorage.getItem('jwt_token');
     
     // Agregar animación de loading al botón
     buttonElement.classList.add('switching');
     buttonElement.disabled = true;
     
-    // Realizar petición AJAX
+    // Realizar petición AJAX con JWT
     fetch(url, {
         method: 'POST',
         headers: {
-            [csrfHeader]: csrfToken,
+            'Authorization': `Bearer ${jwtToken}`,
             'Content-Type': 'application/x-www-form-urlencoded',
         }
     })
@@ -389,32 +388,37 @@ function deleteCategoryConfirm(categoryId, categoryName) {
     bootstrapModal.show();
 }
 
-function submitFormWithCSRF(action, section = null) {
+function submitFormWithJWT(action, section = null) {
+    // Obtener JWT token
+    const jwtToken = localStorage.getItem('jwt_token');
+    
+    // Crear formulario
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = action;
     
-    // Token CSRF
-    const csrfToken = document.querySelector('meta[name="_csrf"]');
-    if (csrfToken) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = '_csrf';
-        input.value = csrfToken.getAttribute('content');
-        form.appendChild(input);
-    }
-    
-    // Sección activa
-    if (section) {
-        const sectionInput = document.createElement('input');
-        sectionInput.type = 'hidden';
-        sectionInput.name = 'section';
-        sectionInput.value = section;
-        form.appendChild(sectionInput);
-    }
-    
-    document.body.appendChild(form);
-    form.submit();
+    // Agregar JWT como header (mediante un input oculto no funciona, usaremos fetch)
+    // En su lugar, vamos a usar fetch con JWT
+    fetch(action, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: section ? `section=${encodeURIComponent(section)}` : ''
+    })
+    .then(response => {
+        if (response.ok) {
+            // Recargar la página para ver los cambios
+            window.location.reload();
+        } else {
+            throw new Error('Error en la operación');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', 'Error al realizar la operación. Por favor, intente nuevamente.');
+    });
 }
 
 // ========================================
@@ -944,7 +948,7 @@ function initDeleteCategoryModal() {
             modal.hide();
             
             // Ejecutar eliminación mediante POST con formulario
-            submitFormWithCSRF(`/menuAdministrador/category/${categoryId}/delete`, 'configuracion');
+            submitFormWithJWT(`/menuAdministrador/category/${categoryId}/delete`, 'configuracion');
             
             // Limpiar la variable
             pendingCategoryDelete = null;

@@ -62,7 +62,7 @@ public class UsuarioController {
             // Cargar promociones activas y vigentes
             List<Promocion> promocionesActivas = promocionRepository.findPromocionesActivasVigentes();
             
-            // Cargar información del restaurante para cada promoción
+            System.out.println("🎉 [PROMOCIONES] Se encontraron " + promocionesActivas.size() + " promociones activas");
             for (Promocion promocion : promocionesActivas) {
                 if (promocion.getCodigoRestaurante() != null) {
                     restauranteRepository.findById(promocion.getCodigoRestaurante())

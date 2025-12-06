@@ -3,9 +3,11 @@ package com.example.SistemaDePromociones.controller;
 import com.example.SistemaDePromociones.model.Restaurante;
 import com.example.SistemaDePromociones.model.Promocion;
 import com.example.SistemaDePromociones.model.Categoria;
+import com.example.SistemaDePromociones.model.UnidadMedidaPlato;
 import com.example.SistemaDePromociones.repository.RestauranteRepository;
 import com.example.SistemaDePromociones.repository.PromocionRepository;
 import com.example.SistemaDePromociones.repository.CategoriaRepository;
+import com.example.SistemaDePromociones.repository.UnidadMedidaPlatoRepository;
 import com.example.SistemaDePromociones.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,6 +29,8 @@ public class MenuRestauranteController {
     private PromocionRepository promocionRepository;
     @Autowired
     private CategoriaRepository categoriaRepository;
+    @Autowired
+    private UnidadMedidaPlatoRepository unidadMedidaPlatoRepository;
 
     /**
      * Mostrar menú principal del restaurante
@@ -150,6 +154,27 @@ public class MenuRestauranteController {
         Long codigoRestaurante = restaurante.getCodigo();
         java.util.List<Promocion> promocionesActivas = promocionRepository.findByCodigoRestauranteAndEstado(codigoRestaurante, "activa");
         java.util.List<Promocion> promocionesBorrador = promocionRepository.findByCodigoRestauranteAndEstado(codigoRestaurante, "borrador");
+        
+        // Cargar unidades de medida para cada promoción activa
+        if (promocionesActivas != null) {
+            for (Promocion promocion : promocionesActivas) {
+                if (promocion.getCodigoUnidadMedida() != null) {
+                    unidadMedidaPlatoRepository.findById(promocion.getCodigoUnidadMedida())
+                        .ifPresent(promocion::setUnidadMedida);
+                }
+            }
+        }
+        
+        // Cargar unidades de medida para cada promoción borrador
+        if (promocionesBorrador != null) {
+            for (Promocion promocion : promocionesBorrador) {
+                if (promocion.getCodigoUnidadMedida() != null) {
+                    unidadMedidaPlatoRepository.findById(promocion.getCodigoUnidadMedida())
+                        .ifPresent(promocion::setUnidadMedida);
+                }
+            }
+        }
+        
         model.addAttribute("promocionesActivas", promocionesActivas != null ? promocionesActivas : new java.util.ArrayList<>());
         model.addAttribute("promocionesBorrador", promocionesBorrador != null ? promocionesBorrador : new java.util.ArrayList<>());
 

@@ -52,6 +52,18 @@ public class Promocion {
     @Transient
     private Restaurante restaurante;
 
+    // Campo transient para pasar información de la unidad de medida a la vista
+    @Transient
+    private UnidadMedidaPlato unidadMedida;
+
+    // Método calculado para obtener el porcentaje de descuento
+    public Double getDescuento() {
+        if (precioOriginal != null && precioPromocional != null && precioOriginal > 0) {
+            return ((precioOriginal - precioPromocional) / precioOriginal) * 100;
+        }
+        return 0.0;
+    }
+
     // Getters y setters
     public Long getCodigo() { return codigo; }
     public void setCodigo(Long codigo) { this.codigo = codigo; }
@@ -118,4 +130,7 @@ public class Promocion {
     
     public Restaurante getRestaurante() { return restaurante; }
     public void setRestaurante(Restaurante restaurante) { this.restaurante = restaurante; }
+    
+    public UnidadMedidaPlato getUnidadMedida() { return unidadMedida; }
+    public void setUnidadMedida(UnidadMedidaPlato unidadMedida) { this.unidadMedida = unidadMedida; }
 }
