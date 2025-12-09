@@ -1545,19 +1545,17 @@
                                         <label class="form-label" style="font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px;">
                                             Imagen de promoción <span style="color: #c92a2a;">*</span>
                                         </label>
-                                        <label for="imagenInput" class="upload-area" 
+                                        <div class="upload-area" id="uploadAreaBtn"
                                                style="display: block; border: 2px dashed #d1d5db; border-radius: 8px; padding: 40px 20px; text-align: center; background-color: #f9fafb; cursor: pointer; transition: border-color 0.2s;">
-                                            <div id="uploadArea">
-                                                <svg style="width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                                </svg>
-                                                <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">Haz clic para subir una imagen</div>
-                                                <div style="font-size: 12px; color: #9ca3af;">PNG, JPG hasta 10MB</div>
-                                            </div>
-                                            <input type="file" id="imagenInput" name="imagen" accept="image/*" style="display: none;" required>
-                                        </label>
+                                            <svg style="width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.5; pointer-events: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                            </svg>
+                                            <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px; pointer-events: none;">Haz clic para subir una imagen</div>
+                                            <div style="font-size: 12px; color: #9ca3af; pointer-events: none;">PNG, JPG hasta 10MB</div>
+                                        </div>
+                                        <input type="file" id="imagenInput" name="imagen" accept="image/*" style="display: none;" required>
                                         <div id="imagePreview" class="mt-2" style="display: none;">
                                             <img id="previewImage" src="" class="img-fluid rounded" style="max-height: 200px; display: block; margin: 0 auto;">
                                             <button type="button" class="btn btn-sm btn-outline-danger mt-2 d-block mx-auto" onclick="removeImage()">
@@ -1853,10 +1851,40 @@
             });
         }
 
+        // Función global para validar precio promocional
+        function validarPrecioPromocional() {
+            const inputPrecioOriginal = document.getElementById('inputPrecioOriginal');
+            const inputPrecioPromocional = document.getElementById('inputPrecioPromocional');
+            
+            if (!inputPrecioOriginal || !inputPrecioPromocional) return true;
+            
+            const precioOriginal = parseFloat(inputPrecioOriginal.value) || 0;
+            const precioPromocional = parseFloat(inputPrecioPromocional.value) || 0;
+            
+            if (precioOriginal > 0 && precioPromocional > 0) {
+                const precioMin = precioOriginal * 0.50;
+                const precioMax = precioOriginal * 0.90;
+                
+                if (precioPromocional < precioMin || precioPromocional > precioMax) {
+                    showWarningModal(
+                        '⚠️ Precio Fuera de Rango',
+                        `El precio promocional debe estar entre S/ ${precioMin.toFixed(2)} y S/ ${precioMax.toFixed(2)} (10% - 50% de descuento del precio original).`
+                    );
+                    inputPrecioPromocional.style.borderColor = '#dc2626';
+                    return false;
+                } else {
+                    inputPrecioPromocional.style.borderColor = '#d1d5db';
+                    return true;
+                }
+            }
+            return true;
+        }
+
         // Inicializar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
             // Cargar platos del menú al inicio
             cargarPlatosMenu();
+            
             // ===== INICIALIZAR TABS DE BOOTSTRAP =====
             // Inicializar manualmente todos los tabs
             const triggerTabList = document.querySelectorAll('button[data-bs-toggle="tab"]');
@@ -1869,7 +1897,20 @@
                 });
             });
             
-            // Botón nueva promoción (verificar si existe)
+            // ===== INICIALIZAR MODAL Y UPLOAD =====
+            inicializarModalPromocion();
+            inicializarEventosFormulario();
+        });
+        
+        // Función para inicializar el modal de promoción (se ejecuta solo una vez)
+        let modalPromocionInicializado = false;
+        let isFileDialogOpen = false; // Variable global para controlar el estado del diálogo
+        
+        function inicializarModalPromocion() {
+            if (modalPromocionInicializado) return;
+            modalPromocionInicializado = true;
+            
+            // Botón nueva promoción
             const btnNuevaPromo = document.getElementById('btnNuevaPromo');
             if (btnNuevaPromo) {
                 btnNuevaPromo.addEventListener('click', function() {
@@ -1878,36 +1919,88 @@
                 });
             }
 
-            // Upload de imagen (verificar si existe)
-            const uploadArea = document.getElementById('uploadArea');
+            // Upload de imagen con protección anti-doble-click
+            const uploadAreaBtn = document.getElementById('uploadAreaBtn');
             const imagenInput = document.getElementById('imagenInput');
             
-            if (uploadArea && imagenInput) {
-                uploadArea.addEventListener('click', function() {
-                    imagenInput.click();
-                });
-
-                imagenInput.addEventListener('change', function(e) {
-                if (e.target.files && e.target.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        imagenSeleccionada = e.target.result;
-                        document.getElementById('previewImage').src = e.target.result;
-                        document.getElementById('imagePreview').style.display = 'block';
-                        document.getElementById('uploadArea').style.display = 'none';
-                        
-                        // Actualizar vista previa
-                        document.getElementById('previewPlaceholder').style.backgroundImage = `url(${e.target.result})`;
-                        document.getElementById('previewPlaceholder').style.backgroundSize = 'cover';
-                        document.getElementById('previewPlaceholder').style.backgroundPosition = 'center';
-                        document.getElementById('previewPlaceholder').innerHTML = '';
+            if (uploadAreaBtn && imagenInput) {
+                // Click en el área de upload
+                uploadAreaBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    
+                    if (isFileDialogOpen) {
+                        console.log('⚠️ Diálogo ya está abierto, ignorando click');
+                        return false;
                     }
-                    reader.readAsDataURL(e.target.files[0]);
-                }
+                    
+                    console.log('✅ Abriendo selector de archivos');
+                    isFileDialogOpen = true;
+                    
+                    // Usar setTimeout para evitar que el navegador agrupe los clicks
+                    setTimeout(() => {
+                        imagenInput.click();
+                    }, 10);
+                    
+                    return false;
+                }, true); // Usar capture phase
+                
+                // Detectar cuando se cierra el diálogo (focus regresa a la ventana)
+                window.addEventListener('focus', function() {
+                    if (isFileDialogOpen) {
+                        setTimeout(() => {
+                            console.log('🔄 Resetear flag - diálogo cerrado');
+                            isFileDialogOpen = false;
+                        }, 300);
+                    }
+                });
+                
+                // Prevenir el comportamiento por defecto del input
+                imagenInput.addEventListener('click', function(e) {
+                    if (isFileDialogOpen) {
+                        console.log('🚫 Input click bloqueado - ya está abierto');
+                        e.stopImmediatePropagation();
+                        return false;
+                    }
+                }, true);
+                
+                // Cuando se selecciona un archivo
+                imagenInput.addEventListener('change', function(e) {
+                    console.log('📁 Archivo seleccionado');
+                    isFileDialogOpen = false;
+                    
+                    if (e.target.files && e.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            imagenSeleccionada = ev.target.result;
+                            const previewImage = document.getElementById('previewImage');
+                            const imagePreview = document.getElementById('imagePreview');
+                            const uploadAreaElem = document.getElementById('uploadAreaBtn');
+                            const previewPlaceholder = document.getElementById('previewPlaceholder');
+                            
+                            if (previewImage) previewImage.src = ev.target.result;
+                            if (imagePreview) imagePreview.style.display = 'block';
+                            if (uploadAreaElem) uploadAreaElem.style.display = 'none';
+                            
+                            // Actualizar vista previa
+                            if (previewPlaceholder) {
+                                previewPlaceholder.style.backgroundImage = `url(${ev.target.result})`;
+                                previewPlaceholder.style.backgroundSize = 'cover';
+                                previewPlaceholder.style.backgroundPosition = 'center';
+                                previewPlaceholder.innerHTML = '';
+                            }
+                        }
+                        reader.readAsDataURL(e.target.files[0]);
+                    }
                 });
             }
-
-            // Cambio en tipo de descuento (verificar si existe)
+        }
+        
+        // Función para inicializar eventos del formulario
+        let eventosFormularioInicializados = false;
+        function inicializarEventosFormulario() {
+            if (eventosFormularioInicializados) return;
+            eventosFormularioInicializados = true;
             const tipoDescuento = document.getElementById('tipoDescuento');
             if (tipoDescuento) {
                 tipoDescuento.addEventListener('change', function() {
@@ -1943,30 +2036,6 @@
                 } else {
                     rangoPrecios.textContent = 'Ingresa el precio con descuento';
                 }
-            }
-            
-            // Función para validar precio promocional
-            function validarPrecioPromocional() {
-                const precioOriginal = parseFloat(inputPrecioOriginal.value) || 0;
-                const precioPromocional = parseFloat(inputPrecioPromocional.value) || 0;
-                
-                if (precioOriginal > 0 && precioPromocional > 0) {
-                    const precioMin = precioOriginal * 0.50;
-                    const precioMax = precioOriginal * 0.90;
-                    
-                    if (precioPromocional < precioMin || precioPromocional > precioMax) {
-                        showWarningModal(
-                            '⚠️ Precio Fuera de Rango',
-                            `El precio promocional debe estar entre S/ ${precioMin.toFixed(2)} y S/ ${precioMax.toFixed(2)} (10% - 50% de descuento del precio original).`
-                        );
-                        inputPrecioPromocional.style.borderColor = '#dc2626';
-                        return false;
-                    } else {
-                        inputPrecioPromocional.style.borderColor = '#d1d5db';
-                        return true;
-                    }
-                }
-                return true;
             }
             
             // Evento cuando cambia el precio promocional
@@ -2104,17 +2173,35 @@
 
             // Inicializar vista previa
             actualizarVistaPrevia();
-        });
+        }
 
         // Función para eliminar imagen
         function removeImage() {
+            // Resetear el flag global
+            if (typeof isFileDialogOpen !== 'undefined') {
+                isFileDialogOpen = false;
+            }
+            
             imagenSeleccionada = null;
-            document.getElementById('imagenInput').value = '';
-            document.getElementById('imagePreview').style.display = 'none';
-            document.getElementById('uploadArea').style.display = 'block';
-            document.getElementById('previewPlaceholder').style.backgroundImage = '';
-            document.getElementById('previewPlaceholder').innerHTML = 'Sin imagen';
-            document.getElementById('previewPlaceholder').style.background = '#eee';
+            const inputElement = document.getElementById('imagenInput');
+            if (inputElement) {
+                inputElement.value = '';
+            }
+            
+            const imagePreview = document.getElementById('imagePreview');
+            if (imagePreview) imagePreview.style.display = 'none';
+            
+            const uploadAreaBtn = document.getElementById('uploadAreaBtn');
+            if (uploadAreaBtn) uploadAreaBtn.style.display = 'block';
+            
+            const previewPlaceholder = document.getElementById('previewPlaceholder');
+            if (previewPlaceholder) {
+                previewPlaceholder.style.backgroundImage = '';
+                previewPlaceholder.innerHTML = 'Sin imagen';
+                previewPlaceholder.style.background = '#eee';
+            }
+            
+            console.log('🗑️ Imagen eliminada - flag reseteado');
         }
 
         // Función para actualizar vista previa
@@ -2325,13 +2412,21 @@
                 return;
             }
 
+            // Obtener el CSRF token
+            const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+            if (!csrfToken) {
+                showErrorModal('❌ Error', 'Token de seguridad no encontrado. Recarga la página e intenta nuevamente.');
+                return;
+            }
+
             const formData = new FormData(form);
 
             try {
                 const response = await fetch('/promociones/crear', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${jwtToken}`
+                        'Authorization': `Bearer ${jwtToken}`,
+                        'X-CSRF-TOKEN': csrfToken
                     },
                     body: formData
                 });
@@ -2359,136 +2454,70 @@
         /**
          * Publicar promoción (borrador → activa)
          */
-        async function publicarPromocion(codigoPromocion) {
-            const jwtToken = localStorage.getItem('jwt_token');
-            if (!jwtToken) {
-                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-                setTimeout(() => window.location.href = '/login', 2000);
-                return;
+        function publicarPromocion(codigoPromocion) {
+            // Crear formulario HTML para enviar
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/promociones/${codigoPromocion}/publicar`;
+            
+            // Agregar CSRF token
+            const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
             }
-
-            // Obtener el CSRF token
-            const csrfToken = document.querySelector('[name="_csrf"]')?.value;
-            if (!csrfToken) {
-                showErrorModal('❌ Error', 'Token de seguridad no encontrado. Recarga la página e intenta nuevamente.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/promociones/${codigoPromocion}/publicar`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${jwtToken}`,
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    showSuccessModal('✅ Promoción Publicada', 'La promoción ahora es visible para todos los clientes.');
-                    
-                    // Recargar la página después de 1 segundo para actualizar las secciones
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                } else {
-                    showErrorModal('❌ Error al Publicar', 'No se pudo publicar la promoción. Inténtalo de nuevo.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor.');
-            }
+            
+            document.body.appendChild(form);
+            form.submit();
         }
 
         /**
          * Despublicar promoción (activa → borrador)
          */
-        async function despublicarPromocion(codigoPromocion) {
-            const jwtToken = localStorage.getItem('jwt_token');
-            if (!jwtToken) {
-                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-                setTimeout(() => window.location.href = '/login', 2000);
-                return;
+        function despublicarPromocion(codigoPromocion) {
+            // Crear formulario HTML para enviar
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/promociones/${codigoPromocion}/despublicar`;
+            
+            // Agregar CSRF token
+            const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
             }
-
-            // Obtener el CSRF token
-            const csrfToken = document.querySelector('[name="_csrf"]')?.value;
-            if (!csrfToken) {
-                showErrorModal('❌ Error', 'Token de seguridad no encontrado. Recarga la página e intenta nuevamente.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/promociones/${codigoPromocion}/despublicar`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${jwtToken}`,
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    showSuccessModal('✅ Promoción Despublicada', 'La promoción ha sido guardada como borrador.');
-                    
-                    // Recargar la página después de 1 segundo para actualizar las secciones
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                } else {
-                    showErrorModal('❌ Error al Despublicar', 'No se pudo despublicar la promoción. Inténtalo de nuevo.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor.');
-            }
+            
+            document.body.appendChild(form);
+            form.submit();
         }
 
         /**
          * Eliminar promoción (activa o borrador)
          */
-        async function eliminarPromocionConJWT(codigoPromocion, tipo) {
-            const jwtToken = localStorage.getItem('jwt_token');
-            if (!jwtToken) {
-                showWarningModal('⚠️ Sesión Expirada', 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-                setTimeout(() => window.location.href = '/login', 2000);
-                return;
+        function eliminarPromocionConJWT(codigoPromocion, tipo) {
+            // Crear formulario HTML para enviar
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/promociones/${codigoPromocion}/eliminar`;
+            
+            // Agregar CSRF token
+            const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
             }
-
-            // Obtener el CSRF token
-            const csrfToken = document.querySelector('[name="_csrf"]')?.value;
-            if (!csrfToken) {
-                showErrorModal('❌ Error', 'Token de seguridad no encontrado. Recarga la página e intenta nuevamente.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/promociones/${codigoPromocion}/eliminar`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${jwtToken}`,
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const mensaje = tipo === 'borrador' 
-                        ? 'El borrador ha sido eliminado.' 
-                        : 'La promoción ha sido eliminada.';
-                    showSuccessModal('✅ Eliminado', mensaje);
-                    
-                    // Recargar la página después de 1 segundo para actualizar las secciones
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                } else {
-                    showErrorModal('❌ Error al Eliminar', 'No se pudo eliminar. Inténtalo de nuevo.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showErrorModal('❌ Error de Conexión', 'Hubo un problema al conectar con el servidor.');
-            }
+            
+            document.body.appendChild(form);
+            form.submit();
         }
 
         /**
