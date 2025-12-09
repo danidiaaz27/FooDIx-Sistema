@@ -16,6 +16,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 /**
  * Controller para gestionar el menú y funcionalidades del restaurante
  */
@@ -150,8 +153,11 @@ public class MenuRestauranteController {
         model.addAttribute("restaurante", restaurante);
         model.addAttribute("nombreComercial", restaurante.getNombre());
 
-        // Promociones reales del restaurante
+        // 🕐 VERIFICAR Y LIMPIAR PROMOCIONES EXPIRADAS ANTES DE CARGAR
         Long codigoRestaurante = restaurante.getCodigo();
+        verificarYLimpiarPromocionesExpiradas(codigoRestaurante);
+
+        // Promociones reales del restaurante (después de la limpieza)
         java.util.List<Promocion> promocionesActivas = promocionRepository.findByCodigoRestauranteAndEstado(codigoRestaurante, "activa");
         java.util.List<Promocion> promocionesBorrador = promocionRepository.findByCodigoRestauranteAndEstado(codigoRestaurante, "borrador");
         
@@ -199,6 +205,39 @@ public class MenuRestauranteController {
         System.out.println("   - Promociones borrador: " + (promocionesBorrador != null ? promocionesBorrador.size() : 0));
         System.out.println("   - Categorías: " + (categorias != null ? categorias.size() : 0));
         System.out.println("   - Estadísticas: " + (model.getAttribute("estadisticas") != null ? "CARGADAS" : "NULL"));
+    }
+    
+    /**
+     * Verifica y limpia promociones expiradas de un restaurante específico
+     * Este método se ejecuta cada vez que el restaurante carga su menú
+     */
+    private void verificarYLimpiarPromocionesExpiradas(Long codigoRestaurante) {
+        try {
+            java.util.List<Promocion> promocionesActivas = promocionRepository.findByCodigoRestauranteAndEstado(codigoRestaurante, "activa");
+            java.sql.Timestamp ahora = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
+            
+            int promocionesMovidas = 0;
+            for (Promocion promocion : promocionesActivas) {
+                // Verificar si la promoción ya expiró
+                if (promocion.getFechaFin() != null && promocion.getFechaFin().before(ahora)) {
+                    System.out.println("⏰ [LIMPIEZA] Promoción expirada detectada: " + promocion.getTitulo() + " (ID: " + promocion.getCodigo() + ")");
+                    
+                    // Cambiar estado a borrador
+                    promocion.setEstado("borrador");
+                    promocion.setFechaModificacion(ahora);
+                    promocionRepository.save(promocion);
+                    
+                    promocionesMovidas++;
+                    System.out.println("   └─ ✅ Movida a 'borrador' automáticamente");
+                }
+            }
+            
+            if (promocionesMovidas > 0) {
+                System.out.println("✅ [LIMPIEZA] " + promocionesMovidas + " promoción(es) expirada(s) movida(s) a borrador");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ [LIMPIEZA] Error al verificar promociones expiradas: " + e.getMessage());
+        }
     }
 }
 
