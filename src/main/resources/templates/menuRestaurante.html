@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
     <title>FoodIx - Panel Restaurante</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -2364,11 +2367,19 @@
                 return;
             }
 
+            // Obtener el CSRF token
+            const csrfToken = document.querySelector('[name="_csrf"]')?.value;
+            if (!csrfToken) {
+                showErrorModal('❌ Error', 'Token de seguridad no encontrado. Recarga la página e intenta nuevamente.');
+                return;
+            }
+
             try {
                 const response = await fetch(`/promociones/${codigoPromocion}/publicar`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${jwtToken}`,
+                        'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -2400,11 +2411,19 @@
                 return;
             }
 
+            // Obtener el CSRF token
+            const csrfToken = document.querySelector('[name="_csrf"]')?.value;
+            if (!csrfToken) {
+                showErrorModal('❌ Error', 'Token de seguridad no encontrado. Recarga la página e intenta nuevamente.');
+                return;
+            }
+
             try {
                 const response = await fetch(`/promociones/${codigoPromocion}/despublicar`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${jwtToken}`,
+                        'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -2436,11 +2455,19 @@
                 return;
             }
 
+            // Obtener el CSRF token
+            const csrfToken = document.querySelector('[name="_csrf"]')?.value;
+            if (!csrfToken) {
+                showErrorModal('❌ Error', 'Token de seguridad no encontrado. Recarga la página e intenta nuevamente.');
+                return;
+            }
+
             try {
                 const response = await fetch(`/promociones/${codigoPromocion}/eliminar`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${jwtToken}`,
+                        'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
                     }
                 });
