@@ -874,19 +874,28 @@
                                         <td th:text="${delivery.tipoVehiculo != null ? delivery.tipoVehiculo.nombre : 'N/A'}">Motocicleta</td>
                                         <td th:text="${#temporals.format(delivery.fechaCreacion, 'dd/MM/yyyy HH:mm')}">01/01/2025 10:00</td>
                                         <td>
-                                            <form th:action="@{/menuAdministrador/repartidor/{id}/approve(id=${delivery.codigo})}" 
-                                                  method="post" style="display: inline;">
-                                                <button type="submit" class="btn btn-sm btn-success" title="Aprobar">
-                                                    <i class="fas fa-check"></i> Aprobar
+                                            <div class="btn-group" role="group" aria-label="Acciones de repartidor pendiente">
+                                                <!-- Botón Aprobar -->
+                                                <form th:action="@{/menuAdministrador/repartidor/{id}/approve(id=${delivery.codigo})}" 
+                                                      method="post" style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-success btn-toggle" 
+                                                            title="Aprobar repartidor"
+                                                            aria-label="Aprobar">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                
+                                                <!-- Botón Rechazar -->
+                                                <button type="button" class="btn btn-sm btn-danger btn-toggle" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#rejectDeliveryModal"
+                                                        th:data-id="${delivery.codigo}"
+                                                        th:data-name="${delivery.usuario != null ? (delivery.usuario.nombre + ' ' + delivery.usuario.apellidoPaterno) : 'Repartidor'}"
+                                                        title="Rechazar repartidor"
+                                                        aria-label="Rechazar">
+                                                    <i class="fas fa-times"></i>
                                                 </button>
-                                            </form>
-                                            <button type="button" class="btn btn-sm btn-danger" title="Rechazar"
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#rejectDeliveryModal"
-                                                    th:data-id="${delivery.codigo}"
-                                                    th:data-name="${delivery.usuario != null ? (delivery.usuario.nombre + ' ' + delivery.usuario.apellidoPaterno) : 'Repartidor'}">
-                                                <i class="fas fa-times"></i> Rechazar
-                                            </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
