@@ -1125,31 +1125,22 @@ function obtenerUbicacionActual() {
                 
                 if (deliveryMap && deliveryMarker) {
                     deliveryMap.setView([selectedLat, selectedLng], 16);
-function showMenuSection(sectionName) {
-    // Ocultar todas las secciones
-    document.querySelectorAll('.menu-section').forEach(section => {
-        section.classList.remove('active');
-    });
-    
-    // Remover active de todos los links
-    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-        link.classList.remove('active');
-    });
-    
-    // Mostrar sección seleccionada
-    document.getElementById(sectionName + '-content').classList.add('active');
-    
-    // Activar link correspondiente
-    document.querySelector(`.sidebar .nav-link[href="#${sectionName}"]`).classList.add('active');
-    
-    // Si es la sección de carrito, inicializar el mapa
-    if (sectionName === 'carrito') {
-        setTimeout(() => {
-            inicializarMapaEntrega();
-        }, 100);
-    }
-}                   btnUbicarme.disabled = false;
+                    deliveryMarker.setLatLng([selectedLat, selectedLng]);
+                    actualizarDireccionDesdeCoords(selectedLat, selectedLng);
                 }
+                
+                if (btnUbicarme) {
+                    btnUbicarme.innerHTML = '<i class="fas fa-location-arrow"></i> Mi ubicación';
+                    btnUbicarme.disabled = false;
+                }
+            },
+            function(error) {
+                console.error('Error al obtener ubicación:', error);
+                if (btnUbicarme) {
+                    btnUbicarme.innerHTML = '<i class="fas fa-location-arrow"></i> Mi ubicación';
+                    btnUbicarme.disabled = false;
+                }
+                alert('No se pudo obtener tu ubicación. Por favor, verifica los permisos.');
             }
         );
     } else {
@@ -1191,7 +1182,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const modal = new bootstrap.Modal(document.getElementById(modalId));
             modal.show();
         }, 500); // Pequeño delay para asegurar que el DOM esté completamente cargado
-    }   }, 500); // Pequeño delay para asegurar que el DOM esté completamente cargado
     }
     
     // Variables para filtrado
@@ -1267,6 +1257,13 @@ function showMenuSection(sectionName) {
     
     // Activar link correspondiente
     document.querySelector(`.sidebar .nav-link[href="#${sectionName}"]`).classList.add('active');
+    
+    // Si es la sección de carrito, inicializar el mapa
+    if (sectionName === 'carrito') {
+        setTimeout(() => {
+            inicializarMapaEntrega();
+        }, 100);
+    }
 }
 
 function updateFloatingCart() {
