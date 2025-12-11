@@ -7,6 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
     <style>
         /* Custom styles for better UX */
@@ -427,23 +428,57 @@
                     <div class="cart-summary">
                         <!-- Información de entrega -->
                         <div class="delivery-info mb-3">
-                            <h6><i class="fas fa-map-marker-alt"></i> Dirección de entrega</h6>
-                            <div class="mb-2">
-                                <input type="text" class="form-control" id="direccionEntrega" 
-                                       th:value="${currentUser['address']}" 
-                                       placeholder="Ingresa tu dirección para delivery">
-                                <small class="form-text text-muted">
-                                    <i class="fas fa-info-circle"></i> Solo para pedidos con delivery
-                                </small>
-                            </div>
-                            <div class="mb-2">
-                                <input type="text" class="form-control" id="telefonoContacto" 
-                                       th:value="${currentUser['phone']}" 
-                                       placeholder="Teléfono de contacto">
-                            </div>
-                            <div class="mb-2">
-                                <textarea class="form-control" id="referenciaEntrega" rows="2" 
-                                          placeholder="Referencias adicionales (opcional)"></textarea>
+                            <h6 class="mb-3"><i class="fas fa-map-marker-alt"></i> Dirección de entrega</h6>
+                            
+                            <div class="row g-2">
+                                <!-- Columna izquierda: Formulario -->
+                                <div class="col-md-7">
+                                    <div class="mb-2">
+                                        <label for="direccionEntrega" class="form-label" style="font-size: 0.85rem; font-weight: 500;">
+                                            <i class="fas fa-map-marked-alt text-primary"></i> Dirección completa
+                                        </label>
+                                        <input type="text" class="form-control form-control-sm" id="direccionEntrega" 
+                                               th:value="${currentUser['address']}" 
+                                               placeholder="Ej: Av. Balta 123, Chiclayo"
+                                               readonly>
+                                        <small class="form-text text-muted" style="font-size: 0.75rem;">
+                                            <i class="fas fa-info-circle"></i> Usa el mapa para ubicar tu dirección
+                                        </small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="telefonoContacto" class="form-label" style="font-size: 0.85rem; font-weight: 500;">
+                                            <i class="fas fa-phone text-success"></i> Teléfono
+                                        </label>
+                                        <input type="text" class="form-control form-control-sm" id="telefonoContacto" 
+                                               th:value="${currentUser['phone']}" 
+                                               placeholder="Ej: +51 987654321">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="referenciaEntrega" class="form-label" style="font-size: 0.85rem; font-weight: 500;">
+                                            <i class="fas fa-sticky-note text-warning"></i> Referencias
+                                        </label>
+                                        <textarea class="form-control form-control-sm" id="referenciaEntrega" rows="2" 
+                                                  placeholder="Ej: Casa azul, cerca del parque"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <!-- Columna derecha: Mapa -->
+                                <div class="col-md-5">
+                                    <label class="form-label" style="font-size: 0.85rem; font-weight: 500;">
+                                        <i class="fas fa-map text-danger"></i> Ubicación exacta
+                                    </label>
+                                    <div id="mapContainer" style="height: 200px; border-radius: 8px; border: 2px solid rgba(198,40,40,0.2); overflow: hidden; position: relative;">
+                                        <div id="deliveryMap" style="height: 100%; width: 100%;"></div>
+                                        <button type="button" id="btnUbicarme" class="btn btn-sm" 
+                                                style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: white; border: 2px solid #C62828; color: #C62828; padding: 4px 8px; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"
+                                                onclick="obtenerUbicacionActual()">
+                                            <i class="fas fa-crosshairs"></i> Mi ubicación
+                                        </button>
+                                    </div>
+                                    <small class="form-text text-muted d-block mt-1" style="font-size: 0.7rem;">
+                                        <i class="fas fa-hand-pointer"></i> Arrastra el marcador para ajustar
+                                    </small>
+                                </div>
                             </div>
                         </div>
 
@@ -953,9 +988,10 @@
                             </div>
                             <div class="flex-fill text-center p-2 rounded" style="background: rgba(40,167,69,0.1);">
                                 <i class="fas fa-shopping-bag text-success" style="font-size: 0.9rem;"></i>
-                                <div class="fw-bold" style="font-size: 0.95rem;" id="modalPedidos">0</div>
-                                <small class="text-muted" style="font-size: 0.65rem;">Pedidos</small>
-                            </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script th:src="@{/js/theme-toggle.js}"></script>
+<script th:src="@{/js/main.js}"></script>
                             <div class="flex-fill text-center p-2 rounded" style="background: rgba(255,193,7,0.1);">
                                 <i class="fas fa-ticket-alt text-warning" style="font-size: 0.9rem;"></i>
                                 <div class="fw-bold" style="font-size: 0.95rem;" id="modalCanjeos">0</div>
@@ -1014,6 +1050,131 @@ function verCarritoAhora() {
         showMenuSection('carrito');
     }, 300);
 }
+// Variables globales para el mapa
+let deliveryMap = null;
+let deliveryMarker = null;
+let selectedLat = -6.7714; // Chiclayo, Perú (coordenadas por defecto)
+let selectedLng = -79.8410;
+
+// Inicializar mapa de entrega
+function inicializarMapaEntrega() {
+    if (deliveryMap) return; // Ya está inicializado
+    
+    // Crear el mapa
+    deliveryMap = L.map('deliveryMap').setView([selectedLat, selectedLng], 15);
+    
+    // Añadir capa de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 19
+    }).addTo(deliveryMap);
+    
+    // Crear marcador arrastrable
+    deliveryMarker = L.marker([selectedLat, selectedLng], {
+        draggable: true,
+        icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        })
+    }).addTo(deliveryMap);
+    
+    // Evento cuando se mueve el marcador
+    deliveryMarker.on('dragend', function(e) {
+        const position = e.target.getLatLng();
+        selectedLat = position.lat;
+        selectedLng = position.lng;
+        actualizarDireccionDesdeCoords(selectedLat, selectedLng);
+    });
+    
+    // Evento click en el mapa
+    deliveryMap.on('click', function(e) {
+        selectedLat = e.latlng.lat;
+        selectedLng = e.latlng.lng;
+        deliveryMarker.setLatLng([selectedLat, selectedLng]);
+        actualizarDireccionDesdeCoords(selectedLat, selectedLng);
+    });
+    
+    // Cargar dirección inicial si existe
+    const direccionActual = document.getElementById('direccionEntrega').value;
+    if (direccionActual && direccionActual.trim() !== '') {
+        // Mantener la dirección actual
+        console.log('📍 Dirección inicial:', direccionActual);
+    } else {
+        // Obtener ubicación actual del navegador
+        obtenerUbicacionActual();
+    }
+}
+
+// Obtener ubicación actual del usuario
+function obtenerUbicacionActual() {
+    if (navigator.geolocation) {
+        const btnUbicarme = document.getElementById('btnUbicarme');
+        if (btnUbicarme) {
+            btnUbicarme.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ubicando...';
+            btnUbicarme.disabled = true;
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                selectedLat = position.coords.latitude;
+                selectedLng = position.coords.longitude;
+                
+                if (deliveryMap && deliveryMarker) {
+                    deliveryMap.setView([selectedLat, selectedLng], 16);
+function showMenuSection(sectionName) {
+    // Ocultar todas las secciones
+    document.querySelectorAll('.menu-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Remover active de todos los links
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Mostrar sección seleccionada
+    document.getElementById(sectionName + '-content').classList.add('active');
+    
+    // Activar link correspondiente
+    document.querySelector(`.sidebar .nav-link[href="#${sectionName}"]`).classList.add('active');
+    
+    // Si es la sección de carrito, inicializar el mapa
+    if (sectionName === 'carrito') {
+        setTimeout(() => {
+            inicializarMapaEntrega();
+        }, 100);
+    }
+}                   btnUbicarme.disabled = false;
+                }
+            }
+        );
+    } else {
+        alert('Tu navegador no soporta geolocalización');
+    }
+}
+
+// Actualizar dirección usando Nominatim (OpenStreetMap)
+function actualizarDireccionDesdeCoords(lat, lng) {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.display_name) {
+                const direccion = data.display_name;
+                document.getElementById('direccionEntrega').value = direccion;
+                console.log('📍 Dirección actualizada:', direccion);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error al obtener dirección:', error);
+            document.getElementById('direccionEntrega').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+        });
+}
 
 // JavaScript para funcionalidades específicas del menú
 document.addEventListener('DOMContentLoaded', function() {
@@ -1030,6 +1191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const modal = new bootstrap.Modal(document.getElementById(modalId));
             modal.show();
         }, 500); // Pequeño delay para asegurar que el DOM esté completamente cargado
+    }   }, 500); // Pequeño delay para asegurar que el DOM esté completamente cargado
     }
     
     // Variables para filtrado
@@ -1418,18 +1580,18 @@ function renderizarCarrito(items, totales) {
                     </button>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="input-group" style="width: 120px;">
-                        <button class="btn btn-outline-secondary btn-sm" onclick="cambiarCantidad(${item.codigoPromocion}, ${item.cantidad - 1})">
+                    <div class="input-group" style="max-width: 140px; min-width: 120px;">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="cambiarCantidad(${item.codigoPromocion}, ${item.cantidad - 1})" style="padding: 0.25rem 0.5rem;">
                             <i class="fas fa-minus"></i>
                         </button>
-                        <input type="number" class="form-control form-control-sm text-center" value="${item.cantidad}" readonly>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="cambiarCantidad(${item.codigoPromocion}, ${item.cantidad + 1})">
+                        <input type="number" class="form-control form-control-sm text-center" value="${item.cantidad}" readonly style="flex: 1; min-width: 50px; font-weight: 600; font-size: 0.95rem;">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="cambiarCantidad(${item.codigoPromocion}, ${item.cantidad + 1})" style="padding: 0.25rem 0.5rem;">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                     <div class="text-end">
                         <div class="text-muted" style="font-size: 0.8rem;">S/ ${item.precioUnitario.toFixed(2)} c/u</div>
-                        <div class="fw-bold" style="color: #C62828;">S/ ${item.subtotal.toFixed(2)}</div>
+                        <div class="fw-bold" style="color: #C62828; font-size: 1.1rem;">S/ ${item.subtotal.toFixed(2)}</div>
                     </div>
                 </div>
             </div>
