@@ -1457,6 +1457,11 @@
         // Variables globales
         let currentOrderId = null;
         let currentDeliveryOrderId = null;
+        let currentOrderEarnings = 0; // Ganancia estimada del pedido actual
+        
+        // Inicializar ganancias del día desde el servidor
+        let gananciasHoyAcumuladas = parseFloat(document.querySelector('.earnings-amount span')?.textContent || '0');
+        let entregasHoyCount = parseInt(document.querySelector('.earnings-amount + small')?.textContent?.match(/\d+/)?.[0] || '0');
         
         // Funciones helper para mostrar notificaciones
         function showSuccessNotification(title, message, callback) {
@@ -1559,7 +1564,393 @@
                 document.getElementById('rejectReason').value = '';
                 currentOrderId = null;
             });
+            
+            // Event listeners para actualizar datos al cambiar de pestaña
+            document.querySelectorAll('.delivery-tabs .nav-link').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', function(event) {
+                    const targetTabId = event.target.getAttribute('data-bs-target');
+                    console.log('Actualizando pestaña:', targetTabId);
+                    
+                    // Actualizar datos según la pestaña activa
+                    if (targetTabId === '#disponibles') {
+                        recargarPedidosDisponibles();
+                    } else if (targetTabId === '#entregas') {
+                        recargarMisEntregas();
+                    } else if (targetTabId === '#estadisticas') {
+                        recargarEstadisticas();
+                    }
+                });
+            });
         });
+        
+        // Función para recargar pedidos disponibles
+        function recargarPedidosDisponibles() {
+            console.log('Recargando pedidos disponibles...');
+            
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch('/menuDelivery/delivery/pedidos/disponibles', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    actualizarListaPedidosDisponibles(data.pedidos);
+                    actualizarBadge('disponibles-tab', data.pedidos.length);
+                }
+            })
+            .catch(error => {
+                console.error('Error al recargar pedidos disponibles:', error);
+            });
+        }
+        
+        // Función para recargar mis entregas
+        function recargarMisEntregas() {
+            console.log('Recargando mis entregas...');
+            
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch('/menuDelivery/delivery/pedidos/mis-entregas', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    actualizarListaMisEntregas(data.entregas);
+                    actualizarBadge('entregas-tab', data.entregas.length);
+                }
+            })
+            .catch(error => {
+                console.error('Error al recargar mis entregas:', error);
+            });
+        }
+        
+        // Función para recargar estadísticas
+        function recargarEstadisticas() {
+            console.log('Recargando estadísticas...');
+            
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch('/menuDelivery/delivery/estadisticas', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    actualizarEstadisticas(data.stats);
+                }
+            })
+            .catch(error => {
+                console.error('Error al recargar estadísticas:', error);
+            });
+        }
+        
+        // Función para actualizar la lista de pedidos disponibles en el DOM
+        function actualizarListaPedidosDisponibles(pedidos) {
+            const container = document.querySelector('#disponibles .row.g-3');
+            
+            if (!pedidos || pedidos.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-box-open fa-4x mb-3" style="color: var(--text-secondary);"></i>
+                        <h4 style="color: var(--text-primary);">No hay pedidos disponibles</h4>
+                        <p class="text-muted">Los nuevos pedidos aparecerán aquí automáticamente</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            pedidos.forEach(pedido => {
+                html += `
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="order-card available-order" data-order-id="${pedido.codigo}">
+                            <div class="order-header">
+                                <div class="restaurant-info">
+                                    <h5 class="restaurant-name">Pedido #${pedido.codigo}</h5>
+                                    <span class="order-id">#${pedido.codigo}</span>
+                                    <span class="priority-badge normal">Normal</span>
+                                </div>
+                                <div class="order-earnings">
+                                    <div class="earning-amount">S/ ${pedido.total.toFixed(2)}</div>
+                                </div>
+                            </div>
+                            <div class="order-details">
+                                <div class="location-time">
+                                    <div class="location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>${pedido.direccionEntrega}</span>
+                                    </div>
+                                    <div class="estimated-time">
+                                        <i class="fas fa-phone"></i>
+                                        <span>${pedido.telefonoContacto}</span>
+                                    </div>
+                                </div>
+                                <div class="order-value">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span class="total-value">Total: S/ ${pedido.total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div class="action-buttons mt-3">
+                                <button type="button" class="btn btn-success btn-sm accept-order-btn" 
+                                        data-order-id="${pedido.codigo}">
+                                    <i class="fas fa-check"></i> Aceptar Pedido
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Re-agregar event listeners a los nuevos botones
+            document.querySelectorAll('.accept-order-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    showAcceptOrderModal(orderId);
+                });
+            });
+        }
+        
+        // Función para actualizar la lista de mis entregas en el DOM
+        function actualizarListaMisEntregas(entregas) {
+            const container = document.querySelector('#entregas .container-fluid.py-4');
+            
+            if (!entregas || entregas.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-box fa-4x mb-3" style="color: var(--text-secondary);"></i>
+                        <h4 style="color: var(--text-primary);">No tienes entregas activas</h4>
+                        <p class="text-muted">Acepta algunos pedidos de la pestaña "Disponibles"</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            entregas.forEach(pedido => {
+                html += `
+                    <div class="order-card my-delivery ${pedido.estado ? 'in-transit' : ''}">
+                        <div class="order-header">
+                            <div class="restaurant-info">
+                                <h5 class="restaurant-name">Pedido #${pedido.codigo}</h5>
+                                <span class="status-badge accepted">${pedido.estado ? 'Activo' : 'Completado'}</span>
+                            </div>
+                            <div class="order-earnings">
+                                <div class="earning-amount">S/ ${pedido.total.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="delivery-addresses">
+                            <div class="address-section" style="grid-column: 1 / -1;">
+                                <h6>Entregar a:</h6>
+                                <p class="address">${pedido.direccionEntrega}</p>
+                                <p class="phone"><i class="fas fa-phone"></i> ${pedido.telefonoContacto}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="special-notes" style="background: rgba(67,160,71,0.1); border-left: 3px solid #43A047;">
+                            <div class="note-item">
+                                <span class="note-label" style="color: #2E7D32;"><i class="fas fa-info-circle"></i> IMPORTANTE:</span>
+                                <span class="note-text" style="color: #2E7D32; font-weight: 600;">Al entregar, solicita al cliente el código de verificación de 4 dígitos</span>
+                            </div>
+                        </div>
+                        
+                        ${pedido.notas ? `
+                        <div class="special-notes">
+                            <div class="note-item">
+                                <span class="note-label">Notas:</span>
+                                <span class="note-text">${pedido.notas}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${pedido.referenciaDireccion ? `
+                        <div class="special-notes">
+                            <div class="note-item">
+                                <span class="note-label">Referencia:</span>
+                                <span class="note-text">${pedido.referenciaDireccion}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="action-buttons">
+                            ${pedido.estado && !pedido.verificado ? `
+                            <button type="button" class="btn btn-success btn-sm mark-delivered" 
+                                    data-order-id="${pedido.codigo}">
+                                <i class="fas fa-check-circle"></i> Marcar como Entregado
+                            </button>
+                            ` : ''}
+                            ${pedido.verificado ? `
+                            <span class="badge bg-success" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                <i class="fas fa-check-circle"></i> Verificado y Entregado
+                            </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Re-agregar event listeners
+            document.querySelectorAll('.mark-delivered').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    showVerificationModal(orderId);
+                });
+            });
+        }
+        
+        // Función para actualizar estadísticas en el DOM
+        function actualizarEstadisticas(stats) {
+            // Actualizar ganancias hoy
+            document.querySelector('.stats-card:nth-child(1) h3').textContent = `S/ ${stats.gananciasHoy.toFixed(2)}`;
+            
+            // Actualizar entregas hoy
+            document.querySelector('.stats-card:nth-child(2) h3').textContent = stats.entregasHoy;
+            
+            // Actualizar calificación
+            document.querySelector('.stats-card:nth-child(3) h3').textContent = `${stats.calificacionPromedio} ⭐`;
+            
+            // Actualizar tasa de éxito
+            document.querySelector('.stats-card:nth-child(4) h3').textContent = `${stats.tasaExito}%`;
+            
+            // Actualizar ganancias semanales
+            const gananciasSemanaElement = document.querySelector('.progress-info span.fw-bold');
+            if (gananciasSemanaElement) {
+                gananciasSemanaElement.textContent = `S/ ${stats.gananciasSemana.toFixed(2)}`;
+            }
+            
+            // Actualizar barra de progreso
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${stats.progresoSemanal}%`;
+            }
+            
+            // Actualizar texto de progreso
+            const progressText = document.querySelector('.progress-section small.text-muted');
+            if (progressText) {
+                progressText.textContent = `${stats.progresoSemanal}% de tu meta semanal (S/ ${stats.metaSemanal.toFixed(2)})`;
+            }
+            
+            // Actualizar resumen total
+            const summaryItems = document.querySelectorAll('.summary-item .summary-value');
+            if (summaryItems.length >= 3) {
+                summaryItems[0].textContent = stats.totalEntregas;
+                summaryItems[1].textContent = `S/ ${stats.promedioEntrega.toFixed(2)}`;
+                summaryItems[2].textContent = `${stats.tiempoPromedio} min`;
+            }
+            
+            // Actualizar header con ganancias de hoy
+            const earningsAmount = document.querySelector('.earnings-amount');
+            if (earningsAmount) {
+                earningsAmount.innerHTML = `S/ <span>${stats.gananciasHoy.toFixed(2)}</span>`;
+            }
+            
+            const entregasHoyText = document.querySelector('.earnings-amount + small');
+            if (entregasHoyText) {
+                entregasHoyText.textContent = `${stats.entregasHoy} entregas`;
+            }
+        }
+        
+        // Función para actualizar los badges de las pestañas
+        function actualizarBadge(tabId, count) {
+            const tab = document.getElementById(tabId);
+            if (tab) {
+                const badge = tab.querySelector('.badge');
+                if (badge) {
+                    badge.textContent = count;
+                }
+            }
+        }
+        
+        // Función para actualizar ganancias en tiempo real
+        function actualizarGananciasEnTiempoReal(ganancia) {
+            // Actualizar ganancias acumuladas
+            gananciasHoyAcumuladas += ganancia;
+            entregasHoyCount += 1;
+            
+            // Actualizar el header con las nuevas ganancias
+            const earningsAmount = document.querySelector('.earnings-amount');
+            if (earningsAmount) {
+                earningsAmount.innerHTML = `S/ <span>${gananciasHoyAcumuladas.toFixed(2)}</span>`;
+            }
+            
+            const entregasHoyText = document.querySelector('.earnings-amount + small');
+            if (entregasHoyText) {
+                entregasHoyText.textContent = `${entregasHoyCount} entregas`;
+            }
+            
+            // Actualizar estadísticas si estamos en esa pestaña
+            const statsCard = document.querySelector('#estadisticas .stats-card:nth-child(1) h3');
+            if (statsCard) {
+                statsCard.textContent = `S/ ${gananciasHoyAcumuladas.toFixed(2)}`;
+            }
+            
+            const entregasCard = document.querySelector('#estadisticas .stats-card:nth-child(2) h3');
+            if (entregasCard) {
+                entregasCard.textContent = entregasHoyCount;
+            }
+            
+            // Actualizar progreso semanal
+            actualizarProgresoSemanal(ganancia);
+            
+            // Guardar en localStorage para persistencia
+            localStorage.setItem('gananciasHoy', gananciasHoyAcumuladas.toFixed(2));
+            localStorage.setItem('entregasHoy', entregasHoyCount);
+        }
+        
+        // Función para actualizar el progreso semanal
+        function actualizarProgresoSemanal(ganancia) {
+            // Obtener ganancia semanal actual
+            const gananciasSemanaElement = document.querySelector('.progress-info span.fw-bold');
+            if (!gananciasSemanaElement) return;
+            
+            const gananciasSemanaActual = parseFloat(gananciasSemanaElement.textContent.replace('S/', '').trim());
+            const nuevasGananciasSemana = gananciasSemanaActual + ganancia;
+            
+            // Actualizar texto de ganancias semanales
+            gananciasSemanaElement.textContent = `S/ ${nuevasGananciasSemana.toFixed(2)}`;
+            
+            // Obtener meta semanal
+            const progressText = document.querySelector('.progress-section small.text-muted');
+            const metaSemanalMatch = progressText?.textContent.match(/S\/\s*([\d.]+)\)/);
+            const metaSemanal = metaSemanalMatch ? parseFloat(metaSemanalMatch[1]) : 500; // Default 500
+            
+            // Calcular nuevo progreso
+            const nuevoProgreso = Math.min(100, (nuevasGananciasSemana / metaSemanal * 100));
+            
+            // Actualizar barra de progreso
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${nuevoProgreso.toFixed(1)}%`;
+            }
+            
+            // Actualizar texto de progreso
+            if (progressText) {
+                progressText.textContent = `${nuevoProgreso.toFixed(1)}% de tu meta semanal (S/ ${metaSemanal.toFixed(2)})`;
+            }
+            
+            // Guardar en localStorage
+            localStorage.setItem('gananciasSemana', nuevasGananciasSemana.toFixed(2));
+        }
         
         function showVerificationModal(orderId) {
             currentDeliveryOrderId = orderId;
@@ -1611,10 +2002,16 @@
                     // Cerrar modal
                     bootstrap.Modal.getInstance(document.getElementById('verifyCodeModal')).hide();
                     
-                    // Mostrar mensaje de éxito
+                    // Obtener ganancia (del servidor o estimada)
+                    const gananciaObtenida = data.ganancia || currentOrderEarnings;
+                    
+                    // Actualizar contadores en tiempo real
+                    actualizarGananciasEnTiempoReal(gananciaObtenida);
+                    
+                    // Mostrar mensaje de éxito con ganancia
                     showSuccessNotification(
                         '¡Entrega verificada!',
-                        'Has ganado S/ ' + data.ganancia.toFixed(2) + '. La entrega se ha completado correctamente.',
+                        'Has ganado S/ ' + gananciaObtenida.toFixed(2) + '. La entrega se ha completado correctamente.',
                         () => location.reload()
                     );
                     
@@ -1653,10 +2050,13 @@
             const address = orderCard.querySelector('.order-address')?.textContent || 'No especificada';
             document.getElementById('acceptModalDistance').textContent = '~2.5 km'; // Placeholder
             
-            // Calcular ganancia estimada (basado en el costo de delivery)
-            const deliveryCost = orderCard.querySelector('.delivery-cost-amount')?.textContent || '5.90';
-            const earnings = (parseFloat(deliveryCost.replace('S/', '').trim()) * 0.8).toFixed(2); // 80% del costo de delivery
+            // Calcular ganancia estimada (basado en el total del pedido)
+            const totalPedido = orderCard.querySelector('.earning-amount')?.textContent || 'S/ 0.00';
+            const earnings = (parseFloat(totalPedido.replace('S/', '').trim()) * 0.15).toFixed(2); // 15% del total del pedido
             document.getElementById('acceptModalEarnings').textContent = `S/ ${earnings}`;
+            
+            // Guardar ganancia estimada para usar después
+            currentOrderEarnings = parseFloat(earnings);
             
             // Mostrar modal
             const modal = new bootstrap.Modal(document.getElementById('acceptOrderModal'));
