@@ -531,24 +531,6 @@
                                         <i class="fas fa-money-bill-wave"></i> Efectivo
                                     </label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodoPago" value="tarjeta" id="tarjeta">
-                                    <label class="form-check-label" for="tarjeta">
-                                        <i class="fas fa-credit-card"></i> Tarjeta
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodoPago" value="yape" id="yape">
-                                    <label class="form-check-label" for="yape">
-                                        <i class="fas fa-mobile-alt"></i> Yape
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="metodoPago" value="plin" id="plin">
-                                    <label class="form-check-label" for="plin">
-                                        <i class="fas fa-mobile-alt"></i> Plin
-                                    </label>
-                                </div>
                             </div>
                             
                             <!-- Notas especiales -->
@@ -1002,36 +984,7 @@
                                 <strong style="font-size: 0.8rem;" id="modalFechaFin">-</strong>
                             </div>
                         </div>
-                        
-                        <!-- Estadísticas compactas -->
-                        <div class="d-flex gap-2 mb-2">
-                            <div class="flex-fill text-center p-2 rounded" style="background: rgba(23,162,184,0.1);">
-                                <i class="fas fa-eye text-info" style="font-size: 0.9rem;"></i>
-                                <div class="fw-bold" style="font-size: 0.95rem;" id="modalVistas">0</div>
-                                <small class="text-muted" style="font-size: 0.65rem;">Vistas</small>
-                            </div>
-                            <div class="flex-fill text-center p-2 rounded" style="background: rgba(40,167,69,0.1);">
-                                <i class="fas fa-shopping-bag text-success" style="font-size: 0.9rem;"></i>
-                                <div class="fw-bold" style="font-size: 0.95rem;" id="modalPedidos">0</div>
-                                <small class="text-muted" style="font-size: 0.65rem;">Pedidos</small>
-                            </div>
-                            <div class="flex-fill text-center p-2 rounded" style="background: rgba(255,193,7,0.1);">
-                                <i class="fas fa-ticket-alt text-warning" style="font-size: 0.9rem;"></i>
-                                <div class="fw-bold" style="font-size: 0.95rem;" id="modalCanjeos">0</div>
-                                <small class="text-muted" style="font-size: 0.65rem;">Canjeos</small>
-                            </div>
-                        </div>
                     </div>
-                </div>
-                
-                <!-- Restricciones y condiciones compactas -->
-                <div class="mt-2 p-2 rounded" style="background: rgba(255,193,7,0.05); border-left: 3px solid #F5A623;">
-                    <h6 class="fw-bold mb-1" style="font-size: 0.9rem;">
-                        <i class="fas fa-exclamation-triangle text-warning me-1"></i>Restricciones y Condiciones
-                    </h6>
-                    <ul class="list-unstyled mb-0 ms-3" id="modalRestricciones" style="font-size: 0.85rem;">
-                        <li><i class="fas fa-info-circle text-info"></i> Cargando...</li>
-                    </ul>
                 </div>
             </div>
             <div class="modal-footer py-2 px-3" style="background-color: #f8f9fa;">
@@ -1643,11 +1596,6 @@ function mostrarModalPedido(numeroPedido, codigoVerificacion) {
                         <div class="mb-3">
                             <i class="fas fa-receipt fa-3x text-success mb-3"></i>
                             <h4>Tu pedido ha sido confirmado</h4>
-                        </div>
-                        
-                        <div class="alert alert-info">
-                            <p class="mb-2"><strong>Número de Pedido:</strong></p>
-                            <h3 class="text-primary mb-0">#${numeroPedido}</h3>
                         </div>
                         
                         <div class="alert alert-warning">
