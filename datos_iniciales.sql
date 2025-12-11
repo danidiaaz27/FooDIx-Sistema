@@ -193,65 +193,21 @@ CREATE TABLE `usuario` (
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- =====================================================
--- INSERTAR USUARIOS DE PRUEBA
+-- INSERTAR USUARIO ADMINISTRADOR
 -- =====================================================
--- ⚠️ NOTA: Todos los usuarios usan la contraseña: Admin123!
+-- ⚠️ NOTA: Usuario administrador con contraseña: Admin123!
 -- Hash BCrypt: $2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge
 -- Para cambiar la contraseña, usa: http://localhost:8080/api/test-password/hash?password=tucontraseña
 -- =====================================================
 
--- Administradores (Password: Admin123!)
+-- Administrador principal (Password: Admin123!)
 INSERT INTO `usuario` (
   `apellido_materno`, `apellido_paterno`, `codigo_rol`, `contrasena`, 
   `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
   `numero_documento`, `fecha_creacion`
 ) VALUES 
 ('System', 'Admin', 1, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
- 'admin@local.dev', NULL, TRUE, 'Admin', NULL, '99999999', NOW()),
-
-('Diaz', 'Jesus', 1, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
- 'JesusDiaz@gmail.com', NULL, TRUE, 'Jesus', '975184139', '99999998', NOW()),
-
-('Herrera', 'Tania', 1, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
- 'Tania@gmail.com', NULL, TRUE, 'Tania', '994518225', '99999997', NOW());
-
--- Usuario restaurante (Daniela) - Password: Admin123!
-INSERT INTO `usuario` (
-  `apellido_materno`, `apellido_paterno`, `codigo_rol`, `contrasena`, 
-  `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
-  `numero_documento`, `fecha_nacimiento`, `genero`, `avatar`, `fecha_creacion`
-) VALUES 
-('Chaname', 'Díaz', 2, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
- 'daniela@test.com', 'Av. Balta 123, Chiclayo', TRUE, 'Daniela', '+51 987654321', 
- '12345678', '1995-05-15', 'femenino', 'Imagen', NOW());
-
--- Repartidores - Password: Admin123!
-INSERT INTO `usuario` (
-  `apellido_materno`, `apellido_paterno`, `codigo_rol`, `contrasena`, 
-  `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
-  `numero_documento`, `fecha_nacimiento`, `genero`, `avatar`, `fecha_creacion`
-) VALUES 
-('', 'Diaz', 3, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
- 'dann27@gmail.com', 'Faustino Sanchez Carrion 258', TRUE, 'Daniela', '975184139', 
- '87654321', '2003-02-27', 'femenino', 'Daniela', NOW()),
-
-('', 'Diaz', 3, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
- 'CarlosDiaz@gmail.com', 'Avenida Saleverry', TRUE, 'Carlos', '975184139', 
- '76543210', NULL, NULL, NULL, NOW());
-
--- Usuarios clientes - Password: Admin123!
-INSERT INTO `usuario` (
-  `apellido_materno`, `apellido_paterno`, `codigo_rol`, `contrasena`, 
-  `correo_electronico`, `direccion`, `estado`, `nombre`, `telefono`, 
-  `numero_documento`, `fecha_nacimiento`, `genero`, `avatar`, `fecha_creacion`
-) VALUES 
-('Herrera', 'Diaz', 4, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
- 'nanisss27@gmail.com', 'Avenida zarumilla', TRUE, 'Daniela Andreina', '975184139', 
- '11223344', '2003-02-27', 'femenino', 'jecha', NOW()),
-
-('Herrera', 'Diaz', 4, '$2a$12$Nc5S.bEvkzigCcsXx8FRpeZc5jUi4JzXyOQLmjc2Wj51bZt1zj8Ge', 
- 'DanielAnteroJunior@gmail.com', 'Avenida Salaverry', TRUE, 'Daniel Antero', '975184139', 
- '44332211', '2003-02-27', 'femenino', 'jecha', NOW());
+ 'admin@local.dev', NULL, TRUE, 'Admin', NULL, '99999999', NOW());
 
 -- =====================================================
 -- TABLAS RESTANTES DEL SISTEMA (sin productos)
@@ -365,41 +321,9 @@ CREATE TABLE `repartidor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- =====================================================
--- INSERTAR REPARTIDORES DE PRUEBA
+-- REPARTIDORES
+-- Se agregarán manualmente desde la interfaz
 -- =====================================================
--- Repartidor 1: dann27@gmail.com (Daniela Diaz) - APROBADO
-INSERT INTO `repartidor` (
-  `codigo_usuario`, `numero_licencia`, `codigo_tipo_vehiculo`, 
-  `codigo_estado_aprobacion`, `codigo_aprobador`, `disponible`, 
-  `estado`, `fecha_creacion`, `fecha_aprobacion`
-) VALUES (
-  (SELECT codigo FROM usuario WHERE correo_electronico = 'dann27@gmail.com' LIMIT 1),
-  'LIC-2024-001',
-  10, -- Motocicleta
-  8,  -- Aprobado
-  (SELECT codigo FROM usuario WHERE correo_electronico = 'admin@local.dev' LIMIT 1),
-  TRUE,
-  TRUE,
-  NOW(),
-  NOW()
-);
-
--- Repartidor 2: CarlosDiaz@gmail.com (Carlos Diaz) - APROBADO
-INSERT INTO `repartidor` (
-  `codigo_usuario`, `numero_licencia`, `codigo_tipo_vehiculo`, 
-  `codigo_estado_aprobacion`, `codigo_aprobador`, `disponible`, 
-  `estado`, `fecha_creacion`, `fecha_aprobacion`
-) VALUES (
-  (SELECT codigo FROM usuario WHERE correo_electronico = 'CarlosDiaz@gmail.com' LIMIT 1),
-  'LIC-2024-002',
-  10, -- Motocicleta
-  8,  -- Aprobado
-  (SELECT codigo FROM usuario WHERE correo_electronico = 'admin@local.dev' LIMIT 1),
-  TRUE,
-  TRUE,
-  NOW(),
-  NOW()
-);
 
 
 -- =====================================================
@@ -593,25 +517,9 @@ CREATE TABLE `promocion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla de promociones con relación a platos y unidades de medida específicas';
 
 -- =====================================================
--- INSERTAR RESTAURANTE PARA DANIELA
+-- RESTAURANTES
+-- Se agregarán manualmente desde la interfaz
 -- =====================================================
-INSERT INTO `restaurante` (
-  `nombre`, `razon_social`, `ruc`, `telefono`, `direccion`, 
-  `correo_electronico`, `codigo_distrito`, `codigo_estado_aprobacion`, 
-  `codigo_usuario`, `estado`, `fecha_creacion`
-) VALUES (
-  'Restaurante Daniela', 
-  'DANIELA CHANAME E.I.R.L.', 
-  '20543210987', 
-  '+51 987654321', 
-  'Av. Balta 123, Chiclayo', 
-  'daniela@test.com', 
-  1, 
-  8, 
-  (SELECT codigo FROM usuario WHERE correo_electronico = 'daniela@test.com' LIMIT 1), 
-  TRUE, 
-  NOW()
-);
 
 -- =====================================================
 -- SISTEMA DE PERMISOS (opcional, si lo usas)
