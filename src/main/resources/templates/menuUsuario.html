@@ -113,6 +113,23 @@
         .cart-items {
             margin-bottom: 2rem;
         }
+        
+        /* Animación para el badge de descuento */
+        @keyframes pulseGlow {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 6px 16px rgba(198,40,40,0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 8px 20px rgba(198,40,40,0.7);
+            }
+        }
+        
+        /* Ajuste para que el grid no corte los badges */
+        .products-grid {
+            padding: 1.5rem 0;
+        }
     </style>
 </head>
 <body>
@@ -293,22 +310,31 @@
 
                     <!-- Promociones -->
                     <div class="product-card shadow-sm" th:each="promocion : ${promociones}" 
-                         style="max-width: 320px; cursor: pointer; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.08);" 
+                         style="max-width: 320px; cursor: pointer; border-radius: 12px; overflow: visible; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.08); position: relative;" 
                          th:attr="data-promocion-id=${promocion.codigo},data-precio=${promocion.precioPromocional},data-categoria=${promocion.categoriaPromocion}"
                          onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';"
                          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';">
                         
-                        <!-- Badge flotante de descuento -->
+                        <!-- Badge flotante de descuento - SIEMPRE VISIBLE -->
                         <div th:if="${promocion.precioOriginal != null and promocion.precioOriginal > promocion.precioPromocional}" 
-                             style="position: absolute; top: 12px; right: 12px; z-index: 10;">
-                            <span class="badge" style="background: linear-gradient(135deg, #C62828 0%, #dc3545 100%); font-size: 0.85rem; padding: 6px 12px; box-shadow: 0 4px 8px rgba(198,40,40,0.3); border-radius: 8px;"
+                             style="position: absolute; top: -8px; right: -8px; z-index: 20;">
+                            <span class="badge animate__animated animate__pulse animate__infinite" 
+                                  style="background: linear-gradient(135deg, #C62828 0%, #dc3545 100%); 
+                                         color: white; 
+                                         font-size: 0.9rem; 
+                                         font-weight: 700;
+                                         padding: 8px 14px; 
+                                         box-shadow: 0 6px 16px rgba(198,40,40,0.5); 
+                                         border-radius: 10px;
+                                         border: 3px solid white;
+                                         animation: pulseGlow 2s ease-in-out infinite;"
                                   th:text="'-' + ${#numbers.formatDecimal(((promocion.precioOriginal - promocion.precioPromocional) / promocion.precioOriginal * 100), 0, 0)} + '%'">
                                 -0%
                             </span>
                         </div>
                         
                         <!-- Imagen mejorada -->
-                        <div class="product-image-placeholder" style="background: linear-gradient(135deg, #C62828 0%, #F5A623 100%); height: 180px; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; position: relative;">
+                        <div class="product-image-placeholder" style="background: linear-gradient(135deg, #C62828 0%, #F5A623 100%); height: 180px; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; position: relative; border-radius: 12px 12px 0 0; overflow: hidden;">
                             <i class="fas fa-utensils"></i>
                             <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); padding: 15px 12px 8px;">
                                 <span class="badge" style="background-color: #F5A623; color: white; font-size: 0.7rem; padding: 3px 10px;" 
@@ -813,6 +839,35 @@
     </div>
 </div>
 
+<!-- Modal de Éxito: Producto Agregado al Carrito -->
+<div class="modal fade" id="carritoSuccessModal" tabindex="-1" aria-labelledby="carritoSuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <div style="background: linear-gradient(135deg, rgba(40,167,69,0.2) 0%, rgba(40,167,69,0.05) 100%); border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; margin: 0 auto; animation: scaleIn 0.5s ease-out;">
+                        <i class="fas fa-check-circle fa-4x" style="color: #28a745;"></i>
+                    </div>
+                </div>
+                <h4 class="mb-3" style="color: #28a745; font-weight: 700;">
+                    <i class="fas fa-shopping-cart me-2"></i>¡Agregado al Carrito!
+                </h4>
+                <p class="text-muted mb-4" style="font-size: 1rem; line-height: 1.6;">
+                    La promoción se ha agregado exitosamente a tu carrito de compras.
+                </p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-lg" onclick="verCarritoAhora()" style="background: linear-gradient(135deg, #C62828 0%, #F5A623 100%); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(198,40,40,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';">
+                        <i class="fas fa-shopping-cart me-2"></i>Ver Mi Carrito
+                    </button>
+                    <button type="button" class="btn btn-lg btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 12px; font-weight: 600;">
+                        <i class="fas fa-plus-circle me-2"></i>Seguir Comprando
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de Detalle de Promoción -->
 <div class="modal fade" id="promocionModal" tabindex="-1" aria-labelledby="promocionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -955,7 +1010,31 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/theme-toggle.js}"></script>
 <script th:src="@{/js/main.js}"></script>
+<style>
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+</style>
 <script>
+// Función para ir al carrito desde el modal de éxito
+function verCarritoAhora() {
+    // Cerrar el modal de éxito
+    const modal = bootstrap.Modal.getInstance(document.getElementById('carritoSuccessModal'));
+    if (modal) modal.hide();
+    
+    // Navegar a la sección del carrito
+    setTimeout(() => {
+        showMenuSection('carrito');
+    }, 300);
+}
+
 // JavaScript para funcionalidades específicas del menú
 document.addEventListener('DOMContentLoaded', function() {
     // Actualizar botón flotante del carrito
@@ -1251,16 +1330,15 @@ function agregarPromocionAlCarrito() {
             // Recargar el carrito
             cargarCarrito();
             
-            // Cerrar modal
+            // Cerrar modal de detalles
             const modal = bootstrap.Modal.getInstance(document.getElementById('promocionModal'));
             if (modal) modal.hide();
             
-            // Cambiar a la sección del carrito si el usuario lo desea
+            // Mostrar modal de éxito
             setTimeout(() => {
-                if (confirm('¿Deseas ver tu carrito ahora?')) {
-                    showMenuSection('carrito');
-                }
-            }, 500);
+                const successModal = new bootstrap.Modal(document.getElementById('carritoSuccessModal'));
+                successModal.show();
+            }, 300);
         } else {
             mostrarNotificacion('❌ ' + (data.message || 'Error al agregar al carrito'), 'error');
             btnAgregar.disabled = false;
