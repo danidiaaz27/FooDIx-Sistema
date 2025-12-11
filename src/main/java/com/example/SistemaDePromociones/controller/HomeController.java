@@ -374,4 +374,22 @@ public class HomeController {
         return null;
     }
     
+    /**
+     * Página de Términos y Condiciones
+     */
+    @GetMapping("/docs/terminos")
+    public String terminos() {
+        System.out.println("📄 [TERMINOS] Mostrando términos y condiciones");
+        return "docs/terminos";
+    }
+    
+    /**
+     * Página de Política de Privacidad
+     */
+    @GetMapping("/docs/privacidad")
+    public String privacidad() {
+        System.out.println("📄 [PRIVACIDAD] Mostrando política de privacidad");
+        return "docs/privacidad";
+    }
+    
 }
