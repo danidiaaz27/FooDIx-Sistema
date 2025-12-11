@@ -440,9 +440,15 @@
                                         </small>
                                     </div>
                                     <div class="mb-2">
-                                        <input type="text" class="form-control" id="telefonoContacto" 
+                                        <input type="tel" class="form-control" id="telefonoContacto" 
                                                th:value="${currentUser['phone']}" 
-                                               placeholder="Teléfono de contacto">
+                                               placeholder="Teléfono de contacto"
+                                               pattern="[0-9]{9}"
+                                               maxlength="9"
+                                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
+                                        <small class="form-text text-muted">
+                                            <i class="fas fa-phone"></i> Ingresa 9 dígitos
+                                        </small>
                                     </div>
                                     <div class="mb-2">
                                         <textarea class="form-control" id="referenciaEntrega" rows="2" 
