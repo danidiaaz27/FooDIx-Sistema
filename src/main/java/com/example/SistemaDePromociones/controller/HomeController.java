@@ -6,12 +6,14 @@ import com.example.SistemaDePromociones.model.TipoVehiculo;
 import com.example.SistemaDePromociones.model.Usuario;
 import com.example.SistemaDePromociones.repository.jdbc.DepartamentoJdbcRepository;
 import com.example.SistemaDePromociones.repository.TipoVehiculoRepository;
+import com.example.SistemaDePromociones.security.CustomUserDetails;
 import com.example.SistemaDePromociones.service.UsuarioService;
 import com.example.SistemaDePromociones.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -168,13 +170,25 @@ public class HomeController {
     
     /**
      * Página de registro de restaurante
-     * Requiere verificación de email previa
+     * Soporta dos flujos:
+     * 1. Usuario autenticado: Va directo al formulario
+     * 2. Usuario nuevo: Requiere verificación de email previa
      */
     @GetMapping("/registroRestaurante")
     public String registroRestaurante(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         System.out.println("🏪 [REGISTRO RESTAURANTE] Cargando formulario de registro de restaurante");
         
-        // Verificar que el email esté verificado
+        // Verificar si hay un usuario autenticado
+        Usuario usuarioAutenticado = (Usuario) session.getAttribute("usuario");
+        
+        if (usuarioAutenticado != null) {
+            // Usuario autenticado: Redirigir a /registro-restaurante (RestauranteController)
+            System.out.println("👤 [REGISTRO RESTAURANTE] Usuario autenticado detectado: " + usuarioAutenticado.getCorreoElectronico());
+            System.out.println("🔄 [REGISTRO RESTAURANTE] Redirigiendo a /registro-restaurante");
+            return "redirect:/registro-restaurante";
+        }
+        
+        // Usuario nuevo: Verificar que el email esté verificado
         String verifiedEmail = (String) session.getAttribute("verifiedEmail");
         if (verifiedEmail == null) {
             System.out.println("⚠️ [REGISTRO RESTAURANTE] Email no verificado, redirigiendo a /verificacion");
@@ -194,13 +208,25 @@ public class HomeController {
     
     /**
      * Página de registro de delivery/repartidor
-     * Requiere verificación de email previa
+     * Soporta dos flujos:
+     * 1. Usuario autenticado: Va directo al formulario
+     * 2. Usuario nuevo: Requiere verificación de email previa
      */
     @GetMapping("/registroDelivery")
     public String registroDelivery(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         System.out.println("🚴 [REGISTRO DELIVERY] Cargando formulario de registro de delivery");
         
-        // Verificar que el email esté verificado
+        // Verificar si hay un usuario autenticado usando SecurityContext
+        Usuario usuarioAutenticado = obtenerUsuarioAutenticado();
+        
+        if (usuarioAutenticado != null) {
+            // Usuario autenticado: Redirigir a /registro-repartidor (DeliveryController)
+            System.out.println("👤 [REGISTRO DELIVERY] Usuario autenticado detectado: " + usuarioAutenticado.getCorreoElectronico());
+            System.out.println("🔄 [REGISTRO DELIVERY] Redirigiendo a /registro-repartidor");
+            return "redirect:/registro-repartidor";
+        }
+        
+        // Usuario nuevo: Verificar que el email esté verificado
         String verifiedEmail = (String) session.getAttribute("verifiedEmail");
         if (verifiedEmail == null) {
             System.out.println("⚠️ [REGISTRO DELIVERY] Email no verificado, redirigiendo a /verificacion");
@@ -322,6 +348,30 @@ public class HomeController {
                 return "redirect:/registro";
             }
         }
+    }
+    
+    /**
+     * Obtener el usuario autenticado desde el SecurityContext de Spring Security
+     */
+    private Usuario obtenerUsuarioAutenticado() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
+            if (authentication != null && authentication.isAuthenticated() 
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
+                
+                Object principal = authentication.getPrincipal();
+                
+                if (principal instanceof CustomUserDetails) {
+                    CustomUserDetails userDetails = (CustomUserDetails) principal;
+                    return userDetails.getUsuario();
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error al obtener usuario autenticado: " + e.getMessage());
+        }
+        
+        return null;
     }
     
 }

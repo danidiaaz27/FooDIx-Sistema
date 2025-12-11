@@ -28,17 +28,17 @@
             <ul class="navbar-nav ms-auto">
                 
                 <!-- Opciones solo para usuarios NO autenticados -->
-                <li class="nav-item" th:if="${session.usuario == null}">
+                <li class="nav-item" th:if="${currentUser == null}">
                     <a class="nav-link" href="/tutorial" th:href="@{/tutorial}">
                         <i class="fas fa-question-circle"></i> Tutorial
                     </a>
                 </li>
-                <li class="nav-item" th:if="${session.usuario == null}">
+                <li class="nav-item" th:if="${currentUser == null}">
                     <a class="nav-link" href="/contacto" th:href="@{/contacto}">
                         <i class="fas fa-envelope"></i> Contacto
                     </a>
                 </li>
-                <li class="nav-item" th:if="${session.usuario == null}">
+                <li class="nav-item" th:if="${currentUser == null}">
                     <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#negocioModal">
                         <i class="fas fa-briefcase"></i> ¿Tienes un negocio?
                     </a>
@@ -52,29 +52,29 @@
                 </li>
 
                 <!-- Opciones para usuarios autenticados -->
-                <li class="nav-item dropdown" th:if="${session.usuario != null}">
+                <li class="nav-item dropdown" th:if="${currentUser != null}">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user-circle"></i> 
-                        <span th:text="${session.usuario.Nombre}">Usuario</span>
+                        <span th:text="${currentUser.nombre}">Usuario</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <!-- Menú según rol -->
-                        <li th:if="${session.usuario.CodigoRol == 1}">
+                        <li th:if="${currentUser.codigoRol == 1}">
                             <a class="dropdown-item" href="/menuAdministrador" th:href="@{/menuAdministrador}">
                                 <i class="fas fa-tachometer-alt"></i> Panel Administrador
                             </a>
                         </li>
-                        <li th:if="${session.usuario.CodigoRol == 2}">
+                        <li th:if="${currentUser.codigoRol == 2}">
                             <a class="dropdown-item" href="/menuRestaurante" th:href="@{/menuRestaurante}">
                                 <i class="fas fa-store"></i> Panel Restaurante
                             </a>
                         </li>
-                        <li th:if="${session.usuario.CodigoRol == 3}">
+                        <li th:if="${currentUser.codigoRol == 3}">
                             <a class="dropdown-item" href="/menuDelivery" th:href="@{/menuDelivery}">
                                 <i class="fas fa-motorcycle"></i> Panel Delivery
                             </a>
                         </li>
-                        <li th:if="${session.usuario.CodigoRol == 4}">
+                        <li th:if="${currentUser.codigoRol == 4}">
                             <a class="dropdown-item" href="/menuUsuario" th:href="@{/menuUsuario}">
                                 <i class="fas fa-utensils"></i> Mi Menú
                             </a>
@@ -130,28 +130,28 @@
                 <!-- Botones dinámicos según rol del usuario autenticado -->
                 <div class="hero-buttons mt-4" th:if="${session.usuario != null}">
                     <!-- Administrador (Rol 1) -->
-                    <a th:if="${session.usuario.CodigoRol == 1}" 
+                    <a th:if="${session.usuario.codigoRol == 1}" 
                        href="/menuAdministrador" th:href="@{/menuAdministrador}" 
                        class="btn btn-danger btn-lg">
                         <i class="fas fa-tachometer-alt"></i> Ver Panel Administrador
                     </a>
                     
                     <!-- Restaurante (Rol 2) -->
-                    <a th:if="${session.usuario.CodigoRol == 2}" 
+                    <a th:if="${session.usuario.codigoRol == 2}" 
                        href="/menuRestaurante" th:href="@{/menuRestaurante}" 
                        class="btn btn-success btn-lg">
                         <i class="fas fa-store"></i> Ver Publicaciones Activas
                     </a>
                     
                     <!-- Repartidor (Rol 3) -->
-                    <a th:if="${session.usuario.CodigoRol == 3}" 
+                    <a th:if="${session.usuario.codigoRol == 3}" 
                        href="/menuDelivery" th:href="@{/menuDelivery}" 
                        class="btn btn-info btn-lg">
                         <i class="fas fa-motorcycle"></i> Ver Pedidos Activos
                     </a>
                     
                     <!-- Cliente/Usuario (Rol 4) -->
-                    <a th:if="${session.usuario.CodigoRol == 4}" 
+                    <a th:if="${session.usuario.codigoRol == 4}" 
                        href="/menuUsuario" th:href="@{/menuUsuario}" 
                        class="btn btn-success btn-lg">
                         <i class="fas fa-utensils"></i> Ver Promociones
@@ -417,7 +417,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <script th:src="@{/js/theme-toggle.js}"></script>
-<script th:src="@{/js/main.js}"></script>
 <script th:src="@{/js/index.js}"></script>
 
 </body>

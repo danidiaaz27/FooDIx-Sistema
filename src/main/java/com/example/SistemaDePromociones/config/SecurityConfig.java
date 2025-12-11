@@ -35,9 +35,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Configurar para JWT: sesiones stateless
+            // Configurar sesiones: permitir sesiones para compatibilidad con JWT
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
             .authorizeHttpRequests(auth -> auth
                 // ========================================
@@ -73,7 +73,8 @@ public class SecurityConfig {
                     "/images/**",               // Imágenes alternativo
                     "/favicon.ico",             // ✅ Icono del sitio web
                     "/uploads/**",              // ✅ Archivos subidos (documentos, imágenes de promociones)
-                    "/files/**"                 // ✅ Controlador de archivos (view/download)
+                    "/files/**",                // ✅ Controlador de archivos (view/download)
+                    "/actuator/**"              // ✅ Endpoints de Spring Actuator para monitoreo
                 ).permitAll()
                 
                 // ========================================
