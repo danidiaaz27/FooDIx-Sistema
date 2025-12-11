@@ -64,6 +64,7 @@ public class SecurityConfig {
                     "/auth/recovery/**",        // Endpoints de recuperación de contraseña
                     "/contacto",                // Página de contacto
                     "/tutorial",                // Tutorial
+                    "/docs/**",                 // ✅ Documentos legales (términos, privacidad, PDFs)
                     "/api/**",                  // ✅ TODAS las APIs públicas (roles, provincias, distritos, validación, etc.)
                     "/menuAdministrador/api/ganancias/**", // ✅ TEMPORAL: API de ganancias sin autenticación para debug
                     "/menuAdministrador/test-password",  // Test de passwords
