@@ -1893,14 +1893,25 @@
         
         // Función para actualizar ganancias en tiempo real
         function actualizarGananciasEnTiempoReal(ganancia) {
+            console.log('Actualizando ganancias en tiempo real:', ganancia);
+            console.log('Ganancias antes:', gananciasHoyAcumuladas);
+            
             // Actualizar ganancias acumuladas
-            gananciasHoyAcumuladas += ganancia;
-            entregasHoyCount += 1;
+            gananciasHoyAcumuladas = parseFloat(gananciasHoyAcumuladas) + parseFloat(ganancia);
+            entregasHoyCount = parseInt(entregasHoyCount) + 1;
+            
+            console.log('Ganancias después:', gananciasHoyAcumuladas);
+            console.log('Entregas después:', entregasHoyCount);
             
             // Actualizar el header con las nuevas ganancias
             const earningsAmount = document.querySelector('.earnings-amount');
             if (earningsAmount) {
-                earningsAmount.innerHTML = `S/ <span>${gananciasHoyAcumuladas.toFixed(2)}</span>`;
+                const spanElement = earningsAmount.querySelector('span');
+                if (spanElement) {
+                    spanElement.textContent = gananciasHoyAcumuladas.toFixed(2);
+                } else {
+                    earningsAmount.innerHTML = `S/ <span>${gananciasHoyAcumuladas.toFixed(2)}</span>`;
+                }
             }
             
             const entregasHoyText = document.querySelector('.earnings-amount + small');
@@ -1925,27 +1936,41 @@
             // Guardar en localStorage para persistencia
             localStorage.setItem('gananciasHoy', gananciasHoyAcumuladas.toFixed(2));
             localStorage.setItem('entregasHoy', entregasHoyCount);
+            
+            console.log('Actualización completada');
         }
         
         // Función para actualizar el progreso semanal
         function actualizarProgresoSemanal(ganancia) {
+            console.log('Actualizando progreso semanal con ganancia:', ganancia);
+            
             // Obtener ganancia semanal actual
             const gananciasSemanaElement = document.querySelector('.progress-info span.fw-bold');
-            if (!gananciasSemanaElement) return;
+            if (!gananciasSemanaElement) {
+                console.log('No se encontró elemento de ganancias semanales');
+                return;
+            }
             
-            const gananciasSemanaActual = parseFloat(gananciasSemanaElement.textContent.replace('S/', '').trim());
-            const nuevasGananciasSemana = gananciasSemanaActual + ganancia;
+            const gananciasSemanaActual = parseFloat(gananciasSemanaElement.textContent.replace('S/', '').replace(',', '').trim()) || 0;
+            const nuevasGananciasSemana = gananciasSemanaActual + parseFloat(ganancia);
+            
+            console.log('Ganancia semanal actual:', gananciasSemanaActual);
+            console.log('Nueva ganancia semanal:', nuevasGananciasSemana);
             
             // Actualizar texto de ganancias semanales
             gananciasSemanaElement.textContent = `S/ ${nuevasGananciasSemana.toFixed(2)}`;
             
             // Obtener meta semanal
             const progressText = document.querySelector('.progress-section small.text-muted');
-            const metaSemanalMatch = progressText?.textContent.match(/S\/\s*([\d.]+)\)/);
-            const metaSemanal = metaSemanalMatch ? parseFloat(metaSemanalMatch[1]) : 500; // Default 500
+            const metaSemanalMatch = progressText?.textContent.match(/S\/\s*([\d,.]+)\)/);
+            const metaSemanal = metaSemanalMatch ? parseFloat(metaSemanalMatch[1].replace(',', '')) : 500; // Default 500
+            
+            console.log('Meta semanal:', metaSemanal);
             
             // Calcular nuevo progreso
             const nuevoProgreso = Math.min(100, (nuevasGananciasSemana / metaSemanal * 100));
+            
+            console.log('Nuevo progreso:', nuevoProgreso);
             
             // Actualizar barra de progreso
             const progressBar = document.querySelector('.progress-bar');
