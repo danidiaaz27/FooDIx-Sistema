@@ -29,7 +29,7 @@
         .delivery-header {
             background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
             color: white;
-            padding: 1.2rem 0;
+            padding: 0.8rem 0;
             box-shadow: 0 4px 20px rgba(46,125,50,0.4);
             border-bottom: 2px solid rgba(76,175,80,0.3);
         }
@@ -203,31 +203,36 @@
         }
         
         .delivery-earnings {
-            background: rgba(76,175,80,0.15);
-            padding: 0.8rem 1.4rem;
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(76,175,80,0.15) 0%, rgba(102,187,106,0.1) 100%);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.5rem;
             border: 1px solid rgba(76,175,80,0.3);
             transition: all 0.3s ease;
+            min-width: 140px;
         }
         
         .delivery-earnings:hover {
-            background: rgba(76,175,80,0.2);
-            transform: scale(1.03);
+            background: linear-gradient(135deg, rgba(76,175,80,0.2) 0%, rgba(102,187,106,0.15) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76,175,80,0.3);
         }
         
         .earnings-amount {
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #66BB6A;
+            line-height: 1.2;
         }
         
         .earnings-label {
-            font-size: 0.85rem;
-            color: #ecf0f1;
-            font-weight: 500;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .delivery-nav {
@@ -844,11 +849,16 @@
             }
             
             .delivery-earnings {
-                padding: 0.6rem 1rem;
+                padding: 0.4rem 0.8rem;
+                min-width: 110px;
             }
             
             .earnings-amount {
-                font-size: 1.1rem;
+                font-size: 1rem;
+            }
+            
+            .earnings-label {
+                font-size: 0.7rem;
             }
             
             .order-header {
@@ -909,10 +919,10 @@
                 <div class="col-lg-6 col-md-7 text-md-end text-center">
                     <div class="header-actions">
                         <div class="delivery-earnings">
-                            <div class="d-flex flex-column align-items-end">
+                            <div class="d-flex flex-column align-items-center">
                                 <span class="earnings-label">Hoy</span>
                                 <span class="earnings-amount">S/ <span th:text="${gananciasHoy}">0.00</span></span>
-                                <small class="text-muted" style="font-size: 0.7rem;" th:text="${entregasHoy} + ' entregas'">0 entregas</small>
+                                <small class="text-muted" style="font-size: 0.65rem; line-height: 1; margin-top: 2px;" th:text="${entregasHoy} + ' entregas'">0 entregas</small>
                             </div>
                         </div>
                         <button class="theme-toggle" type="button" aria-label="Cambiar tema">
