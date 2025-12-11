@@ -1123,6 +1123,14 @@ function showMenuSection(sectionName) {
     
     // Activar link correspondiente
     document.querySelector(`.sidebar .nav-link[href="#${sectionName}"]`).classList.add('active');
+    
+    // Si se muestra el carrito, invalidar el tamaño del mapa para que se renderice correctamente
+    if (sectionName === 'carrito' && typeof deliveryMap !== 'undefined' && deliveryMap !== null) {
+        setTimeout(function() {
+            deliveryMap.invalidateSize();
+            console.log('🗺️ Tamaño del mapa invalidado');
+        }, 300);
+    }
 }
 
 function updateFloatingCart() {

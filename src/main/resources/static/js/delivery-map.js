@@ -7,17 +7,60 @@ let deliveryMap = null;
 let deliveryMarker = null;
 let userLatitude = -6.7714; // Chiclayo, Perú - Centro por defecto
 let userLongitude = -79.8391;
+let mapInitialized = false;
 
 // Inicializar el mapa cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-    initializeDeliveryMap();
     setupMapEventListeners();
+    observeCartSection();
 });
+
+/**
+ * Observa cuando la sección del carrito se vuelve visible
+ */
+function observeCartSection() {
+    const carritoSection = document.getElementById('carrito-content');
+    if (!carritoSection) {
+        console.warn('⚠️ Sección carrito no encontrada');
+        return;
+    }
+
+    // Observador de mutaciones para detectar cuando se muestra el carrito
+    const observer = new MutationObserver(function(mutations) {
+        if (carritoSection.classList.contains('active') && !mapInitialized) {
+            console.log('🗺️ Carrito visible, inicializando mapa...');
+            // Pequeño delay para asegurar que el contenedor tenga dimensiones
+            setTimeout(function() {
+                initializeDeliveryMap();
+            }, 300);
+        }
+    });
+
+    observer.observe(carritoSection, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+
+    // Si el carrito ya está visible, inicializar inmediatamente
+    if (carritoSection.classList.contains('active')) {
+        setTimeout(function() {
+            initializeDeliveryMap();
+        }, 300);
+    }
+}
 
 /**
  * Inicializa el mapa de Leaflet
  */
 function initializeDeliveryMap() {
+    if (mapInitialized) {
+        console.log('ℹ️ Mapa ya inicializado, invalidando tamaño...');
+        if (deliveryMap) {
+            deliveryMap.invalidateSize();
+        }
+        return;
+    }
+
     try {
         // Verificar si el contenedor del mapa existe
         const mapContainer = document.getElementById('deliveryMap');
@@ -25,6 +68,8 @@ function initializeDeliveryMap() {
             console.warn('⚠️ Contenedor del mapa no encontrado');
             return;
         }
+
+        console.log('🗺️ Inicializando mapa de Leaflet...');
 
         // Inicializar el mapa centrado en Chiclayo, Perú
         deliveryMap = L.map('deliveryMap').setView([userLatitude, userLongitude], 15);
@@ -66,6 +111,14 @@ function initializeDeliveryMap() {
             // Actualizar la dirección
             updateAddressFromCoordinates(lat, lng);
         });
+
+        // Marcar como inicializado
+        mapInitialized = true;
+
+        // Invalidar tamaño para asegurar renderizado correcto
+        setTimeout(function() {
+            deliveryMap.invalidateSize();
+        }, 100);
 
         // Intentar obtener la ubicación actual del usuario
         tryGetUserLocation();
