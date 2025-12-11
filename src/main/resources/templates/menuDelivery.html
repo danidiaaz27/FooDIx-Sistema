@@ -1005,8 +1005,7 @@
                             
                             <!-- Botones de acción -->
                             <div class="action-buttons mt-3">
-                                <button type="button" class="btn btn-success btn-sm" 
-                                        onclick="window.location.href='/menuDelivery/pedidos/' + this.getAttribute('data-order-id') + '/aceptar'"
+                                <button type="button" class="btn btn-success btn-sm accept-order-btn" 
                                         th:attr="data-order-id=${pedido.codigo}">
                                     <i class="fas fa-check"></i> Aceptar Pedido
                                 </button>
@@ -1309,6 +1308,16 @@
         let currentDeliveryOrderId = null;
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Event listeners para aceptar pedido
+            document.querySelectorAll('.accept-order-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    if (confirm('¿Aceptar este pedido?')) {
+                        acceptOrder(orderId);
+                    }
+                });
+            });
+            
             // Event listeners para rechazar pedido
             document.querySelectorAll('.reject-order').forEach(btn => {
                 btn.addEventListener('click', function(e) {
