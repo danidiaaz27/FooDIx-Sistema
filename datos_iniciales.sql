@@ -811,59 +811,12 @@ WHERE cantidad_disponible IS NULL;
 CREATE INDEX idx_pedido_codigo_verificacion ON pedido(codigo_verificacion);
 
 -- =====================================================
--- INSERTAR PEDIDOS DE PRUEBA
--- =====================================================
--- Pedido 1: Usuario cliente para delivery
-INSERT INTO `pedido` (
-  `codigo_usuario`, `codigo_restaurante`, `codigo_metodo_pago`, `total`, `descuento`, 
-  `direccion_entrega`, `telefono_contacto`, `notas`, `referencia_direccion`,
-  `codigo_verificacion`, `verificado`, `estado`, `fecha_pedido`, `subtotal`
-) VALUES (
-  (SELECT codigo FROM usuario WHERE correo_electronico = 'nanisss27@gmail.com' LIMIT 1),
-  (SELECT codigo FROM restaurante WHERE nombre = 'Restaurante Daniela' LIMIT 1),
-  1, -- Método de pago: Efectivo
-  35.90,
-  0.00,
-  'Avenida zarumilla - ninguna',
-  '975184139',
-  NULL,
-  NULL,
-  '1234', -- Código de verificación
-  FALSE,
-  TRUE, -- Pedido activo/pendiente
-  NOW(),
-  35.90
-);
-
--- Pedido 2: Otro pedido de prueba
-INSERT INTO `pedido` (
-  `codigo_usuario`, `codigo_restaurante`, `codigo_metodo_pago`, `total`, `descuento`, 
-  `direccion_entrega`, `telefono_contacto`, `notas`, `referencia_direccion`,
-  `codigo_verificacion`, `verificado`, `estado`, `fecha_pedido`, `subtotal`
-) VALUES (
-  (SELECT codigo FROM usuario WHERE correo_electronico = 'DanielAnteroJunior@gmail.com' LIMIT 1),
-  (SELECT codigo FROM restaurante WHERE nombre = 'Restaurante Daniela' LIMIT 1),
-  1, -- Método de pago: Efectivo
-  35.90,
-  0.00,
-  'Avenida zarumilla - ningun',
-  '975184139',
-  NULL,
-  NULL,
-  '5678', -- Código de verificación
-  FALSE,
-  TRUE, -- Pedido activo/pendiente
-  NOW(),
-  35.90
-);
-
--- =====================================================
 -- SISTEMA DE COMISIONES DE LA PLATAFORMA
 -- =====================================================
 
 -- Tabla de configuración de comisión
 DROP TABLE IF EXISTS `configuracion_comision`;
-CREATE TABLE `configuracion_comision` (
+CREATE TABLE `configuracion_comision` ( 
   `codigo` bigint NOT NULL AUTO_INCREMENT,
   `porcentaje_comision` decimal(5,2) NOT NULL DEFAULT 5.00 COMMENT 'Porcentaje de comisión (ej: 5.00 = 5%)',
   `descripcion` varchar(255) DEFAULT NULL,
@@ -904,25 +857,11 @@ ADD COLUMN monto_restaurante DECIMAL(10,2) DEFAULT 0.00 COMMENT 'Monto que recib
 CREATE INDEX idx_pedido_comision ON pedido(comision_plataforma);
 CREATE INDEX idx_pedido_fecha_estado ON pedido(fecha_pedido, estado);
 
--- Actualizar pedidos existentes con los cálculos de comisión
-UPDATE pedido 
-SET 
-  porcentaje_comision = 5.00,
-  comision_plataforma = ROUND(subtotal * 0.05, 2),
-  monto_restaurante = ROUND(subtotal - (subtotal * 0.05), 2)
-WHERE comision_plataforma IS NULL OR comision_plataforma = 0.00;
-
--- Insertar registros de ganancias para pedidos existentes
-INSERT INTO ganancia_plataforma (codigo_pedido, fecha_registro, subtotal, comision, porcentaje_aplicado, monto_restaurante)
-SELECT 
-  codigo,
-  fecha_pedido,
-  subtotal,
-  ROUND(subtotal * 0.05, 2) as comision,
-  5.00 as porcentaje_aplicado,
-  ROUND(subtotal - (subtotal * 0.05), 2) as monto_restaurante
-FROM pedido
-WHERE estado = TRUE;
+-- =====================================================
+-- NOTA: Pedidos de prueba eliminados para producción
+-- La base de datos inicia sin pedidos ni ganancias
+-- Los datos se generarán cuando los usuarios realicen pedidos
+-- =====================================================
 
 SET FOREIGN_KEY_CHECKS = 1;
 
