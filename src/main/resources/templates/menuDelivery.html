@@ -958,12 +958,6 @@
                         <span class="badge bg-warning ms-1" th:text="${misEntregas != null ? misEntregas.size() : 0}">0</span>
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="estadisticas-tab" data-bs-toggle="tab" 
-                            data-bs-target="#estadisticas" type="button" role="tab">
-                        <i class="fas fa-chart-bar"></i> Estadísticas
-                    </button>
-                </li>
             </ul>
         </div>
     </div>
@@ -1089,102 +1083,6 @@
                         <span class="badge bg-success" style="padding: 0.5rem 1rem; font-size: 0.85rem;" th:if="${pedido.verificado}">
                             <i class="fas fa-check-circle"></i> Verificado y Entregado
                         </span>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-
-        <!-- ESTADÍSTICAS TAB -->
-        <div class="tab-pane fade" id="estadisticas" role="tabpanel">
-            <div class="container-fluid py-4">
-                
-                <!-- Stats Cards -->
-                <div class="row mb-4 g-3">
-                    <div class="col-md-3 col-sm-6">
-                        <div class="stats-card">
-                            <div class="stats-icon bg-success">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
-                            <div class="stats-info">
-                                <h6>Ganancias Hoy</h6>
-                                <h3 th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas['gananciasHoy'], 1, 2)}">S/ 0.00</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="stats-card">
-                            <div class="stats-icon bg-primary">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            <div class="stats-info">
-                                <h6>Entregas Hoy</h6>
-                                <h3 th:text="${estadisticas['entregasHoy']}">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="stats-card">
-                            <div class="stats-icon bg-warning">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="stats-info">
-                                <h6>Calificación</h6>
-                                <h3 th:text="${estadisticas['calificacionPromedio']} + ' ⭐'">0 ⭐</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="stats-card">
-                            <div class="stats-icon bg-info">
-                                <i class="fas fa-target"></i>
-                            </div>
-                            <div class="stats-info">
-                                <h6>Tasa de Éxito</h6>
-                                <h3 th:text="${estadisticas['tasaExito']} + '%'">0%</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Progress Section -->
-                <div class="progress-section mb-4">
-                    <h5>Progreso Semanal</h5>
-                    <div class="progress-info">
-                        <span>Ganancias esta semana</span>
-                        <span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas['gananciasSemana'], 1, 2)}">S/ 0.00</span>
-                    </div>
-                    <div class="progress mb-2">
-                        <div class="progress-bar bg-success" role="progressbar" 
-                             th:attr="style='width: ' + ${estadisticas['progresoSemanal']} + '%'"></div>
-                    </div>
-                    <small class="text-muted" th:text="${estadisticas['progresoSemanal']} + '% de tu meta semanal (S/ ' + ${#numbers.formatDecimal(estadisticas['metaSemanal'], 1, 2)} + ')'">
-                        0% de tu meta semanal
-                    </small>
-                </div>
-
-                <!-- Summary Stats -->
-                <div class="summary-stats">
-                    <h5>Resumen Total</h5>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="summary-item">
-                                <span class="summary-label">Total de entregas</span>
-                                <span class="summary-value" th:text="${estadisticas['totalEntregas']}">0</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="summary-item">
-                                <span class="summary-label">Promedio por entrega</span>
-                                <span class="summary-value" th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas['promedioEntrega'], 1, 2)}">S/ 0.00</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="summary-item">
-                                <span class="summary-label">Tiempo promedio</span>
-                                <span class="summary-value" th:text="${estadisticas['tiempoPromedio']} + ' min'">0 min</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 
