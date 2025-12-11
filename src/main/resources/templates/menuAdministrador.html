@@ -702,7 +702,8 @@
 
                                                 <!-- Botón Aprobar -->
                                                 <button type="button" class="btn btn-sm btn-success btn-toggle" 
-                                                        onclick="aprobarRestaurante(this)"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#approveRestaurantModal"
                                                         th:data-id="${restaurant.codigo}"
                                                         th:data-nombre="${restaurant.nombre}"
                                                         title="Aprobar restaurante">
@@ -876,14 +877,15 @@
                                         <td>
                                             <div class="btn-group" role="group" aria-label="Acciones de repartidor pendiente">
                                                 <!-- Botón Aprobar -->
-                                                <form th:action="@{/menuAdministrador/repartidor/{id}/approve(id=${delivery.codigo})}" 
-                                                      method="post" style="display: inline;">
-                                                    <button type="submit" class="btn btn-sm btn-success btn-toggle" 
-                                                            title="Aprobar repartidor"
-                                                            aria-label="Aprobar">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="btn btn-sm btn-success btn-toggle" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#approveDeliveryModal"
+                                                        th:data-id="${delivery.codigo}"
+                                                        th:data-name="${delivery.usuario != null ? (delivery.usuario.nombre + ' ' + delivery.usuario.apellidoPaterno) : 'Repartidor'}"
+                                                        title="Aprobar repartidor"
+                                                        aria-label="Aprobar">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
                                                 
                                                 <!-- Botón Rechazar -->
                                                 <button type="button" class="btn btn-sm btn-danger btn-toggle" 
@@ -1460,6 +1462,35 @@
     </div>
 </div>
 
+<!-- Modal para aprobar restaurante -->
+<div class="modal fade" id="approveRestaurantModal" tabindex="-1" aria-labelledby="approveRestaurantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="approveRestaurantModalLabel"><i class="fas fa-check-circle"></i> Aprobar Restaurante</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="approveRestaurantForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="section" value="restaurantes">
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-store-alt fa-4x text-success"></i>
+                    </div>
+                    <p class="text-center fs-5">¿Está seguro de aprobar el restaurante <strong id="approveRestaurantNombre"></strong>?</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Esto permitirá que puedan acceder al sistema y comenzar a publicar su menú.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Sí, Aprobar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Modal para rechazar restaurante -->
 <div class="modal fade" id="rejectRestaurantModal" tabindex="-1" aria-labelledby="rejectRestaurantModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -1484,6 +1515,34 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Rechazar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para aprobar repartidor -->
+<div class="modal fade" id="approveDeliveryModal" tabindex="-1" aria-labelledby="approveDeliveryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="approveDeliveryModalLabel"><i class="fas fa-check-circle"></i> Aprobar Repartidor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="approveDeliveryForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-user-check fa-4x text-success"></i>
+                    </div>
+                    <p class="text-center fs-5">¿Está seguro de aprobar al repartidor <strong id="approveDeliveryNombre"></strong>?</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Al aprobar, el repartidor podrá acceder a la plataforma y comenzar a aceptar pedidos.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Sí, Aprobar</button>
                 </div>
             </form>
         </div>
@@ -1645,6 +1704,110 @@
                 </button>
                 <button type="button" class="btn btn-primary" id="confirmToggleDeliveryStatus">
                     <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de éxito para documentos subidos -->
+<div class="modal fade" id="successDocumentModal" tabindex="-1" aria-labelledby="successDocumentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white border-0">
+                <h5 class="modal-title" id="successDocumentModalLabel">
+                    <i class="fas fa-check-circle me-2"></i>¡Éxito!
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-file-upload fa-4x text-success"></i>
+                </div>
+                <h4 class="mb-3">Documentos Subidos Exitosamente</h4>
+                <p class="text-muted mb-0">Los documentos del restaurante han sido cargados correctamente y están disponibles para revisión.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal" onclick="location.reload()">
+                    <i class="fas fa-check"></i> Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de error para documentos -->
+<div class="modal fade" id="errorDocumentModal" tabindex="-1" aria-labelledby="errorDocumentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title" id="errorDocumentModalLabel">
+                    <i class="fas fa-exclamation-circle me-2"></i>Error
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-times-circle fa-4x text-danger"></i>
+                </div>
+                <h4 class="mb-3">Error al Subir Documentos</h4>
+                <p class="text-muted mb-0" id="errorDocumentMessage">No se pudieron subir los documentos. Por favor, intente nuevamente.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de éxito para plato guardado -->
+<div class="modal fade" id="successDishModal" tabindex="-1" aria-labelledby="successDishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white border-0">
+                <h5 class="modal-title" id="successDishModalLabel">
+                    <i class="fas fa-check-circle me-2"></i>¡Éxito!
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-utensils fa-4x text-success"></i>
+                </div>
+                <h4 class="mb-3" id="successDishTitle">Plato Guardado Exitosamente</h4>
+                <p class="text-muted mb-0" id="successDishMessage">El plato ha sido guardado correctamente y está disponible en el menú.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-check"></i> Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de error para plato -->
+<div class="modal fade" id="errorDishModal" tabindex="-1" aria-labelledby="errorDishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title" id="errorDishModalLabel">
+                    <i class="fas fa-exclamation-circle me-2"></i>Error
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-times-circle fa-4x text-danger"></i>
+                </div>
+                <h4 class="mb-3">Error al Guardar Plato</h4>
+                <p class="text-muted mb-0" id="errorDishMessage">No se pudo guardar el plato. Por favor, intente nuevamente.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
                 </button>
             </div>
         </div>
@@ -3041,17 +3204,25 @@ function uploadDocuments() {
         button.innerHTML = originalText;
         
         if (data.success) {
-            alert('✅ Documentos subidos exitosamente');
-            location.reload(); // Recargar para ver los cambios
+            // Mostrar modal de éxito
+            const successModal = new bootstrap.Modal(document.getElementById('successDocumentModal'));
+            successModal.show();
         } else {
-            alert('❌ Error: ' + (data.message || 'No se pudieron subir los documentos'));
+            // Mostrar modal de error con mensaje personalizado
+            document.getElementById('errorDocumentMessage').textContent = data.message || 'No se pudieron subir los documentos';
+            const errorModal = new bootstrap.Modal(document.getElementById('errorDocumentModal'));
+            errorModal.show();
         }
     })
     .catch(error => {
         button.disabled = false;
         button.innerHTML = originalText;
         console.error('Error:', error);
-        alert('❌ Error al subir documentos: ' + error.message);
+        
+        // Mostrar modal de error
+        document.getElementById('errorDocumentMessage').textContent = 'Error al subir documentos: ' + error.message;
+        const errorModal = new bootstrap.Modal(document.getElementById('errorDocumentModal'));
+        errorModal.show();
     });
 }
 
@@ -3392,6 +3563,67 @@ function actualizarComision() {
             alert('❌ Error de conexión');
         });
 }
+</script>
+
+<!-- =====================================================
+     🚚 SCRIPT: MODALES DE REPARTIDORES Y RESTAURANTES
+     ===================================================== -->
+<script>
+// Modal para aprobar restaurante
+document.addEventListener('DOMContentLoaded', function() {
+    const approveRestaurantModal = document.getElementById('approveRestaurantModal');
+    
+    if (approveRestaurantModal) {
+        approveRestaurantModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const restaurantId = button.getAttribute('data-id');
+            const restaurantName = button.getAttribute('data-nombre');
+            
+            // Actualizar el nombre del restaurante en el modal
+            document.getElementById('approveRestaurantNombre').textContent = restaurantName;
+            
+            // Actualizar la acción del formulario
+            const form = document.getElementById('approveRestaurantForm');
+            form.action = '/menuAdministrador/restaurant/' + restaurantId + '/approve';
+        });
+    }
+    
+    // Modal para aprobar repartidor
+    const approveModal = document.getElementById('approveDeliveryModal');
+    
+    if (approveModal) {
+        approveModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const deliveryId = button.getAttribute('data-id');
+            const deliveryName = button.getAttribute('data-name');
+            
+            // Actualizar el nombre del repartidor en el modal
+            document.getElementById('approveDeliveryNombre').textContent = deliveryName;
+            
+            // Actualizar la acción del formulario
+            const form = document.getElementById('approveDeliveryForm');
+            form.action = '/menuAdministrador/repartidor/' + deliveryId + '/approve';
+        });
+    }
+    
+    // Modal para rechazar repartidor
+    const rejectModal = document.getElementById('rejectDeliveryModal');
+    
+    if (rejectModal) {
+        rejectModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const deliveryId = button.getAttribute('data-id');
+            const deliveryName = button.getAttribute('data-name');
+            
+            // Actualizar el nombre del repartidor en el modal
+            document.getElementById('rejectDeliveryNombre').textContent = deliveryName;
+            
+            // Actualizar la acción del formulario
+            const form = document.getElementById('rejectDeliveryForm');
+            form.action = '/menuAdministrador/repartidor/' + deliveryId + '/reject';
+        });
+    }
+});
 </script>
 
 <!-- JWT Helper para cerrar sesión -->

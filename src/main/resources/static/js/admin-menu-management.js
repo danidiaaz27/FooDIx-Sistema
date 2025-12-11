@@ -415,8 +415,20 @@ async function saveDish() {
         // Cerrar modal de agregar/editar primero
         closeAddDishModal();
         
-        // Mostrar mensaje de éxito
-        alert(`✅ Plato ${wasEditing ? 'actualizado' : 'guardado'} exitosamente`);
+        // Mostrar modal de éxito
+        const successTitle = document.getElementById('successDishTitle');
+        const successMessage = document.getElementById('successDishMessage');
+        
+        if (wasEditing) {
+            successTitle.textContent = 'Plato Actualizado Exitosamente';
+            successMessage.textContent = 'El plato ha sido actualizado correctamente y los cambios están disponibles en el menú.';
+        } else {
+            successTitle.textContent = 'Plato Guardado Exitosamente';
+            successMessage.textContent = 'El plato ha sido guardado correctamente y está disponible en el menú.';
+        }
+        
+        const successModal = new bootstrap.Modal(document.getElementById('successDishModal'));
+        successModal.show();
         
         // Recargar menú (el modal de gestión de menú sigue abierto)
         console.log('Recargando menú del restaurante:', restaurantId);
@@ -426,7 +438,11 @@ async function saveDish() {
         saveButton.disabled = false;
         saveButton.innerHTML = originalText;
         console.error('Error al guardar plato:', error);
-        alert(`❌ Error al guardar el plato: ${error.message}`);
+        
+        // Mostrar modal de error
+        document.getElementById('errorDishMessage').textContent = error.message || 'No se pudo guardar el plato. Por favor, intente nuevamente.';
+        const errorModal = new bootstrap.Modal(document.getElementById('errorDishModal'));
+        errorModal.show();
     }
 }
 

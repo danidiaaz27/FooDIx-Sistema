@@ -22,7 +22,7 @@ function getJwtToken() {
 
 /**
  * Cierra la sesión eliminando el token JWT
- * Redirige al login
+ * Realiza petición POST al endpoint /logout y redirige
  */
 function cerrarSesion() {
     console.log('🚪 [JWT] Cerrando sesión...');
@@ -43,10 +43,38 @@ function cerrarSesion() {
     }
     keysToRemove.forEach(key => localStorage.removeItem(key));
     
-    console.log('✅ [JWT] Sesión cerrada, redirigiendo a página principal');
+    console.log('✅ [JWT] Sesión cerrada en cliente, enviando petición al servidor...');
     
-    // Redirigir a index.html
-    window.location.href = '/?logout=true';
+    // Obtener token CSRF desde meta tags o input hidden
+    let csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    
+    // Si no está en meta, buscar en input hidden
+    if (!csrfToken) {
+        csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+    }
+    
+    console.log('🔍 [JWT] Token CSRF encontrado:', csrfToken ? 'Sí' : 'No');
+    
+    // Crear un formulario oculto para hacer POST a /logout
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/logout';
+    form.style.display = 'none';
+    
+    // Agregar token CSRF con el nombre correcto (_csrf)
+    if (csrfToken) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_csrf';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        console.log('✅ [JWT] Token CSRF agregado al formulario:', csrfToken.substring(0, 10) + '...');
+    } else {
+        console.error('❌ [JWT] No se encontró token CSRF - El logout puede fallar');
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
 }
 
 /**

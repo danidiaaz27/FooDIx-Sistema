@@ -75,12 +75,7 @@
                             <h2 class="fw-bold">Iniciar Sesión</h2>
                             <p class="text-muted">Ingresa tus credenciales para continuar</p>
                         </div>
-                            <!-- Mensajes de notificación -->
-                            <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-circle me-2"></i> 
-                                <strong>Error:</strong> Correo electrónico o contraseña incorrectos
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
+                            <!-- Mensajes de notificación (ocultos, ahora se muestran en modales) -->
                             <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show" role="alert">
                                 <i class="fas fa-check-circle me-2"></i> 
                                 <strong>Éxito:</strong> Has cerrado sesión correctamente
@@ -95,6 +90,31 @@
                                 <i class="fas fa-check-circle me-2"></i>
                                 <span th:text="${message}"></span>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <!-- Modal de Error de Login -->
+                            <div class="modal fade" id="errorLoginModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg">
+                                        <div class="modal-body text-center p-4">
+                                            <div class="mb-3">
+                                                <div class="bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                                     style="width: 70px; height: 70px; font-size: 2rem;">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </div>
+                                            </div>
+                                            <h4 class="mb-3 fw-bold text-danger">Error de Autenticación</h4>
+                                            <p class="text-muted mb-4">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Correo o contraseña incorrectos.<br>
+                                                Por favor, verifica tus credenciales e intenta nuevamente.
+                                            </p>
+                                            <button type="button" class="btn btn-danger btn-lg px-5" data-bs-dismiss="modal">
+                                                <i class="fas fa-check me-2"></i>Entendido
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Modal de Registro Exitoso -->
@@ -293,6 +313,26 @@
         if (registroExitoso) {
             const modal = new bootstrap.Modal(document.getElementById('registroExitosoModal'));
             modal.show();
+        }
+
+        // Mostrar modal de error si hay mensaje de error del servidor
+        const errorMensaje = /*[[${error}]]*/ null;
+        if (errorMensaje) {
+            const errorModal = new bootstrap.Modal(document.getElementById('errorLoginModal'));
+            errorModal.show();
+        }
+        
+        // También verificar parámetro error en URL (por si viene de Spring Security)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')) {
+            const errorModal = new bootstrap.Modal(document.getElementById('errorLoginModal'));
+            errorModal.show();
+            
+            // Limpiar la URL después de mostrar el modal
+            setTimeout(() => {
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }, 500);
         }
     });
 </script>
