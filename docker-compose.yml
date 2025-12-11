@@ -27,7 +27,7 @@ services:
       - LOGGING_LEVEL_COM_EXAMPLE=DEBUG
       
       # Configuración de API externa (DNI/RUC) - IMPORTANTE: Sin espacios
-      - API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2NzAsImV4cCI6MTc2NjA2MjYwNn0.hlbmy0E3-8Xu_VztA-29dl--HevUyRr0jYAoDFd46N0
+      - API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1NTksImV4cCI6MTc2MzMxODEzNH0.bzVljvbLILWrSrhsLV8sI7c-6I1gw7URf6R0lV0lToU
       
       # Configuración de backups
       - BACKUP_DIRECTORY=/backups
