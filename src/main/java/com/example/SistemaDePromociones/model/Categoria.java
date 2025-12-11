@@ -22,9 +22,6 @@ public class Categoria {
     @Column(name = "Descripcion", columnDefinition = "TEXT")
     private String descripcion;
     
-    @Column(name = "Icono", length = 100)
-    private String icono;
-    
     @Column(name = "Estado", nullable = false)
     private Boolean estado = true;
 }

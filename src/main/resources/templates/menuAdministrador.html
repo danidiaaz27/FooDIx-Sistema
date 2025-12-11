@@ -146,6 +146,41 @@
             }
         }
 
+        /* Estilos para campos bloqueados - Roles del sistema */
+        input[disabled], textarea[disabled], select[disabled] {
+            cursor: not-allowed !important;
+            background-color: #e9ecef !important;
+            opacity: 0.7;
+        }
+
+        .form-check-input[disabled] {
+            cursor: not-allowed !important;
+            opacity: 0.5;
+        }
+
+        .form-check-input[disabled] ~ label {
+            cursor: not-allowed !important;
+            opacity: 0.6;
+        }
+
+        /* Badge de rol protegido */
+        #editRolSystemBadge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Sticky header para tablas */
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f8f9fa !important;
+        }
+
         /* Estilos mejorados para tarjetas de estadísticas */
         .card.h-100 {
             cursor: pointer;
@@ -1530,11 +1565,6 @@
                                 <label for="categoryDescription" class="form-label">Descripción</label>
                                 <textarea class="form-control" id="categoryDescription" name="descripcion" rows="2"></textarea>
                             </div>
-                            <div class="mb-3">
-                                <label for="categoryIcon" class="form-label">Icono (FontAwesome)</label>
-                                <input type="text" class="form-control" id="categoryIcon" name="icono" placeholder="fa-utensils">
-                                <small class="text-muted">Ejemplo: fa-utensils, fa-pizza-slice, fa-fish, fa-hamburger</small>
-                            </div>
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="fas fa-plus"></i> Crear Categoría
                             </button>
@@ -1548,7 +1578,6 @@
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Icono</th>
                                         <th>Nombre</th>
                                         <th>Descripción</th>
                                         <th>Estado</th>
@@ -1557,7 +1586,6 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="category : ${categories}">
-                                        <td><i th:class="'fas ' + ${category.icono} + ' fa-lg'"></i></td>
                                         <td><strong th:text="${category.nombre}">Pollería</strong></td>
                                         <td><small th:text="${category.descripcion}">Descripción</small></td>
                                         <td>
@@ -1993,31 +2021,62 @@
                         </form>
                     </div>
                     
-                    <!-- Lista de administradores existentes -->
+                    <!-- Lista de usuarios del sistema existentes -->
                     <div class="col-md-7">
                         <h6 class="mb-3"><i class="fas fa-list"></i> Usuarios del Sistema Registrados</h6>
-                        <div class="table-responsive">
+                        <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
                             <table class="table table-hover table-sm">
-                                <thead class="table-light">
+                                <thead class="table-light sticky-top">
                                     <tr>
                                         <th>ID</th>
-                                        <th>Nombre Completo</th>
+                                        <th>Nombre</th>
                                         <th>Email</th>
-                                        <th>Teléfono</th>
+                                        <th>Rol</th>
                                         <th>Estado</th>
+                                        <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:each="admin : ${adminUsers}">
-                                        <td th:text="${admin.codigo}">1</td>
-                                        <td><strong th:text="${admin.nombreCompleto}">Admin User</strong></td>
-                                        <td th:text="${admin.correoElectronico}">admin@example.com</td>
-                                        <td th:text="${admin.telefono != null ? admin.telefono : 'N/A'}">999999999</td>
+                                        <td class="fw-bold" th:text="${admin.codigo}">1</td>
+                                        <td>
+                                            <div th:text="${admin.nombre + ' ' + admin.apellidoPaterno}">Nombre</div>
+                                            <small class="text-muted" th:text="${admin.telefono != null ? admin.telefono : 'Sin teléfono'}">Tel</small>
+                                        </td>
+                                        <td>
+                                            <small th:text="${admin.correoElectronico}">email@example.com</small>
+                                        </td>
+                                        <td>
+                                            <span th:if="${admin.codigoRol == 1}" class="badge bg-danger">
+                                                <i class="fas fa-crown"></i> ADMIN
+                                            </span>
+                                            <span th:if="${admin.codigoRol == 2}" class="badge bg-warning text-dark">
+                                                <i class="fas fa-store"></i> RESTAURANTE
+                                            </span>
+                                            <span th:if="${admin.codigoRol == 3}" class="badge bg-info">
+                                                <i class="fas fa-motorcycle"></i> REPARTIDOR
+                                            </span>
+                                        </td>
                                         <td>
                                             <span th:class="${admin.estado ? 'badge bg-success' : 'badge bg-danger'}"
                                                   th:text="${admin.estado ? 'Activo' : 'Inactivo'}">
                                                 Activo
                                             </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                        th:onclick="'toggleUserStatus(' + ${admin.codigo} + ')'"
+                                                        th:title="${admin.estado ? 'Desactivar' : 'Activar'}">
+                                                    <i th:class="${admin.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${adminUsers == null || adminUsers.isEmpty()}">
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                                            <p class="mb-0">No hay usuarios del sistema registrados</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -2068,6 +2127,17 @@
                                         </label>
                                         <textarea class="form-control" id="rolDescripcion" name="descripcion" rows="2" 
                                                   placeholder="Describe las funciones de este rol..."></textarea>
+                                    </div>
+                                    
+                                    <!-- Alerta informativa -->
+                                    <div class="alert alert-info border-0 mb-3" style="background-color: #cfe2ff;">
+                                        <div class="d-flex align-items-start">
+                                            <i class="fas fa-info-circle text-info me-2 mt-1"></i>
+                                            <small>
+                                                <strong>Nota:</strong> Los nuevos roles solo pueden tener permisos administrativos 
+                                                (Usuarios del Sistema, Categorías y Configuración).
+                                            </small>
+                                        </div>
                                     </div>
                                     
                                     <!-- Permisos del rol -->
@@ -2138,95 +2208,14 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Clientes -->
-                                    <div class="card mb-3 border-success" th:if="${permisos.?[seccion == 'clientes'].size() > 0}">
-                                        <div class="card-header bg-success bg-opacity-10">
-                                            <div class="form-check">
-                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllClientes" data-section="clientes">
-                                                <label class="form-check-label fw-bold text-success" for="selectAllClientes">
-                                                    <i class="fas fa-user-friends me-2"></i> Clientes
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row g-2">
-                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'clientes']}">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
-                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
-                                                               th:value="${permiso.codigo}"
-                                                               th:data-nombre="${permiso.nombre}"
-                                                               th:data-accion="${permiso.accion}"
-                                                               data-section="clientes">
-                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
-                                                            <span class="badge bg-success me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
-                                                            <small th:text="${permiso.descripcion}">Descripción</small>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <!-- Clientes - OCULTO para nuevos roles -->
+                                    <!-- Solo roles del sistema pueden tener estos permisos -->
                                     
-                                    <!-- Restaurantes -->
-                                    <div class="card mb-3 border-warning" th:if="${permisos.?[seccion == 'restaurantes'].size() > 0}">
-                                        <div class="card-header bg-warning bg-opacity-10">
-                                            <div class="form-check">
-                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllRestaurantes" data-section="restaurantes">
-                                                <label class="form-check-label fw-bold text-warning" for="selectAllRestaurantes">
-                                                    <i class="fas fa-utensils me-2"></i> Restaurantes
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row g-2">
-                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'restaurantes']}">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
-                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
-                                                               th:value="${permiso.codigo}"
-                                                               th:data-nombre="${permiso.nombre}"
-                                                               th:data-accion="${permiso.accion}"
-                                                               data-section="restaurantes">
-                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
-                                                            <span class="badge bg-warning text-dark me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
-                                                            <small th:text="${permiso.descripcion}">Descripción</small>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <!-- Restaurantes - OCULTO para nuevos roles -->
+                                    <!-- Solo roles del sistema pueden tener estos permisos -->
                                     
-                                    <!-- Delivery -->
-                                    <div class="card mb-3 border-danger" th:if="${permisos.?[seccion == 'delivery'].size() > 0}">
-                                        <div class="card-header bg-danger bg-opacity-10">
-                                            <div class="form-check">
-                                                <input class="form-check-input select-all-section" type="checkbox" id="selectAllDelivery" data-section="delivery">
-                                                <label class="form-check-label fw-bold text-danger" for="selectAllDelivery">
-                                                    <i class="fas fa-motorcycle me-2"></i> Repartidores
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row g-2">
-                                                <div class="col-md-6" th:each="permiso : ${permisos.?[seccion == 'delivery']}">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input permiso-checkbox" type="checkbox" 
-                                                               th:id="'modal_permiso_' + ${permiso.codigo}"
-                                                               th:value="${permiso.codigo}"
-                                                               th:data-nombre="${permiso.nombre}"
-                                                               th:data-accion="${permiso.accion}"
-                                                               data-section="delivery">
-                                                        <label class="form-check-label" th:for="'modal_permiso_' + ${permiso.codigo}">
-                                                            <span class="badge bg-danger me-1" style="font-size: 0.75rem;" th:text="${permiso.accion}">Ver</span>
-                                                            <small th:text="${permiso.descripcion}">Descripción</small>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <!-- Delivery - OCULTO para nuevos roles -->
+                                    <!-- Solo roles del sistema pueden tener estos permisos -->
                                     
                                     <!-- Categorías -->
                                     <div class="card mb-3 border-secondary" th:if="${permisos.?[seccion == 'categorias'].size() > 0}">
@@ -2344,8 +2333,9 @@
                                                         <span class="badge bg-primary rounded-pill" th:text="${rol.permisos.size()}">0</span>
                                                     </button>
                                                     <span th:if="${rol.permisos == null || rol.permisos.isEmpty()}" 
-                                                          class="text-muted fst-italic">
-                                                        <i class="fas fa-ban"></i>
+                                                          class="text-muted fst-italic"
+                                                          title="Sin permisos asignados">
+                                                        <i class="fas fa-lock"></i>
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
@@ -2356,8 +2346,9 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="btn-group" role="group">
-                                                        <!-- Botón Editar -->
+                                                        <!-- Botón Editar - Solo para roles personalizados -->
                                                         <button type="button" class="btn btn-sm btn-outline-info" 
+                                                                th:if="${rol.codigo > 4}"
                                                                 data-bs-toggle="modal" 
                                                                 data-bs-target="#editRolModal"
                                                                 th:data-id="${rol.codigo}"
@@ -2368,9 +2359,18 @@
                                                             <i class="fas fa-edit"></i>
                                                         </button>
                                                         
-                                                        <!-- Botón Cambiar Estado -->
+                                                        <!-- Candado para roles del sistema -->
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                                th:if="${rol.codigo <= 4}"
+                                                                disabled
+                                                                title="Rol del sistema protegido - No editable">
+                                                            <i class="fas fa-lock"></i>
+                                                        </button>
+                                                        
+                                                        <!-- Botón Cambiar Estado - Solo para roles personalizados -->
                                                         <form th:action="@{/menuAdministrador/role/{id}/toggle-status(id=${rol.codigo})}" 
-                                                              method="post" style="display: inline;">
+                                                              method="post" style="display: inline;"
+                                                              th:if="${rol.codigo > 4}">
                                                             <button type="submit" class="btn btn-sm btn-outline-warning" 
                                                                     th:title="${rol.estado ? 'Desactivar' : 'Activar'}">
                                                                 <i th:class="${rol.estado ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
@@ -2433,12 +2433,27 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editRolForm" method="post">
+                <input type="hidden" id="editRolCodigo" value="">
                 <div class="modal-body p-4">
+                    <!-- Alerta para roles del sistema -->
+                    <div class="alert alert-warning border-0 mb-3" id="editRolSystemAlert" style="display: none; background-color: #fff3cd;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shield-alt text-warning fs-4 me-3"></i>
+                            <div>
+                                <strong>⚠️ Rol del Sistema Protegido</strong>
+                                <p class="mb-0 small">Este rol tiene configuraciones predefinidas. El nombre y permisos no pueden modificarse.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="editRolNombre" class="form-label fw-bold">
                                     <i class="fas fa-tag text-primary me-1"></i> Nombre del Rol *
+                                    <span class="badge bg-primary ms-2" id="editRolSystemBadge" style="display: none;">
+                                        <i class="fas fa-lock me-1"></i>Protegido
+                                    </span>
                                 </label>
                                 <input type="text" class="form-control" id="editRolNombre" name="nombre" required>
                             </div>
@@ -2455,9 +2470,9 @@
                                 <label class="form-label fw-bold">
                                     <i class="fas fa-shield-alt text-success me-1"></i> Permisos de Acceso
                                 </label>
-                                <button type="button" class="btn btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#editPermisosModal">
-                                    <i class="fas fa-list-check me-2"></i>
-                                    Modificar Permisos
+                                <button type="button" class="btn btn-outline-success w-100" id="editPermisosBtn" data-bs-toggle="modal" data-bs-target="#editPermisosModal">
+                                    <i class="fas fa-list-check me-2" id="editPermisosIcon"></i>
+                                    <span id="editPermisosText">Modificar Permisos</span>
                                     <span class="badge bg-success ms-2" id="editCountPermisos">0</span>
                                 </button>
                                 <div id="editSelectedPermisosDisplay" class="mt-2 p-2 border rounded bg-light" style="min-height: 60px; max-height: 200px; overflow-y: auto;">
@@ -2741,7 +2756,6 @@
                                 <th>ID</th>
                                 <th>Nombre</th>
                                 <th>Descripción</th>
-                                <th>Icono</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -2751,7 +2765,6 @@
                                 <td th:text="${category.codigo}">1</td>
                                 <td th:text="${category.nombre}">Pollería</td>
                                 <td th:text="${category.descripcion}">Descripción</td>
-                                <td><i th:class="'fas ' + ${category.icono}"></i> <span th:text="${category.icono}"></span></td>
                                 <td>
                                     <span th:class="${category.estado ? 'badge bg-success' : 'badge bg-danger'}"
                                           th:text="${category.estado ? 'Activo' : 'Inactivo'}">

@@ -33,24 +33,23 @@ CREATE TABLE `categoria` (
   `codigo` bigint NOT NULL AUTO_INCREMENT,
   `descripcion` text,
   `estado` BOOLEAN NOT NULL DEFAULT TRUE,
-  `icono` varchar(100) DEFAULT NULL,
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`codigo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `categoria` VALUES 
-(1, 'Pollo a la brasa y parrillas', TRUE, 'fa-drumstick-bite', 'Pollería'),
-(2, 'Ceviches y comida marina', TRUE, 'fa-fish', 'Cevichería'),
-(3, 'Comida norteña y chicharrones', TRUE, 'fa-utensils', 'Chaufería'),
-(4, 'Restaurantes de mariscos', TRUE, 'fa-shrimp', 'Mariscos'),
-(5, 'Platos tradicionales peruanos', TRUE, 'fa-plate-wheat', 'Comida Criolla'),
-(6, 'Comida fusión chino-peruana', TRUE, 'fa-bowl-rice', 'Chifa'),
-(7, 'Pizzas y comida italiana', TRUE, 'fa-pizza-slice', 'Pizzería'),
-(8, 'Hamburguesas y fast food', TRUE, 'fa-burger', 'Hamburguesas'),
-(9, 'Heladerías y postres', TRUE, 'fa-ice-cream', 'Postres'),
-(10, 'Cafés y bebidas', TRUE, 'fa-mug-hot', 'Cafetería'),
-(11, 'Opciones vegetarianas y veganas', TRUE, 'fa-leaf', 'Comida Vegetariana'),
-(12, 'Comida japonesa', TRUE, 'fa-fish-fins', 'Sushi');
+(1, 'Pollo a la brasa y parrillas', TRUE, 'Pollería'),
+(2, 'Ceviches y comida marina', TRUE, 'Cevichería'),
+(3, 'Comida norteña y chicharrones', TRUE, 'Chaufería'),
+(4, 'Restaurantes de mariscos', TRUE, 'Mariscos'),
+(5, 'Platos tradicionales peruanos', TRUE, 'Comida Criolla'),
+(6, 'Comida fusión chino-peruana', TRUE, 'Chifa'),
+(7, 'Pizzas y comida italiana', TRUE, 'Pizzería'),
+(8, 'Hamburguesas y fast food', TRUE, 'Hamburguesas'),
+(9, 'Heladerías y postres', TRUE, 'Postres'),
+(10, 'Cafés y bebidas', TRUE, 'Cafetería'),
+(11, 'Opciones vegetarianas y veganas', TRUE, 'Comida Vegetariana'),
+(12, 'Comida japonesa', TRUE, 'Sushi');
 
 -- =====================================================
 -- TABLA: departamento

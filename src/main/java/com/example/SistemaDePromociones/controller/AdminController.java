@@ -126,6 +126,13 @@ public class AdminController {
         model.addAttribute("clientes", clientes);
         System.out.println("👥 [ADMIN] Clientes cargados: " + clientes.size());
         
+        // Cargar usuarios del sistema (roles 1=ADMIN, 2=RESTAURANTE, 3=REPARTIDOR)
+        List<Usuario> adminUsers = usuarioRepository.findAll().stream()
+                .filter(u -> u.getCodigoRol() != null && u.getCodigoRol() <= 3L)
+                .collect(Collectors.toList());
+        model.addAttribute("adminUsers", adminUsers);
+        System.out.println("👨‍💼 [ADMIN] Usuarios del sistema cargados: " + adminUsers.size());
+        
         // Cargar repartidores pendientes de aprobación
         List<Repartidor> pendingRepartidores = repartidorRepository.findByCodigoEstadoAprobacion(7L);
         model.addAttribute("pendingRepartidores", pendingRepartidores);
@@ -157,7 +164,6 @@ public class AdminController {
     public String crearCategoria(
             @RequestParam("nombre") String nombre,
             @RequestParam(value = "descripcion", required = false) String descripcion,
-            @RequestParam(value = "icono", required = false, defaultValue = "fa-utensils") String icono,
             RedirectAttributes redirectAttributes) {
         
         try {
@@ -166,7 +172,6 @@ public class AdminController {
             Categoria categoria = new Categoria();
             categoria.setNombre(nombre);
             categoria.setDescripcion(descripcion);
-            categoria.setIcono(icono);
             categoria.setEstado(true);
             
             categoriaRepository.save(categoria);

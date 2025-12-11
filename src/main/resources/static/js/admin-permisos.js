@@ -112,16 +112,59 @@ function initGestionPermisosEdicion() {
         selectAll.addEventListener('change', function() {
             const section = this.dataset.section;
             const checkboxes = document.querySelectorAll(`.edit-permiso-checkbox[data-section="${section}"]`);
-            checkboxes.forEach(cb => cb.checked = this.checked);
+            checkboxes.forEach(cb => {
+                if (!cb.disabled) {
+                    cb.checked = this.checked;
+                }
+            });
             updateEditPermisosDisplay();
         });
     });
     
     // Confirmar selección de edición
     document.getElementById('confirmEditPermisos')?.addEventListener('click', function() {
+        const rolId = document.getElementById('editRolCodigo')?.value;
+        if (rolId && isSystemRole(parseInt(rolId))) {
+            alert('⚠️ No se pueden modificar los permisos de roles del sistema.');
+            return;
+        }
         updateEditPermisosDisplay();
         updateEditHiddenInputs();
     });
+    
+    // Resetear al abrir modal de edición
+    const editRolModal = document.getElementById('editRolModal');
+    if (editRolModal) {
+        editRolModal.addEventListener('show.bs.modal', function() {
+            // Resetear estados de checkboxes
+            document.querySelectorAll('.edit-permiso-checkbox').forEach(checkbox => {
+                checkbox.disabled = false;
+                const label = checkbox.closest('.form-check');
+                if (label) {
+                    label.classList.remove('text-muted', 'opacity-75');
+                    label.style.cursor = '';
+                }
+            });
+            
+            // Resetear select all
+            document.querySelectorAll('.edit-select-all-section').forEach(selectAll => {
+                selectAll.disabled = false;
+            });
+        });
+    }
+    
+    // Prevenir envío del formulario para roles del sistema
+    const editRolForm = document.getElementById('editRolForm');
+    if (editRolForm) {
+        editRolForm.addEventListener('submit', function(e) {
+            const rolId = document.getElementById('editRolCodigo')?.value;
+            if (rolId && isSystemRole(parseInt(rolId))) {
+                e.preventDefault();
+                alert('⚠️ No se pueden modificar los roles del sistema (ADMINISTRADOR, RESTAURANTE, REPARTIDOR, USUARIO).');
+                return false;
+            }
+        });
+    }
     
     // Inicializar
     updateEditPermisosDisplay();
@@ -172,8 +215,59 @@ function updateEditHiddenInputs() {
 // 4. CARGAR PERMISOS DE UN ROL
 // ========================================
 
+// Helper: Verificar si es un rol del sistema
+function isSystemRole(rolId) {
+    return rolId >= 1 && rolId <= 4;
+}
+
 window.loadRolPermisos = function(rolId) {
     console.log('🔍 Cargando permisos del rol:', rolId);
+    
+    const isSystem = isSystemRole(rolId);
+    console.log('🔒 Es rol del sistema:', isSystem);
+    
+    // Mostrar/ocultar alerta de sistema
+    const systemAlert = document.getElementById('editRolSystemAlert');
+    const systemBadge = document.getElementById('editRolSystemBadge');
+    const nombreInput = document.getElementById('editRolNombre');
+    const permisosBtn = document.getElementById('editPermisosBtn');
+    const permisosText = document.getElementById('editPermisosText');
+    const permisosIcon = document.getElementById('editPermisosIcon');
+    
+    if (systemAlert) {
+        systemAlert.style.display = isSystem ? 'block' : 'none';
+    }
+    
+    if (systemBadge) {
+        systemBadge.style.display = isSystem ? 'inline-block' : 'none';
+    }
+    
+    // Bloquear campo de nombre para roles del sistema
+    if (nombreInput) {
+        nombreInput.disabled = isSystem;
+        nombreInput.style.cursor = isSystem ? 'not-allowed' : 'text';
+        nombreInput.style.backgroundColor = isSystem ? '#e9ecef' : '';
+    }
+    
+    // Cambiar texto del botón de permisos
+    if (permisosBtn && permisosText && permisosIcon) {
+        if (isSystem) {
+            permisosText.textContent = 'Ver Permisos (Solo Lectura)';
+            permisosIcon.className = 'fas fa-eye me-2';
+            permisosBtn.classList.remove('btn-outline-success');
+            permisosBtn.classList.add('btn-outline-info');
+        } else {
+            permisosText.textContent = 'Modificar Permisos';
+            permisosIcon.className = 'fas fa-list-check me-2';
+            permisosBtn.classList.remove('btn-outline-info');
+            permisosBtn.classList.add('btn-outline-success');
+        }
+    }
+    
+    // Guardar rolId actual para validación
+    if (document.getElementById('editRolCodigo')) {
+        document.getElementById('editRolCodigo').value = rolId;
+    }
     
     fetch('/menuAdministrador/role/' + rolId + '/permisos')
         .then(response => response.json())
@@ -183,7 +277,27 @@ window.loadRolPermisos = function(rolId) {
             document.querySelectorAll('.edit-permiso-checkbox').forEach(checkbox => {
                 const permisoCodigo = parseInt(checkbox.getAttribute('data-codigo'));
                 checkbox.checked = permisos.includes(permisoCodigo);
+                
+                // Deshabilitar checkboxes para roles del sistema
+                if (isSystem) {
+                    checkbox.disabled = true;
+                    const label = checkbox.closest('.form-check');
+                    if (label) {
+                        label.classList.add('text-muted', 'opacity-75');
+                        label.style.cursor = 'not-allowed';
+                    }
+                }
             });
+            
+            // Deshabilitar seleccionar todas las secciones
+            if (isSystem) {
+                document.querySelectorAll('.edit-select-all-section').forEach(selectAll => {
+                    selectAll.disabled = true;
+                });
+            }
+            
+            // Actualizar display
+            updateEditPermisosDisplay();
         })
         .catch(error => {
             console.error('❌ Error cargando permisos:', error);
