@@ -92,6 +92,15 @@ public class Pedido {
     
     @Column(name = "verificado")
     private Boolean verificado = false;
+    
+    @Column(name = "comision_plataforma")
+    private BigDecimal comisionPlataforma = BigDecimal.ZERO;
+    
+    @Column(name = "porcentaje_comision")
+    private BigDecimal porcentajeComision = new BigDecimal("5.00");
+    
+    @Column(name = "monto_restaurante")
+    private BigDecimal montoRestaurante = BigDecimal.ZERO;
 
     // Getters y setters
     public Long getCodigo() { return codigo; }
@@ -182,4 +191,13 @@ public class Pedido {
     
     public Boolean getVerificado() { return verificado; }
     public void setVerificado(Boolean verificado) { this.verificado = verificado; }
+    
+    public BigDecimal getComisionPlataforma() { return comisionPlataforma; }
+    public void setComisionPlataforma(BigDecimal comisionPlataforma) { this.comisionPlataforma = comisionPlataforma; }
+    
+    public BigDecimal getPorcentajeComision() { return porcentajeComision; }
+    public void setPorcentajeComision(BigDecimal porcentajeComision) { this.porcentajeComision = porcentajeComision; }
+    
+    public BigDecimal getMontoRestaurante() { return montoRestaurante; }
+    public void setMontoRestaurante(BigDecimal montoRestaurante) { this.montoRestaurante = montoRestaurante; }
 }

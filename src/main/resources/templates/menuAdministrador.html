@@ -344,6 +344,13 @@
                         </a>
                     </li>
                     
+                    <!-- Ganancias de la Plataforma -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" onclick="showSection('ganancias')" data-section="ganancias">
+                            <i class="fas fa-hand-holding-usd"></i> Ganancias FooDIx
+                        </a>
+                    </li>
+                    
                     <!-- Configuración - Solo si tiene permiso 'configuracion' -->
                     <li class="nav-item" th:if="${permisosUsuario.contains('configuracion')}">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('configuracion')" data-section="configuracion">
@@ -356,6 +363,130 @@
 
         <!-- Contenido principal -->
         <div class="col-md-9 col-lg-10 main-content">
+            <!-- =====================================================
+                 💰 SECCIÓN GANANCIAS DE LA PLATAFORMA
+                 ===================================================== -->
+            <section id="ganancias-content" class="menu-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-hand-holding-usd"></i> Ganancias de FooDIx</h2>
+                    <p class="text-muted">Sistema de comisiones y ganancias de la plataforma</p>
+                </div>
+
+                <!-- Tarjetas de resumen -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="rounded-circle mx-auto mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-dollar-sign fa-2x text-white"></i>
+                                </div>
+                                <h6 class="text-muted mb-2">Ganancias Totales</h6>
+                                <h3 class="mb-0 text-success" id="gananciasTotales">S/ 0.00</h3>
+                                <small class="text-muted">Acumulado histórico</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="rounded-circle mx-auto mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-calendar-alt fa-2x text-white"></i>
+                                </div>
+                                <h6 class="text-muted mb-2">Ganancias del Mes</h6>
+                                <h3 class="mb-0 text-primary" id="gananciasMes">S/ 0.00</h3>
+                                <small class="text-muted" id="mesActual">Mes actual</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="rounded-circle mx-auto mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-calendar-day fa-2x text-white"></i>
+                                </div>
+                                <h6 class="text-muted mb-2">Ganancias de Hoy</h6>
+                                <h3 class="mb-0 text-danger" id="gananciasHoy">S/ 0.00</h3>
+                                <small class="text-muted">Ganancias diarias</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="rounded-circle mx-auto mb-3" style="width: 70px; height: 70px; background: linear-gradient(135deg, #ffa751 0%, #ffe259 100%); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-percentage fa-2x text-white"></i>
+                                </div>
+                                <h6 class="text-muted mb-2">Comisión Actual</h6>
+                                <h3 class="mb-0 text-warning" id="porcentajeComision">5.00%</h3>
+                                <button class="btn btn-sm btn-outline-warning mt-2" data-bs-toggle="modal" data-bs-target="#configComisionModal">
+                                    <i class="fas fa-cog"></i> Configurar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-info-circle text-info"></i> Información del Sistema de Comisiones
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2"><i class="fas fa-check text-success"></i> Las comisiones se calculan sobre el subtotal (sin delivery)</li>
+                                            <li class="mb-2"><i class="fas fa-check text-success"></i> Se registran automáticamente en cada pedido</li>
+                                            <li class="mb-2"><i class="fas fa-check text-success"></i> El porcentaje es configurable desde el panel</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert alert-light border-start border-primary border-4 mb-0">
+                                            <h6 class="alert-heading"><i class="fas fa-calculator"></i> Ejemplo de Cálculo:</h6>
+                                            <p class="mb-1">• Subtotal pedido: <strong>S/ 100.00</strong></p>
+                                            <p class="mb-1">• Comisión (5%): <strong class="text-success">S/ 5.00</strong> (FooDIx)</p>
+                                            <p class="mb-0">• Monto restaurante: <strong>S/ 95.00</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de historial -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-history"></i> Historial de Ganancias</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="tablaGanancias">
+                                <thead>
+                                    <tr>
+                                        <th>Pedido #</th>
+                                        <th>Fecha</th>
+                                        <th>Subtotal</th>
+                                        <th>Comisión (%)</th>
+                                        <th>Ganancia FooDIx</th>
+                                        <th>Monto Restaurante</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historialGanancias">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            <i class="fas fa-spinner fa-spin"></i> Cargando datos...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Sección Usuarios/Clientes - Solo si tiene permiso -->
             <section id="usuarios-content" class="menu-section">
                 <div class="section-header">
@@ -2988,6 +3119,270 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+</script>
+
+<!-- =====================================================
+     💰 MODAL: CONFIGURAR COMISIÓN
+     ===================================================== -->
+<div class="modal fade" id="configComisionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-cog"></i> Configurar Comisión de la Plataforma
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> La comisión se aplica sobre el subtotal de cada pedido (sin incluir el costo de delivery)
+                </div>
+                
+                <div class="mb-3">
+                    <label for="nuevoPorcentaje" class="form-label">
+                        <i class="fas fa-percentage"></i> Porcentaje de Comisión
+                    </label>
+                    <div class="input-group">
+                        <input type="number" 
+                               class="form-control" 
+                               id="nuevoPorcentaje" 
+                               min="0" 
+                               max="100" 
+                               step="0.01" 
+                               value="5.00"
+                               placeholder="Ej: 5.00">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <small class="text-muted">Ingrese un valor entre 0 y 100</small>
+                </div>
+                
+                <div class="card bg-light border-0">
+                    <div class="card-body">
+                        <h6><i class="fas fa-calculator"></i> Simulación:</h6>
+                        <p class="mb-1">Con un subtotal de <strong>S/ 100.00</strong>:</p>
+                        <ul class="list-unstyled mb-0">
+                            <li>• Comisión FooDIx: <strong class="text-success" id="simulacionComision">S/ 5.00</strong></li>
+                            <li>• Monto restaurante: <strong id="simulacionRestaurante">S/ 95.00</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-warning" onclick="actualizarComision()">
+                    <i class="fas fa-save"></i> Guardar Configuración
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================
+     💰 SCRIPT: GANANCIAS
+     ===================================================== -->
+<script>
+// Bandera para cargar datos solo una vez
+let gananciasYaCargadas = false;
+
+// Cargar datos de ganancias al mostrar la sección
+document.addEventListener('DOMContentLoaded', function() {
+    // Interceptar cambio a sección de ganancias
+    const originalShowSection = window.showSection;
+    window.showSection = function(sectionName) {
+        originalShowSection(sectionName);
+        
+        if (sectionName === 'ganancias' && !gananciasYaCargadas) {
+            cargarResumenGanancias();
+            cargarHistorialGanancias();
+            gananciasYaCargadas = true;
+        }
+    };
+    
+    // Simulación en tiempo real al cambiar porcentaje
+    const inputPorcentaje = document.getElementById('nuevoPorcentaje');
+    if (inputPorcentaje) {
+        inputPorcentaje.addEventListener('input', function() {
+            const porcentaje = parseFloat(this.value) || 0;
+            const subtotal = 100;
+            const comision = subtotal * (porcentaje / 100);
+            const montoRestaurante = subtotal - comision;
+            
+            document.getElementById('simulacionComision').textContent = 'S/ ' + comision.toFixed(2);
+            document.getElementById('simulacionRestaurante').textContent = 'S/ ' + montoRestaurante.toFixed(2);
+        });
+    }
+});
+
+/**
+ * Obtener token JWT del localStorage
+ */
+function getAuthToken() {
+    return localStorage.getItem('jwtToken') || '';
+}
+
+/**
+ * Cargar resumen de ganancias
+ */
+function cargarResumenGanancias() {
+    // Mostrar indicador de carga
+    document.getElementById('gananciasTotales').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    document.getElementById('gananciasMes').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    document.getElementById('gananciasHoy').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    document.getElementById('porcentajeComision').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    fetch('/menuAdministrador/api/ganancias/resumen', {
+        headers: {
+            'Authorization': 'Bearer ' + getAuthToken()
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('gananciasTotales').textContent = 'S/ ' + parseFloat(data.gananciasTotales).toFixed(2);
+                document.getElementById('gananciasMes').textContent = 'S/ ' + parseFloat(data.gananciasMes).toFixed(2);
+                document.getElementById('gananciasHoy').textContent = 'S/ ' + parseFloat(data.gananciasHoy).toFixed(2);
+                document.getElementById('porcentajeComision').textContent = parseFloat(data.porcentajeComision).toFixed(2) + '%';
+                document.getElementById('nuevoPorcentaje').value = parseFloat(data.porcentajeComision).toFixed(2);
+                
+                // Actualizar mes actual
+                const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                const mesActual = meses[new Date().getMonth()];
+                document.getElementById('mesActual').textContent = mesActual + ' ' + new Date().getFullYear();
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando resumen:', error);
+            document.getElementById('gananciasTotales').textContent = 'Error';
+            document.getElementById('gananciasMes').textContent = 'Error';
+            document.getElementById('gananciasHoy').textContent = 'Error';
+            document.getElementById('porcentajeComision').textContent = 'Error';
+        });
+}
+
+/**
+ * Cargar historial de ganancias
+ */
+function cargarHistorialGanancias() {
+    const tbody = document.getElementById('historialGanancias');
+    
+    // Mostrar mensaje de carga
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="6" class="text-center">
+                <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                <p class="mt-2 mb-0">Cargando historial...</p>
+            </td>
+        </tr>
+    `;
+    
+    fetch('/menuAdministrador/api/ganancias/historial', {
+        headers: {
+            'Authorization': 'Bearer ' + getAuthToken()
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.ganancias) {
+                if (data.ganancias.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                <i class="fas fa-inbox"></i> No hay registros de ganancias aún
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = data.ganancias.map(g => {
+                    const fecha = new Date(g.fechaRegistro);
+                    const fechaFormateada = fecha.toLocaleDateString('es-PE', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    return `
+                        <tr>
+                            <td><strong>#${g.codigoPedido}</strong></td>
+                            <td>${fechaFormateada}</td>
+                            <td>S/ ${parseFloat(g.subtotal).toFixed(2)}</td>
+                            <td><span class="badge bg-warning">${parseFloat(g.porcentajeAplicado).toFixed(2)}%</span></td>
+                            <td><strong class="text-success">S/ ${parseFloat(g.comision).toFixed(2)}</strong></td>
+                            <td>S/ ${parseFloat(g.montoRestaurante).toFixed(2)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando historial:', error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Error al cargar datos
+                    </td>
+                </tr>
+            `;
+        });
+}
+
+/**
+ * Actualizar comisión
+ */
+function actualizarComision() {
+    const porcentaje = parseFloat(document.getElementById('nuevoPorcentaje').value);
+    
+    if (isNaN(porcentaje) || porcentaje < 0 || porcentaje > 100) {
+        alert('El porcentaje debe estar entre 0 y 100');
+        return;
+    }
+    
+    if (!confirm(`¿Está seguro de cambiar la comisión a ${porcentaje.toFixed(2)}%?\n\nEsto afectará a todos los pedidos nuevos.`)) {
+        return;
+    }
+    
+    const btn = event.target;
+    const textoOriginal = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    
+    fetch('/menuAdministrador/api/ganancias/actualizar-comision?porcentaje=' + porcentaje, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + getAuthToken()
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = textoOriginal;
+            
+            if (data.success) {
+                alert('✅ Comisión actualizada correctamente');
+                
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('configComisionModal'));
+                modal.hide();
+                
+                // Recargar datos
+                cargarResumenGanancias();
+            } else {
+                alert('❌ ' + (data.message || 'Error al actualizar comisión'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            btn.disabled = false;
+            btn.innerHTML = textoOriginal;
+            alert('❌ Error de conexión');
+        });
+}
 </script>
 
 <!-- JWT Helper para cerrar sesión -->

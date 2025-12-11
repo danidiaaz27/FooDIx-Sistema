@@ -6,12 +6,16 @@ import com.example.SistemaDePromociones.model.Usuario;
 import com.example.SistemaDePromociones.model.Repartidor;
 import com.example.SistemaDePromociones.model.Rol;
 import com.example.SistemaDePromociones.model.Permiso;
+import com.example.SistemaDePromociones.model.ConfiguracionComision;
+import com.example.SistemaDePromociones.model.GananciaPlataforma;
 import com.example.SistemaDePromociones.repository.CategoriaRepository;
 import com.example.SistemaDePromociones.repository.RestauranteRepository;
 import com.example.SistemaDePromociones.repository.UsuarioRepository;
 import com.example.SistemaDePromociones.repository.RepartidorRepository;
 import com.example.SistemaDePromociones.repository.RolRepository;
 import com.example.SistemaDePromociones.repository.PermisoRepository;
+import com.example.SistemaDePromociones.repository.ConfiguracionComisionRepository;
+import com.example.SistemaDePromociones.repository.GananciaPlataformaRepository;
 import com.example.SistemaDePromociones.service.EmailService;
 import com.example.SistemaDePromociones.service.FileStorageService;
 import com.example.SistemaDePromociones.repository.jdbc.RestauranteJdbcRepository;
@@ -74,6 +78,12 @@ public class AdminController {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    
+    @Autowired
+    private ConfiguracionComisionRepository configuracionComisionRepository;
+    
+    @Autowired
+    private GananciaPlataformaRepository gananciaPlataformaRepository;
     
     /**
      * Mostrar el menú de administrador
@@ -1227,6 +1237,153 @@ public class AdminController {
             e.printStackTrace();
             response.put("success", false);
             response.put("message", "Error al subir documentos: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    // =====================================================
+    // 💰 ENDPOINTS DE GANANCIAS DE LA PLATAFORMA
+    // =====================================================
+    
+    /**
+     * Obtener resumen de ganancias
+     */
+    @GetMapping("/api/ganancias/resumen")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> obtenerResumenGanancias() {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Ganancias totales
+            java.math.BigDecimal gananciasTotales = gananciaPlataformaRepository.calcularGananciasTotales();
+            
+            // Ganancias del mes actual
+            LocalDateTime inicioMes = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime finMes = LocalDateTime.now().withDayOfMonth(LocalDateTime.now().toLocalDate().lengthOfMonth()).withHour(23).withMinute(59).withSecond(59);
+            java.math.BigDecimal gananciasMes = gananciaPlataformaRepository.calcularGananciasPorPeriodo(inicioMes, finMes);
+            
+            // Ganancias de hoy
+            LocalDateTime inicioHoy = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime finHoy = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
+            java.math.BigDecimal gananciasHoy = gananciaPlataformaRepository.calcularGananciasPorPeriodo(inicioHoy, finHoy);
+            
+            // Pedidos procesados
+            Long pedidosProcesados = gananciaPlataformaRepository.contarPedidosProcesados();
+            
+            // Porcentaje de comisión actual
+            java.math.BigDecimal porcentajeActual = configuracionComisionRepository
+                .findFirstByEstadoTrueOrderByFechaVigenciaDesc()
+                .map(ConfiguracionComision::getPorcentajeComision)
+                .orElse(new java.math.BigDecimal("5.00"));
+            
+            response.put("success", true);
+            response.put("gananciasTotales", gananciasTotales);
+            response.put("gananciasMes", gananciasMes);
+            response.put("gananciasHoy", gananciasHoy);
+            response.put("pedidosProcesados", pedidosProcesados);
+            response.put("porcentajeComision", porcentajeActual);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error al obtener resumen: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    /**
+     * Obtener historial de ganancias
+     */
+    @GetMapping("/api/ganancias/historial")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> obtenerHistorialGanancias() {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            List<GananciaPlataforma> ganancias = gananciaPlataformaRepository.findAllByOrderByFechaRegistroDesc();
+            
+            response.put("success", true);
+            response.put("ganancias", ganancias);
+            response.put("total", ganancias.size());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error al obtener historial: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    /**
+     * Obtener ganancias por mes (gráfico)
+     */
+    @GetMapping("/api/ganancias/por-mes")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> obtenerGananciasPorMes() {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            List<Object[]> gananciasPorMes = gananciaPlataformaRepository.obtenerGananciasPorMes();
+            
+            response.put("success", true);
+            response.put("datos", gananciasPorMes);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error al obtener datos: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    /**
+     * Actualizar porcentaje de comisión
+     */
+    @PostMapping("/api/ganancias/actualizar-comision")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> actualizarComision(@RequestParam java.math.BigDecimal porcentaje) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Validar porcentaje
+            if (porcentaje.compareTo(java.math.BigDecimal.ZERO) <= 0 || 
+                porcentaje.compareTo(new java.math.BigDecimal("100")) > 0) {
+                response.put("success", false);
+                response.put("message", "El porcentaje debe estar entre 0 y 100");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Desactivar configuraciones anteriores
+            configuracionComisionRepository.findAll().forEach(config -> {
+                config.setEstado(false);
+                configuracionComisionRepository.save(config);
+            });
+            
+            // Crear nueva configuración
+            ConfiguracionComision nuevaConfig = new ConfiguracionComision();
+            nuevaConfig.setPorcentajeComision(porcentaje);
+            nuevaConfig.setDescripcion("Comisión actualizada desde panel de administración");
+            nuevaConfig.setFechaVigencia(LocalDate.now());
+            nuevaConfig.setEstado(true);
+            
+            configuracionComisionRepository.save(nuevaConfig);
+            
+            response.put("success", true);
+            response.put("message", "Comisión actualizada a " + porcentaje + "%");
+            response.put("porcentaje", porcentaje);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error al actualizar comisión: " + e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
     }

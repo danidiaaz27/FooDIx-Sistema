@@ -5,9 +5,13 @@ import com.example.SistemaDePromociones.model.CarritoItem;
 import com.example.SistemaDePromociones.model.Pedido;
 import com.example.SistemaDePromociones.model.DetallePedido;
 import com.example.SistemaDePromociones.model.Promocion;
+import com.example.SistemaDePromociones.model.ConfiguracionComision;
+import com.example.SistemaDePromociones.model.GananciaPlataforma;
 import com.example.SistemaDePromociones.repository.PedidoRepository;
 import com.example.SistemaDePromociones.repository.DetallePedidoRepository;
 import com.example.SistemaDePromociones.repository.PromocionRepository;
+import com.example.SistemaDePromociones.repository.ConfiguracionComisionRepository;
+import com.example.SistemaDePromociones.repository.GananciaPlataformaRepository;
 import com.example.SistemaDePromociones.service.CarritoService;
 import com.example.SistemaDePromociones.security.CustomUserDetails;
 import jakarta.servlet.http.HttpSession;
@@ -17,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +46,12 @@ public class CarritoController {
     
     @Autowired
     private DetallePedidoRepository detallePedidoRepository;
+    
+    @Autowired
+    private ConfiguracionComisionRepository configuracionComisionRepository;
+    
+    @Autowired
+    private GananciaPlataformaRepository gananciaPlataformaRepository;
     
     /**
      * Obtener resumen del carrito
@@ -198,6 +209,32 @@ public class CarritoController {
             
             // Calcular totales
             Map<String, Object> totales = carritoService.calcularTotales(session);
+            BigDecimal subtotal = BigDecimal.valueOf((Double) totales.get("subtotal"));
+            BigDecimal costoDelivery = BigDecimal.valueOf((Double) totales.get("costoDelivery"));
+            
+            // ============================================
+            // 💰 CALCULAR COMISIÓN DE LA PLATAFORMA
+            // ============================================
+            // Obtener porcentaje de comisión configurado (default 5%)
+            BigDecimal porcentajeComision = configuracionComisionRepository
+                .findFirstByEstadoTrueOrderByFechaVigenciaDesc()
+                .map(ConfiguracionComision::getPorcentajeComision)
+                .orElse(new BigDecimal("5.00"));
+            
+            // Calcular comisión sobre el subtotal (sin incluir delivery)
+            BigDecimal comision = subtotal
+                .multiply(porcentajeComision)
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            
+            // Calcular monto que recibe el restaurante
+            BigDecimal montoRestaurante = subtotal.subtract(comision);
+            
+            BigDecimal total = subtotal.add(costoDelivery);
+            
+            System.out.println("💰 [COMISIÓN] Subtotal: S/ " + subtotal);
+            System.out.println("💰 [COMISIÓN] Comisión FooDIx (" + porcentajeComision + "%): S/ " + comision);
+            System.out.println("💰 [COMISIÓN] Monto Restaurante: S/ " + montoRestaurante);
+            System.out.println("💰 [COMISIÓN] Total pedido: S/ " + total);
             
             // Crear pedido
             Pedido pedido = new Pedido();
@@ -205,10 +242,16 @@ public class CarritoController {
             pedido.setCodigoRestaurante(items.get(0).getCodigoRestaurante()); // Todos del mismo restaurante
             // pedido.setNumeroPedido(generarNumeroPedido()); // Campo no existe en BD
             pedido.setCodigoVerificacion(generarCodigoVerificacion());
-            pedido.setSubtotal(BigDecimal.valueOf((Double) totales.get("subtotal")));
+            pedido.setSubtotal(subtotal);
             pedido.setDescuento(BigDecimal.ZERO); // Sin descuento por ahora
-            pedido.setCostoDelivery(BigDecimal.valueOf((Double) totales.get("costoDelivery")));
-            pedido.setTotal(BigDecimal.valueOf((Double) totales.get("total")));
+            pedido.setCostoDelivery(costoDelivery);
+            pedido.setTotal(total);
+            
+            // ⚡ NUEVOS CAMPOS DE COMISIÓN
+            pedido.setComisionPlataforma(comision);
+            pedido.setPorcentajeComision(porcentajeComision);
+            pedido.setMontoRestaurante(montoRestaurante);
+            
             pedido.setCodigoMetodoPago(obtenerCodigoMetodoPago(pedidoRequest.getMetodoPago()));
             pedido.setDireccionEntrega(pedidoRequest.getDireccionEntrega());
             pedido.setReferenciaDireccion(pedidoRequest.getReferencia());
@@ -220,6 +263,21 @@ public class CarritoController {
             pedido.setVerificado(false);
             
             Pedido pedidoGuardado = pedidoRepository.save(pedido);
+            
+            // ============================================
+            // 📊 REGISTRAR GANANCIA DE LA PLATAFORMA
+            // ============================================
+            GananciaPlataforma ganancia = new GananciaPlataforma();
+            ganancia.setCodigoPedido(pedidoGuardado.getCodigo());
+            ganancia.setSubtotal(subtotal);
+            ganancia.setComision(comision);
+            ganancia.setPorcentajeAplicado(porcentajeComision);
+            ganancia.setMontoRestaurante(montoRestaurante);
+            ganancia.setFechaRegistro(LocalDateTime.now());
+            
+            gananciaPlataformaRepository.save(ganancia);
+            
+            System.out.println("✅ [GANANCIA] Registrada para pedido #" + pedidoGuardado.getCodigo());
             
             // Crear detalles del pedido y actualizar stock
             for (CarritoItem item : items) {

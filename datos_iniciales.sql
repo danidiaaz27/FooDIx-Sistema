@@ -857,9 +857,77 @@ INSERT INTO `pedido` (
   35.90
 );
 
+-- =====================================================
+-- SISTEMA DE COMISIONES DE LA PLATAFORMA
+-- =====================================================
+
+-- Tabla de configuración de comisión
+DROP TABLE IF EXISTS `configuracion_comision`;
+CREATE TABLE `configuracion_comision` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `porcentaje_comision` decimal(5,2) NOT NULL DEFAULT 5.00 COMMENT 'Porcentaje de comisión (ej: 5.00 = 5%)',
+  `descripcion` varchar(255) DEFAULT NULL,
+  `fecha_vigencia` date NOT NULL,
+  `estado` BOOLEAN NOT NULL DEFAULT TRUE,
+  `fecha_creacion` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`codigo`),
+  KEY `IDX_estado_vigencia` (`estado`, `fecha_vigencia`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuración de comisiones de la plataforma';
+
+-- Insertar comisión por defecto del 5%
+INSERT INTO `configuracion_comision` (`porcentaje_comision`, `descripcion`, `fecha_vigencia`, `estado`) 
+VALUES (5.00, 'Comisión estándar de la plataforma FooDIx', CURDATE(), TRUE);
+
+-- Tabla de registro de ganancias de la plataforma
+DROP TABLE IF EXISTS `ganancia_plataforma`;
+CREATE TABLE `ganancia_plataforma` (
+  `codigo` bigint NOT NULL AUTO_INCREMENT,
+  `codigo_pedido` bigint NOT NULL,
+  `fecha_registro` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `subtotal` decimal(10,2) NOT NULL COMMENT 'Subtotal del pedido (sin delivery)',
+  `comision` decimal(10,2) NOT NULL COMMENT 'Comisión calculada para FooDIx',
+  `porcentaje_aplicado` decimal(5,2) NOT NULL COMMENT 'Porcentaje que se aplicó al momento del pedido',
+  `monto_restaurante` decimal(10,2) NOT NULL COMMENT 'Monto que recibe el restaurante',
+  PRIMARY KEY (`codigo`),
+  KEY `FK_ganancia_pedido` (`codigo_pedido`),
+  KEY `IDX_fecha_registro` (`fecha_registro`),
+  CONSTRAINT `FK_ganancia_pedido` FOREIGN KEY (`codigo_pedido`) REFERENCES `pedido` (`codigo`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de ganancias de FooDIx por cada pedido';
+
+-- Agregar campos de comisión a la tabla pedido
+ALTER TABLE pedido 
+ADD COLUMN comision_plataforma DECIMAL(10,2) DEFAULT 0.00 COMMENT 'Comisión que se lleva FooDIx',
+ADD COLUMN porcentaje_comision DECIMAL(5,2) DEFAULT 5.00 COMMENT 'Porcentaje aplicado de comisión',
+ADD COLUMN monto_restaurante DECIMAL(10,2) DEFAULT 0.00 COMMENT 'Monto que recibe el restaurante (subtotal - comisión)';
+
+-- Crear índices para optimizar consultas de ganancias
+CREATE INDEX idx_pedido_comision ON pedido(comision_plataforma);
+CREATE INDEX idx_pedido_fecha_estado ON pedido(fecha_pedido, estado);
+
+-- Actualizar pedidos existentes con los cálculos de comisión
+UPDATE pedido 
+SET 
+  porcentaje_comision = 5.00,
+  comision_plataforma = ROUND(subtotal * 0.05, 2),
+  monto_restaurante = ROUND(subtotal - (subtotal * 0.05), 2)
+WHERE comision_plataforma IS NULL OR comision_plataforma = 0.00;
+
+-- Insertar registros de ganancias para pedidos existentes
+INSERT INTO ganancia_plataforma (codigo_pedido, fecha_registro, subtotal, comision, porcentaje_aplicado, monto_restaurante)
+SELECT 
+  codigo,
+  fecha_pedido,
+  subtotal,
+  ROUND(subtotal * 0.05, 2) as comision,
+  5.00 as porcentaje_aplicado,
+  ROUND(subtotal - (subtotal * 0.05), 2) as monto_restaurante
+FROM pedido
+WHERE estado = TRUE;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =====================================================
 -- FIN DEL SCRIPT DE INICIALIZACIÓN
 -- ✅ Base de datos FooDix configurada completamente
+-- ✅ Sistema de comisiones implementado
 -- =====================================================

@@ -65,11 +65,13 @@ public class SecurityConfig {
                     "/contacto",                // Página de contacto
                     "/tutorial",                // Tutorial
                     "/api/**",                  // ✅ TODAS las APIs públicas (roles, provincias, distritos, validación, etc.)
+                    "/menuAdministrador/api/ganancias/**", // ✅ TEMPORAL: API de ganancias sin autenticación para debug
                     "/menuAdministrador/test-password",  // Test de passwords
                     "/css/**",                  // Recursos estáticos CSS
                     "/js/**",                   // Recursos estáticos JS
                     "/img/**",                  // Imágenes
                     "/images/**",               // Imágenes alternativo
+                    "/favicon.ico",             // ✅ Icono del sitio web
                     "/uploads/**",              // ✅ Archivos subidos (documentos, imágenes de promociones)
                     "/files/**"                 // ✅ Controlador de archivos (view/download)
                 ).permitAll()
@@ -82,6 +84,7 @@ public class SecurityConfig {
                 // 3 = REPARTIDOR     → ROLE_DELIVERY
                 // 4 = USUARIO        → ROLE_CUSTOMER
                 // ========================================
+                .requestMatchers("/menuAdministrador/api/ganancias/**").hasRole("ADMIN") // ✅ API de ganancias
                 .requestMatchers("/menuAdministrador/**").hasRole("ADMIN")
                 .requestMatchers("/menuRestaurante/**").hasRole("RESTAURANT")
                 .requestMatchers("/menuDelivery/**").hasRole("DELIVERY")
