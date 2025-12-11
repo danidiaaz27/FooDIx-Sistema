@@ -46,9 +46,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =============================================
     // MOSTRAR MODAL INFORMATIVO AL CARGAR LA PÁGINA
+    // (Solo si no es usuario autenticado)
     // =============================================
-    const modalInfoRepartidor = new bootstrap.Modal(document.getElementById('modalInfoRepartidor'));
-    modalInfoRepartidor.show();
+    if (!window.usuarioAutenticado) {
+        const modalInfoRepartidor = new bootstrap.Modal(document.getElementById('modalInfoRepartidor'));
+        modalInfoRepartidor.show();
+    }
     
     // =============================================
     // FUNCIÓN PARA MOSTRAR NOTIFICACIONES COMO MODALES

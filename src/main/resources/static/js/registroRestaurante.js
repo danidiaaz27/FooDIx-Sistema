@@ -46,9 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =============================================
     // MOSTRAR MODAL INFORMATIVO AL CARGAR LA PÁGINA
+    // Solo para usuarios nuevos, no para usuarios autenticados
     // =============================================
-    const modalInfoRestaurante = new bootstrap.Modal(document.getElementById('modalInfoRestaurante'));
-    modalInfoRestaurante.show();
+    if (!window.usuarioAutenticado) {
+        const modalInfoRestaurante = new bootstrap.Modal(document.getElementById('modalInfoRestaurante'));
+        modalInfoRestaurante.show();
+    } else {
+        console.log('👤 [USUARIO AUTENTICADO] No se muestra modal informativo');
+    }
     
     // =============================================
     // FUNCIÓN PARA MOSTRAR NOTIFICACIONES COMO MODALES
@@ -127,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =============================================
     // SI VIENE DEL SERVIDOR (PASO 2), MOSTRAR EL FORMULARIO CORRESPONDIENTE
+    // Incluye soporte para usuarios autenticados que van directo al Paso 2
     // =============================================
     if (pasoInicial && pasoInicial === 'restaurante') {
         console.log('🏪 [PASO 2] Mostrando formulario de restaurante');
@@ -141,6 +147,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (rolInput) rolInput.value = '2';
+        
+        // Ocultar modal informativo para usuarios autenticados
+        // ya que ellos van directo al formulario de restaurante
+        const usuarioAutenticadoFlag = document.querySelector('[data-usuario-autenticado]');
+        if (usuarioAutenticadoFlag && usuarioAutenticadoFlag.dataset.usuarioAutenticado === 'true') {
+            console.log('👤 [USUARIO AUTENTICADO] Ocultando modal informativo');
+            // No mostrar el modal, el usuario ya conoce el sistema
+        }
     }
     
     // =============================================

@@ -319,7 +319,7 @@
                     <!-- Gestion de Clientes - Solo si tiene permiso 'clientes' -->
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" onclick="showSection('usuarios')" data-section="usuarios">
-                            <i class="fas fa-users"></i> Gestión de Clientes
+                            <i class="fas fa-users"></i> Clientes
                         </a>
                     </li>
                     
@@ -684,9 +684,9 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <div class="btn-group" role="group">
+                                            <div class="btn-group" role="group" aria-label="Acciones de restaurante">
                                                 <!-- Botón Ver Detalles -->
-                                                <button type="button" class="btn btn-sm btn-info" 
+                                                <button type="button" class="btn btn-sm btn-info btn-toggle" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#viewRestaurantModal"
                                                         th:data-id="${restaurant.codigo}"
@@ -696,27 +696,27 @@
                                                         th:data-email="${restaurant.correoElectronico}"
                                                         th:data-telefono="${restaurant.telefono}"
                                                         th:data-direccion="${restaurant.direccion}"
-                                                        title="Ver Detalles y Documentos">
-                                                    <i class="fas fa-eye"></i> Ver
+                                                        title="Ver detalles y documentos">
+                                                    <i class="fas fa-eye"></i>
                                                 </button>
 
                                                 <!-- Botón Aprobar -->
-                                                <button type="button" class="btn btn-sm btn-success" 
+                                                <button type="button" class="btn btn-sm btn-success btn-toggle" 
                                                         onclick="aprobarRestaurante(this)"
                                                         th:data-id="${restaurant.codigo}"
                                                         th:data-nombre="${restaurant.nombre}"
-                                                        title="Aprobar Restaurante">
-                                                    <i class="fas fa-check"></i> Aprobar
+                                                        title="Aprobar restaurante">
+                                                    <i class="fas fa-check"></i>
                                                 </button>
                                                 
                                                 <!-- Botón Rechazar -->
-                                                <button type="button" class="btn btn-sm btn-danger" 
+                                                <button type="button" class="btn btn-sm btn-danger btn-toggle" 
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#rejectRestaurantModal"
                                                         th:data-id="${restaurant.codigo}"
                                                         th:data-nombre="${restaurant.nombre}"
-                                                        title="Rechazar Restaurante">
-                                                    <i class="fas fa-times"></i> Rechazar
+                                                        title="Rechazar restaurante">
+                                                    <i class="fas fa-times"></i>
                                                 </button>
                                             </div>
                                         </td>
