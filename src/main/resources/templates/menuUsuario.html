@@ -1272,22 +1272,6 @@ function mostrarDatosPromocionEnModal(promocion, codigoPromocion) {
     document.getElementById('modalFechaInicio').textContent = fechaInicio;
     document.getElementById('modalFechaFin').textContent = fechaFin;
     
-    // Restricciones
-    const restricciones = [];
-    if (promocion.cantidadMinima) restricciones.push(`Cantidad mínima: ${promocion.cantidadMinima}`);
-    if (promocion.cantidadMaxima) restricciones.push(`Cantidad máxima: ${promocion.cantidadMaxima}`);
-    if (promocion.limiteCanjeos) restricciones.push(`Límite de canjeos: ${promocion.limiteCanjeos}`);
-    
-    const restriccionesHtml = restricciones.length > 0 
-        ? restricciones.map(r => `<li><i class="fas fa-info-circle text-info"></i> ${r}</li>`).join('')
-        : '<li class="text-muted"><i>Sin restricciones especiales</i></li>';
-    document.getElementById('modalRestricciones').innerHTML = restriccionesHtml;
-    
-    // Métricas
-    document.getElementById('modalVistas').textContent = promocion.contadorVistas || 0;
-    document.getElementById('modalPedidos').textContent = promocion.contadorPedidos || 0;
-    document.getElementById('modalCanjeos').textContent = 0; // Por ahora siempre 0
-    
     // Estado y botón
     const estadoElement = document.getElementById('modalEstado');
     const btnAgregar = document.getElementById('btnAgregarPromocion');
